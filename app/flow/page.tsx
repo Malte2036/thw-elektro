@@ -202,6 +202,7 @@ export default function FlowPage() {
     // Check for circular connection
     if (isCircularConnection(connection, allCableData)) {
       console.log("Circular connection detected");
+      alert("Circular connection detected");
       return;
     }
 
@@ -213,6 +214,14 @@ export default function FlowPage() {
       )
     ) {
       console.log("Edge already exists");
+      alert("Edge already exists");
+      return;
+    }
+
+    // Check if node does not already has an input edge
+    if (edges.find((edge) => edge.target === connection.target)) {
+      console.log("Node already has an input edge");
+      alert("Node already has an input edge");
       return;
     }
 
