@@ -44,7 +44,9 @@ export default function CableEdge(edgeProps: EdgeProps<CableEdgeData>) {
             className="edgebutton bg-white border-black border-2 rounded-md  px-1 py-0.5"
             onClick={() => edgeProps.data?.onClickCallback()}
           >
-            {edgeProps.data?.cable.length}m{" "}
+            {edgeProps.data?.cable.length}m<br />
+            {edgeProps.data?.cable.current}A<br />
+            {edgeProps.data?.cable.voltage}V<br />
             {edgeProps.data?.voltageDrop.toFixed(2)}%
           </button>
         </div>

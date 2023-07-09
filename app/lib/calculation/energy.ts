@@ -1,15 +1,14 @@
 import { Cable } from "../data/Cable";
-import { Consumer } from "../data/Consumer";
 
-export function calculateVoltageDrop(cable: Cable, consumer: Consumer): number {
+export function calculateVoltageDropPercent(
+  cable: Cable,
+  energyConsumption: number
+): number {
   const voltage = cable.voltage;
   const length = cable.length;
-  const powerInWatt = consumer.energyConsumption;
+  const powerInWatt = energyConsumption;
   const resistance = 56;
   const diameter = cable.getDiameter();
-  console.log(
-    `voltage: ${voltage}, length: ${length}, powerInWatt: ${powerInWatt}, resistance: ${resistance}, diameter: ${diameter}`
-  );
 
   if (voltage === 230) {
     return (
@@ -19,13 +18,6 @@ export function calculateVoltageDrop(cable: Cable, consumer: Consumer): number {
     );
   }
   if (voltage === 400) {
-    console.log(
-      `(${length} * ${powerInWatt}) / (${resistance} * ${diameter} * ${Math.pow(
-        voltage,
-        2
-      )})*100})`
-    );
-
     return (
       ((length * powerInWatt) /
         (resistance * diameter * Math.pow(voltage, 2))) *
