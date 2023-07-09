@@ -31,6 +31,38 @@ export function calculateVoltageDropPercent(
   throw new Error("Invalid voltage. Only 230V and 400V are supported.");
 }
 
+export function calculateVoltageDropPercentTraverseSum(
+  allConsumerData: ConsumerData[],
+  allDistributorData: DistributorData[],
+  allCableData: CableData[],
+  allVoltageDrops: Map<string, number>,
+  headCableTarget: string,
+  leafCableSource: string
+): number {
+  if (headCableTarget === leafCableSource) {
+    console.log(allVoltageDrops);
+
+    return allVoltageDrops.get(`${headCableTarget} -> ${leafCableSource}`) ?? 0;
+  }
+
+  const outputEdges = allCableData.filter((c) => c.source === headCableTarget);
+  console.log("output edges found for", headCableTarget, leafCableSource);
+
+  let voltageDropPercentSum = 0;
+  for (const edge of outputEdges) {
+    voltageDropPercentSum += calculateVoltageDropPercentTraverseSum(
+      allConsumerData,
+      allDistributorData,
+      allCableData,
+      allVoltageDrops,
+      edge.target,
+      leafCableSource
+    );
+  }
+
+  return voltageDropPercentSum;
+}
+
 export function isVoltageDropTooHigh(voltageDropPercent: number): boolean {
   return voltageDropPercent > 3;
 }
@@ -47,6 +79,31 @@ export function calculatePowerInWatt(cable: Cable): number {
   }
 
   throw new Error("Invalid voltage. Only 230V and 400V are supported.");
+}
+
+export function getVoltageDropForCableData(
+  allConsumerData: ConsumerData[],
+  allDistributorData: DistributorData[],
+  allEnergyConsumptions: Map<string, number>,
+  headCableData: CableData
+): number {
+  const consumerData = allConsumerData.find(
+    (c) => c.consumer.id === headCableData.target
+  );
+  const distributorData = allDistributorData.find(
+    (d) => d.distributor.id === headCableData.target
+  );
+
+  let energyConsumption = 0;
+
+  if (consumerData !== undefined) {
+    energyConsumption = consumerData.consumer.energyConsumption;
+  } else if (distributorData !== undefined) {
+    energyConsumption =
+      allEnergyConsumptions.get(distributorData.distributor.id) ?? 0;
+  }
+
+  return calculateVoltageDropPercent(headCableData.cable, energyConsumption);
 }
 
 export function getRecursiveEnergyConsumption(
