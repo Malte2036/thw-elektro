@@ -6,7 +6,12 @@ import {
 } from "reactflow";
 import { Cable } from "../lib/data/Cable";
 
-export default function CableEdge(edgeProps: EdgeProps<Cable>) {
+export type CableEdgeData = {
+  cable: Cable;
+  onClickCallback: () => void;
+};
+
+export default function CableEdge(edgeProps: EdgeProps<CableEdgeData>) {
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX: edgeProps.sourceX,
     sourceY: edgeProps.sourceY,
@@ -36,9 +41,9 @@ export default function CableEdge(edgeProps: EdgeProps<Cable>) {
         >
           <button
             className="edgebutton"
-            onClick={(event) => console.log(event)}
+            onClick={(event) => edgeProps.data?.onClickCallback()}
           >
-            {edgeProps.data?.length}m
+            {edgeProps.data?.cable.length}m
           </button>
         </div>
       </EdgeLabelRenderer>

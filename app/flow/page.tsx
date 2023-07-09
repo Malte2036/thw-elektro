@@ -8,8 +8,9 @@ import { Consumer } from "../lib/data/Consumer";
 import { ConsumerNode } from "./ConsumerNode";
 import { ProducerNode } from "./ProducerNode";
 import { Producer } from "../lib/data/Producer";
-import CableEdge from "./CableEdge";
-import { Cable } from "../lib/data/Cable";
+import CableEdge, { CableEdgeData } from "./CableEdge";
+import { Cable, getNextCableLength } from "../lib/data/Cable";
+import { Position, getRandomPosition } from "../lib/Position";
 
 export default function FlowPage() {
   const nodeTypes = useMemo(
@@ -18,42 +19,75 @@ export default function FlowPage() {
   );
   const edgeTypes = useMemo(() => ({ cableEdge: CableEdge }), []);
 
-  const [consumers] = useState([new Consumer("1", 5), new Consumer("2", 6.3)]);
-  const [producer] = useState(new Producer("SEA", 54));
-  const [cables] = useState<Cable[]>([new Cable("cable-1", 50)]);
+  const [consumers] = useState<{ consumer: Consumer; position: Position }[]>([
+    {
+      consumer: new Consumer("1", 5),
+      position: getRandomPosition(),
+    },
+    {
+      consumer: new Consumer("2", 6.3),
+      position: getRandomPosition(),
+    },
+  ]);
+  const [producer] = useState<{ producer: Producer; position: Position }>({
+    producer: new Producer("SEA", 54),
+    position: getRandomPosition(),
+  });
+  const [cables, setCables] = useState<
+    { cable: Cable; source: string; target: string }[]
+  >([]);
 
   var [nodes, setNodes] = useState<ReactFlow.Node<any, string>[]>();
 
-  const [edges, setEdges] = useState<ReactFlow.Edge<Cable>[]>();
+  const [edges, setEdges] = useState<ReactFlow.Edge<CableEdgeData>[]>([]);
 
   function updateNodes() {
     setNodes([
       {
-        id: producer.id,
+        id: producer.producer.id,
         type: "producerNode",
-        position: { x: Math.random() * 1000, y: Math.random() * 1000 },
+        position: producer.position,
         data: { producer: producer },
+        draggable: true,
       },
       ...consumers.map((consumer) => {
         return {
-          id: consumer.id,
+          id: consumer.consumer.id,
           type: "consumerNode",
-          position: { x: Math.random() * 1000, y: Math.random() * 1000 },
-          data: { consumer: consumer },
+          position: consumer.position,
+          data: { consumer: consumer.consumer },
+          draggable: true,
         };
       }),
     ]);
     setEdges(
       cables.map((cable) => {
         return {
-          id: cable.id,
-          source: producer.id,
+          id: cable.cable.id,
+          source: cable.source,
           sourceHandle: "output",
-          target: consumers[0].id,
+          target: cable.target,
           targetHandle: "input",
           animated: true,
           type: "cableEdge",
-          data: cable,
+          data: {
+            cable: cable.cable,
+            onClickCallback: () => {
+              setCables((state) =>
+                state.map((stateCable) =>
+                  stateCable.cable.id === cable.cable.id
+                    ? {
+                        ...cable,
+                        cable: {
+                          ...cable.cable,
+                          length: getNextCableLength(cable.cable.length),
+                        },
+                      }
+                    : cable
+                )
+              );
+            },
+          },
         };
       })
     );
@@ -61,7 +95,21 @@ export default function FlowPage() {
 
   useEffect(() => {
     updateNodes();
-  }, [consumers]);
+  }, [consumers, cables]);
+
+  function onConnect(connection: ReactFlow.Connection) {
+    console.log("onConnect");
+    if (!connection.source || !connection.target) return;
+
+    setCables([
+      ...cables,
+      {
+        cable: new Cable("cable-" + cables.length, 50),
+        source: connection.source,
+        target: connection.target,
+      },
+    ]);
+  }
 
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
@@ -70,6 +118,7 @@ export default function FlowPage() {
         nodes={nodes}
         edgeTypes={edgeTypes}
         edges={edges}
+        onConnect={onConnect}
       >
         <ReactFlow.Background />
         <ReactFlow.Controls />
