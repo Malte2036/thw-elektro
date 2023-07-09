@@ -5,6 +5,7 @@ import {
   getBezierPath,
 } from "reactflow";
 import { Cable } from "../lib/data/Cable";
+import { isVoltageDropTooHigh } from "../lib/calculation/energy";
 
 export type CableEdgeData = {
   cable: Cable;
@@ -41,13 +42,18 @@ export default function CableEdge(edgeProps: EdgeProps<CableEdgeData>) {
           className="nodrag nopan"
         >
           <button
-            className="edgebutton bg-white border-black border-2 rounded-md  px-1 py-0.5"
+            className={`edgebutton bg-white ${
+              isVoltageDropTooHigh(edgeProps.data?.voltageDrop ?? 0)
+                ? "border-red-600 text-red-600 font-bold border-4"
+                : "border-black  border-2"
+            } rounded-md px-1 py-0.5 flex flex-col items-center justify-center`}
             onClick={() => edgeProps.data?.onClickCallback()}
           >
-            {edgeProps.data?.cable.length}m<br />
-            {edgeProps.data?.cable.current}A<br />
-            {edgeProps.data?.cable.voltage}V<br />
-            {edgeProps.data?.voltageDrop.toFixed(2)}%
+            <div>{edgeProps.data?.cable.length}m</div>
+            <div>
+              {edgeProps.data?.cable.current}A/{edgeProps.data?.cable.voltage}V
+            </div>
+            <div>{edgeProps.data?.voltageDrop.toFixed(2)}%</div>
           </button>
         </div>
       </EdgeLabelRenderer>

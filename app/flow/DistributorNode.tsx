@@ -4,11 +4,15 @@ import { Distributor } from "../lib/data/Distributor";
 export function DistributorNode({
   data,
 }: {
-  data: { distributor: Distributor; energyFlow: number };
+  data: { distributor: Distributor; energyFlow: number; hasEnergy: boolean };
 }) {
   return (
     <div>
-      <div className="bg-thw text-white px-6 py-2">
+      <div
+        className={`${
+          data.hasEnergy ? "bg-thw" : "bg-thw-400"
+        } text-white px-6 py-2`}
+      >
         <div className="text-xs">Verteiler:</div>
         {data.energyFlow / 1000}kW
       </div>

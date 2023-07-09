@@ -118,16 +118,22 @@ export default function FlowPage() {
             distributor: distributorData.distributor,
             energyFlow:
               allEnergyConsumptions.get(distributorData.distributor.id) ?? 0,
+            hasEnergy: allEnergyConsumptions.has(
+              distributorData.distributor.id
+            ),
           },
           draggable: true,
         };
       }),
-      ...allConsumerData.map((consumer) => {
+      ...allConsumerData.map((consumerData) => {
         return {
-          id: consumer.consumer.id,
+          id: consumerData.consumer.id,
           type: "consumerNode",
-          position: consumer.position,
-          data: { consumer: consumer.consumer },
+          position: consumerData.position,
+          data: {
+            consumer: consumerData.consumer,
+            hasEnergy: allEnergyConsumptions.has(consumerData.consumer.id),
+          },
           draggable: true,
         };
       }),

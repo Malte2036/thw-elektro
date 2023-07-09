@@ -30,6 +30,10 @@ export function calculateVoltageDropPercent(
   throw new Error("Invalid voltage. Only 230V and 400V are supported.");
 }
 
+export function isVoltageDropTooHigh(voltageDropPercent: number): boolean {
+  return voltageDropPercent > 3;
+}
+
 export function calculatePowerInWatt(cable: Cable): number {
   const voltage = cable.voltage;
   const current = cable.current;
