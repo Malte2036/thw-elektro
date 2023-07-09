@@ -13,6 +13,8 @@ import { Cable, getNextCableLength } from "../lib/data/Cable";
 import { Position, getRandomPosition } from "../lib/Position";
 import { calculateVoltageDrop as calculateVoltageDropPercent } from "../lib/calculation/energy";
 
+type CableData = { cable: Cable; source: string; target: string };
+
 export default function FlowPage() {
   const nodeTypes = useMemo(
     () => ({ consumerNode: ConsumerNode, producerNode: ProducerNode }),
@@ -34,13 +36,19 @@ export default function FlowPage() {
     producer: new Producer("SEA", 54000),
     position: getRandomPosition(),
   });
-  const [cables, setCables] = useState<
-    { cable: Cable; source: string; target: string }[]
-  >([]);
+  const [allCableData, setAllCableData] = useState<CableData[]>([]);
 
   var [nodes, setNodes] = useState<ReactFlow.Node<any, string>[]>();
 
   const [edges, setEdges] = useState<ReactFlow.Edge<CableEdgeData>[]>([]);
+
+  function getVoltageDropForCableData(cableData: CableData): number {
+    const consumer = consumers.find((c) => c.consumer.id == cableData.target);
+
+    if (consumer == undefined) return 0;
+
+    return calculateVoltageDropPercent(cableData.cable, consumer.consumer);
+  }
 
   function updateNodes() {
     setNodes([
@@ -62,34 +70,35 @@ export default function FlowPage() {
       }),
     ]);
     setEdges(
-      cables.map((cable) => {
+      allCableData.map((cableData) => {
         return {
-          id: cable.cable.id,
-          source: cable.source,
+          id: cableData.cable.id,
+          source: cableData.source,
           sourceHandle: "output",
-          target: cable.target,
+          target: cableData.target,
           targetHandle: "input",
           animated: true,
           type: "cableEdge",
           data: {
-            cable: cable.cable,
+            cable: cableData.cable,
             onClickCallback: () => {
-              setCables((state) => [
+              setAllCableData((state) => [
                 ...state.filter(
-                  (stateCable) => stateCable.cable.id !== cable.cable.id
+                  (stateCable) => stateCable.cable.id !== cableData.cable.id
                 ),
                 {
                   cable: new Cable(
                     "cable-" + Math.floor(Math.random() * 1_000_000),
-                    getNextCableLength(cable.cable.length),
-                    cable.cable.voltage,
-                    cable.cable.current
+                    getNextCableLength(cableData.cable.length),
+                    cableData.cable.voltage,
+                    cableData.cable.current
                   ),
-                  source: cable.source,
-                  target: cable.target,
+                  source: cableData.source,
+                  target: cableData.target,
                 },
               ]);
             },
+            voltageDrop: getVoltageDropForCableData(cableData),
           },
         };
       })
@@ -99,14 +108,14 @@ export default function FlowPage() {
   useEffect(() => {
     updateNodes();
 
-    cables.forEach((cable) => {
+    allCableData.forEach((cableData) => {
       const voltageDrop = calculateVoltageDropPercent(
-        cable.cable,
+        cableData.cable,
         consumers[0].consumer
       );
       console.log(`Voltage drop: ${voltageDrop.toFixed(6)}%`);
     });
-  }, [consumers, cables]);
+  }, [consumers, allCableData]);
 
   function onConnect(connection: ReactFlow.Connection) {
     if (!connection.source || !connection.target) return;
@@ -121,8 +130,8 @@ export default function FlowPage() {
       return;
     }
 
-    setCables([
-      ...cables,
+    setAllCableData([
+      ...allCableData,
       {
         cable: new Cable(
           "cable-" + Math.floor(Math.random() * 1_000_000),

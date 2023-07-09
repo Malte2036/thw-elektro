@@ -8,6 +8,7 @@ import { Cable } from "../lib/data/Cable";
 
 export type CableEdgeData = {
   cable: Cable;
+  voltageDrop: number;
   onClickCallback: () => void;
 };
 
@@ -43,7 +44,8 @@ export default function CableEdge(edgeProps: EdgeProps<CableEdgeData>) {
             className="edgebutton bg-white border-black border-2 rounded-md  px-1 py-0.5"
             onClick={() => edgeProps.data?.onClickCallback()}
           >
-            {edgeProps.data?.cable.length}m
+            {edgeProps.data?.cable.length}m{" "}
+            {edgeProps.data?.voltageDrop.toFixed(2)}%
           </button>
         </div>
       </EdgeLabelRenderer>
