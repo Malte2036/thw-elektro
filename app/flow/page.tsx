@@ -11,6 +11,7 @@ import { Producer } from "../lib/data/Producer";
 import CableEdge, { CableEdgeData } from "./CableEdge";
 import { Cable, getNextCableLength } from "../lib/data/Cable";
 import { Position, getRandomPosition } from "../lib/Position";
+import { calculateVoltageDrop as calculateVoltageDropPercent } from "../lib/calculation/energy";
 
 export default function FlowPage() {
   const nodeTypes = useMemo(
@@ -21,16 +22,16 @@ export default function FlowPage() {
 
   const [consumers] = useState<{ consumer: Consumer; position: Position }[]>([
     {
-      consumer: new Consumer("1", 5),
+      consumer: new Consumer("1", 5000),
       position: getRandomPosition(),
     },
     {
-      consumer: new Consumer("2", 6.3),
+      consumer: new Consumer("2", 6300),
       position: getRandomPosition(),
     },
   ]);
   const [producer] = useState<{ producer: Producer; position: Position }>({
-    producer: new Producer("SEA", 54),
+    producer: new Producer("SEA", 54000),
     position: getRandomPosition(),
   });
   const [cables, setCables] = useState<
@@ -80,7 +81,9 @@ export default function FlowPage() {
                 {
                   cable: new Cable(
                     "cable-" + Math.floor(Math.random() * 1_000_000),
-                    getNextCableLength(cable.cable.length)
+                    getNextCableLength(cable.cable.length),
+                    cable.cable.voltage,
+                    cable.cable.current
                   ),
                   source: cable.source,
                   target: cable.target,
@@ -95,6 +98,14 @@ export default function FlowPage() {
 
   useEffect(() => {
     updateNodes();
+
+    cables.forEach((cable) => {
+      const voltageDrop = calculateVoltageDropPercent(
+        cable.cable,
+        consumers[0].consumer
+      );
+      console.log(`Voltage drop: ${voltageDrop.toFixed(6)}%`);
+    });
   }, [consumers, cables]);
 
   function onConnect(connection: ReactFlow.Connection) {
@@ -113,7 +124,12 @@ export default function FlowPage() {
     setCables([
       ...cables,
       {
-        cable: new Cable("cable-" + Math.floor(Math.random() * 1_000_000), 50),
+        cable: new Cable(
+          "cable-" + Math.floor(Math.random() * 1_000_000),
+          50,
+          400,
+          16
+        ),
         source: connection.source,
         target: connection.target,
       },

@@ -6,7 +6,7 @@ export function ConsumerNode({ data }: { data: { consumer: Consumer } }) {
     <div>
       <div className="bg-thw text-white px-6 py-2">
         <div className="text-xs">Verbraucher:</div>
-        {data.consumer.energyLoad}kW
+        {data.consumer.energyConsumption}kW
       </div>
       <Handle
         type="target"

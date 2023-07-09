@@ -1,9 +1,9 @@
 export class Consumer {
   public readonly id: string;
-  public readonly energyLoad: number;
+  public readonly energyConsumption: number;
 
-  constructor(id: string, energyLoad: number) {
+  constructor(id: string, energyConsumption: number) {
     this.id = id;
-    this.energyLoad = energyLoad;
+    this.energyConsumption = energyConsumption;
   }
 }
