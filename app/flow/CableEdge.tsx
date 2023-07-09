@@ -40,8 +40,8 @@ export default function CableEdge(edgeProps: EdgeProps<CableEdgeData>) {
           className="nodrag nopan"
         >
           <button
-            className="edgebutton"
-            onClick={(event) => edgeProps.data?.onClickCallback()}
+            className="edgebutton bg-white border-black border-2 rounded-md  px-1 py-0.5"
+            onClick={() => edgeProps.data?.onClickCallback()}
           >
             {edgeProps.data?.cable.length}m
           </button>

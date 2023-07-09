@@ -47,7 +47,7 @@ export default function FlowPage() {
         id: producer.producer.id,
         type: "producerNode",
         position: producer.position,
-        data: { producer: producer },
+        data: { producer: producer.producer },
         draggable: true,
       },
       ...consumers.map((consumer) => {
@@ -73,19 +73,19 @@ export default function FlowPage() {
           data: {
             cable: cable.cable,
             onClickCallback: () => {
-              setCables((state) =>
-                state.map((stateCable) =>
-                  stateCable.cable.id === cable.cable.id
-                    ? {
-                        ...cable,
-                        cable: {
-                          ...cable.cable,
-                          length: getNextCableLength(cable.cable.length),
-                        },
-                      }
-                    : cable
-                )
-              );
+              setCables((state) => [
+                ...state.filter(
+                  (stateCable) => stateCable.cable.id !== cable.cable.id
+                ),
+                {
+                  cable: new Cable(
+                    "cable-" + Math.floor(Math.random() * 1_000_000),
+                    getNextCableLength(cable.cable.length)
+                  ),
+                  source: cable.source,
+                  target: cable.target,
+                },
+              ]);
             },
           },
         };
@@ -98,13 +98,22 @@ export default function FlowPage() {
   }, [consumers, cables]);
 
   function onConnect(connection: ReactFlow.Connection) {
-    console.log("onConnect");
     if (!connection.source || !connection.target) return;
+
+    if (
+      edges.find(
+        (edge) =>
+          edge.source === connection.source && edge.target === connection.target
+      )
+    ) {
+      console.log("edge already exists");
+      return;
+    }
 
     setCables([
       ...cables,
       {
-        cable: new Cable("cable-" + cables.length, 50),
+        cable: new Cable("cable-" + Math.floor(Math.random() * 1_000_000), 50),
         source: connection.source,
         target: connection.target,
       },
