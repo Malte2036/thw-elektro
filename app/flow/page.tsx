@@ -17,7 +17,6 @@ import {
 } from "../lib/calculation/energy";
 import { DistributorNode } from "./DistributorNode";
 import { Distributor } from "../lib/data/Distributor";
-import { sumArray } from "../lib/utils";
 
 export type CableData = { cable: Cable; source: string; target: string };
 export type ConsumerData = { consumer: Consumer; position: Position };
@@ -59,11 +58,15 @@ export default function FlowPage() {
     },
   ]);
   const [producer] = useState<{ producer: Producer; position: Position }>({
-    producer: new Producer("SEA", 54000),
+    producer: new Producer("SEA"),
     position: { x: 50, y: 300 },
   });
 
   const [allCableData, setAllCableData] = useState<CableData[]>([]);
+
+  const [allEnergyConsumptions, setAllEnergyConsumptions] = useState<
+    Map<string, number>
+  >(new Map());
 
   var [nodes, setNodes] = useState<ReactFlow.Node<any, string>[]>();
 
@@ -82,12 +85,8 @@ export default function FlowPage() {
     if (consumerData !== undefined) {
       energyConsumption = consumerData.consumer.energyConsumption;
     } else if (distributorData !== undefined) {
-      energyConsumption = getRecursiveEnergyConsumption(
-        allConsumerData,
-        allDistributorData,
-        allCableData,
-        headCableData
-      );
+      energyConsumption =
+        allEnergyConsumptions.get(distributorData.distributor.id) ?? 0;
     }
 
     console.log(
@@ -103,24 +102,32 @@ export default function FlowPage() {
         id: producer.producer.id,
         type: "producerNode",
         position: producer.position,
-        data: { producer: producer.producer },
+        data: {
+          producer: producer.producer,
+          energyFlow: allEnergyConsumptions.get(producer.producer.id) ?? 0,
+        },
         draggable: true,
       },
+
+      ...allDistributorData.map((distributorData) => {
+        return {
+          id: distributorData.distributor.id,
+          type: "distributorNode",
+          position: distributorData.position,
+          data: {
+            distributor: distributorData.distributor,
+            energyFlow:
+              allEnergyConsumptions.get(distributorData.distributor.id) ?? 0,
+          },
+          draggable: true,
+        };
+      }),
       ...allConsumerData.map((consumer) => {
         return {
           id: consumer.consumer.id,
           type: "consumerNode",
           position: consumer.position,
           data: { consumer: consumer.consumer },
-          draggable: true,
-        };
-      }),
-      ...allDistributorData.map((distributorData) => {
-        return {
-          id: distributorData.distributor.id,
-          type: "distributorNode",
-          position: distributorData.position,
-          data: { distributor: distributorData.distributor },
           draggable: true,
         };
       }),
@@ -161,13 +168,26 @@ export default function FlowPage() {
     );
   }
 
-  useEffect(() => {
-    updateNodes();
+  function updateEnergyConsumptions() {
+    setAllEnergyConsumptions(
+      getRecursiveEnergyConsumption(
+        allConsumerData,
+        allDistributorData,
+        allCableData,
+        producer.producer.id
+      )
+    );
+  }
 
-    //allCableData.forEach((cableData) => {
-    //  const voltageDrop = getVoltageDropForCableData(cableData);
-    //});
+  useEffect(() => {
+    updateEnergyConsumptions();
+    updateNodes();
   }, [allConsumerData, allCableData, allDistributorData, producer]);
+
+  useEffect(() => {
+    // bug fix: update nodes after voltage drop calculation
+    updateNodes();
+  }, [allEnergyConsumptions]);
 
   function onConnect(connection: ReactFlow.Connection) {
     if (!connection.source || !connection.target) return;

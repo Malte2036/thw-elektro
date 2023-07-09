@@ -1,12 +1,16 @@
 import { Handle, Position } from "reactflow";
 import { Producer } from "../lib/data/Producer";
 
-export function ProducerNode({ data }: { data: { producer: Producer } }) {
+export function ProducerNode({
+  data,
+}: {
+  data: { producer: Producer; energyFlow: number };
+}) {
   return (
     <>
       <div className="bg-thw text-white px-6 py-2">
         <div className="text-xs">Erzeuger ({data.producer.id}):</div>
-        {data.producer.energyProduction / 1000}kW
+        {data.energyFlow / 1000}kW
       </div>
       <Handle
         type="source"

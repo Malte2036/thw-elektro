@@ -48,46 +48,59 @@ export function getRecursiveEnergyConsumption(
   allConsumerData: ConsumerData[],
   allDistributorData: DistributorData[],
   allCableData: CableData[],
-  headCableData: CableData
-) {
-  let energyConsumption = 0;
+  headCableTarget: string
+): Map<string, number> {
+  const energyConsumptionMap = new Map<string, number>();
 
-  const outputEdges = allCableData.filter(
-    (c) => c.source === headCableData.target
-  );
+  const outputEdges = allCableData.filter((c) => c.source === headCableTarget);
+  if (outputEdges.length === 0) {
+    console.log("No output edges found for", headCableTarget);
+  }
 
   const dependingConsumers = getDependingConsumersEnergyConsumption(
     allConsumerData,
     outputEdges
   );
+  dependingConsumers.forEach((value, key) =>
+    energyConsumptionMap.set(key, value)
+  );
+
   const dependingDistributors = getDependingDistributorsEnergyConsumption(
     allConsumerData,
     allDistributorData,
     allCableData,
     outputEdges
   );
+  dependingDistributors.forEach((value, key) =>
+    energyConsumptionMap.set(key, value)
+  );
 
-  energyConsumption = dependingConsumers + dependingDistributors;
+  const energyConsumption = sumArray(
+    Array.from(energyConsumptionMap.entries())
+      .filter((v) => !v[0].includes("distributor"))
+      .map((v) => v[1])
+  );
+  energyConsumptionMap.set(headCableTarget, energyConsumption);
 
-  console.log(`Energy consumption: ${energyConsumption}`);
-
-  return energyConsumption;
+  return energyConsumptionMap;
 }
 
 function getDependingConsumersEnergyConsumption(
   allConsumerData: ConsumerData[],
   outputEdges: CableData[]
-): number {
-  return sumArray(
-    outputEdges
-      .map(
-        (e) =>
-          allConsumerData.find((c) => c.consumer.id === e.target)?.consumer
-            ?.energyConsumption
-      )
-      .filter((e) => e !== undefined)
-      .map((e) => e as number)
-  );
+): Map<string, number> {
+  const energyConsumptionMap = new Map<string, number>();
+
+  for (const edge of outputEdges) {
+    const consumption = allConsumerData.find(
+      (c) => c.consumer.id === edge.target
+    )?.consumer?.energyConsumption;
+
+    if (consumption !== undefined) {
+      energyConsumptionMap.set(edge.target, consumption);
+    }
+  }
+  return energyConsumptionMap;
 }
 
 function getDependingDistributorsEnergyConsumption(
@@ -95,18 +108,20 @@ function getDependingDistributorsEnergyConsumption(
   allDistributorData: DistributorData[],
   allCableData: CableData[],
   outputEdges: CableData[]
-): number {
+): Map<string, number> {
+  const energyConsumptionMap = new Map<string, number>();
+
   const dependingEdges = outputEdges.filter((e) =>
     allDistributorData.find((d) => d.distributor.id === e.target)
   );
-  return sumArray(
-    dependingEdges.map((e) =>
-      getRecursiveEnergyConsumption(
-        allConsumerData,
-        allDistributorData,
-        allCableData,
-        e
-      )
-    )
-  );
+  for (const edge of dependingEdges) {
+    const res = getRecursiveEnergyConsumption(
+      allConsumerData,
+      allDistributorData,
+      allCableData,
+      edge.target
+    );
+    res.forEach((value, key) => energyConsumptionMap.set(key, value));
+  }
+  return energyConsumptionMap;
 }
