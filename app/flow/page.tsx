@@ -24,17 +24,21 @@ export default function FlowPage() {
 
   const [consumers] = useState<{ consumer: Consumer; position: Position }[]>([
     {
-      consumer: new Consumer("1", 5000),
-      position: getRandomPosition(),
+      consumer: new Consumer("consumer-1", 5000),
+      position: { x: 350, y: 100 },
     },
     {
-      consumer: new Consumer("2", 6300),
-      position: getRandomPosition(),
+      consumer: new Consumer("consumer-2", 4300),
+      position: { x: 350, y: 300 },
+    },
+    {
+      consumer: new Consumer("consumer-3", 6300),
+      position: { x: 350, y: 500 },
     },
   ]);
   const [producer] = useState<{ producer: Producer; position: Position }>({
     producer: new Producer("SEA", 54000),
-    position: getRandomPosition(),
+    position: { x: 50, y: 300 },
   });
   const [allCableData, setAllCableData] = useState<CableData[]>([]);
 
