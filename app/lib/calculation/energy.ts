@@ -1,6 +1,7 @@
 import { CableData, ConsumerData, DistributorData } from "@/app/flow/page";
 import { Cable } from "../data/Cable";
 import { sumArray } from "../utils";
+import * as ReactFlow from "reactflow";
 
 export function calculateVoltageDropPercent(
   cable: Cable,
@@ -128,4 +129,32 @@ function getDependingDistributorsEnergyConsumption(
     res.forEach((value, key) => energyConsumptionMap.set(key, value));
   }
   return energyConsumptionMap;
+}
+
+export function isCircularConnection(
+  connection: ReactFlow.Connection,
+  allCableData: CableData[],
+  visited: Set<string> = new Set<string>(),
+  currentNode?: string
+): boolean {
+  visited.add(currentNode || connection.target!);
+  const neighbors = allCableData.filter(
+    (edge) => edge.source === (currentNode || connection.target)
+  );
+
+  for (const neighbor of neighbors) {
+    if (neighbor.target === connection.source) {
+      return true; // Circular connection found
+    }
+
+    if (!visited.has(neighbor.target)) {
+      if (
+        isCircularConnection(connection, allCableData, visited, neighbor.target)
+      ) {
+        return true; // Circular connection found
+      }
+    }
+  }
+
+  return false;
 }

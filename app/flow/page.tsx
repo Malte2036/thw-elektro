@@ -14,6 +14,7 @@ import { Position } from "../lib/Position";
 import {
   calculateVoltageDropPercent,
   getRecursiveEnergyConsumption,
+  isCircularConnection,
 } from "../lib/calculation/energy";
 import { DistributorNode } from "./DistributorNode";
 import { Distributor } from "../lib/data/Distributor";
@@ -198,13 +199,20 @@ export default function FlowPage() {
   function onConnect(connection: ReactFlow.Connection) {
     if (!connection.source || !connection.target) return;
 
+    // Check for circular connection
+    if (isCircularConnection(connection, allCableData)) {
+      console.log("Circular connection detected");
+      return;
+    }
+
+    // Check if the edge already exists
     if (
       edges.find(
         (edge) =>
           edge.source === connection.source && edge.target === connection.target
       )
     ) {
-      console.log("edge already exists");
+      console.log("Edge already exists");
       return;
     }
 
