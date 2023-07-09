@@ -8,7 +8,12 @@ export function ProducerNode({ data }: { data: { producer: Producer } }) {
         <div className="text-xs">Erzeuger ({data.producer.id}):</div>
         {data.producer.energyProduction}kW
       </div>
-      <Handle type="source" position={Position.Right} id="output" />
+      <Handle
+        type="source"
+        position={Position.Right}
+        id="output"
+        style={{ width: 12, height: 12 }}
+      />
     </>
   );
 }

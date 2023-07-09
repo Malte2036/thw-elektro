@@ -8,7 +8,12 @@ export function ConsumerNode({ data }: { data: { consumer: Consumer } }) {
         <div className="text-xs">Verbraucher:</div>
         {data.consumer.energyLoad}kW
       </div>
-      <Handle type="target" position={Position.Left} id="input" />
+      <Handle
+        type="target"
+        position={Position.Left}
+        id="input"
+        style={{ width: 12, height: 12 }}
+      />
     </div>
   );
 }
