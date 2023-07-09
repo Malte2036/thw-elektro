@@ -11,13 +11,17 @@ import { Producer } from "../lib/data/Producer";
 import CableEdge, { CableEdgeData } from "./CableEdge";
 import { Cable, getNextCableLength } from "../lib/data/Cable";
 import { Position } from "../lib/Position";
-import { calculateVoltageDropPercent } from "../lib/calculation/energy";
+import {
+  calculateVoltageDropPercent,
+  getRecursiveEnergyConsumption,
+} from "../lib/calculation/energy";
 import { DistributorNode } from "./DistributorNode";
 import { Distributor } from "../lib/data/Distributor";
 import { sumArray } from "../lib/utils";
 
-type CableData = { cable: Cable; source: string; target: string };
-type DistributorData = { distributor: Distributor; position: Position };
+export type CableData = { cable: Cable; source: string; target: string };
+export type ConsumerData = { consumer: Consumer; position: Position };
+export type DistributorData = { distributor: Distributor; position: Position };
 
 export default function FlowPage() {
   const nodeTypes = useMemo(
@@ -30,7 +34,7 @@ export default function FlowPage() {
   );
   const edgeTypes = useMemo(() => ({ cableEdge: CableEdge }), []);
 
-  const [consumers] = useState<{ consumer: Consumer; position: Position }[]>([
+  const [allConsumerData] = useState<ConsumerData[]>([
     {
       consumer: new Consumer("consumer-1", 1500),
       position: { x: 550, y: 100 },
@@ -47,7 +51,11 @@ export default function FlowPage() {
   const [allDistributorData] = useState<DistributorData[]>([
     {
       distributor: new Distributor("distributor-1"),
-      position: { x: 300, y: 300 },
+      position: { x: 300, y: 200 },
+    },
+    {
+      distributor: new Distributor("distributor-2"),
+      position: { x: 300, y: 400 },
     },
   ]);
   const [producer] = useState<{ producer: Producer; position: Position }>({
@@ -61,37 +69,32 @@ export default function FlowPage() {
 
   const [edges, setEdges] = useState<ReactFlow.Edge<CableEdgeData>[]>([]);
 
-  function getVoltageDropForCableData(cableData: CableData): number {
-    const consumerData = consumers.find(
-      (c) => c.consumer.id == cableData.target
+  function getVoltageDropForCableData(headCableData: CableData): number {
+    const consumerData = allConsumerData.find(
+      (c) => c.consumer.id === headCableData.target
     );
     const distributorData = allDistributorData.find(
-      (d) => d.distributor.id == cableData.target
+      (d) => d.distributor.id === headCableData.target
     );
 
-    var energyConsumption = 0;
-    if (consumerData != undefined) {
+    let energyConsumption = 0;
+
+    if (consumerData !== undefined) {
       energyConsumption = consumerData.consumer.energyConsumption;
-    } else if (distributorData != undefined) {
-      const outputEdges = allCableData.filter(
-        (c) => c.source == distributorData.distributor.id
+    } else if (distributorData !== undefined) {
+      energyConsumption = getRecursiveEnergyConsumption(
+        allConsumerData,
+        allDistributorData,
+        allCableData,
+        headCableData
       );
-
-      type DependingType = { cable: Cable; consumer: Consumer } | undefined;
-      const depending: DependingType[] = outputEdges
-        .map((e) => ({
-          cable: e.cable,
-          consumer: consumers.find((c) => c.consumer.id == e.target)?.consumer,
-        }))
-        .filter((e) => e.consumer !== undefined)
-        .map((e) => ({ cable: e.cable, consumer: e.consumer as Consumer }));
-
-      const consumption = depending.map((d) => d!.consumer.energyConsumption);
-      energyConsumption = sumArray(consumption);
-      console.log(energyConsumption);
     }
 
-    return calculateVoltageDropPercent(cableData.cable, energyConsumption);
+    console.log(
+      `${headCableData.source}-${headCableData.target}: ${energyConsumption}`
+    );
+
+    return calculateVoltageDropPercent(headCableData.cable, energyConsumption);
   }
 
   function updateNodes() {
@@ -103,7 +106,7 @@ export default function FlowPage() {
         data: { producer: producer.producer },
         draggable: true,
       },
-      ...consumers.map((consumer) => {
+      ...allConsumerData.map((consumer) => {
         return {
           id: consumer.consumer.id,
           type: "consumerNode",
@@ -161,11 +164,10 @@ export default function FlowPage() {
   useEffect(() => {
     updateNodes();
 
-    allCableData.forEach((cableData) => {
-      const voltageDrop = getVoltageDropForCableData(cableData);
-      console.log(`Voltage drop: ${voltageDrop.toFixed(6)}%`);
-    });
-  }, [consumers, allCableData]);
+    //allCableData.forEach((cableData) => {
+    //  const voltageDrop = getVoltageDropForCableData(cableData);
+    //});
+  }, [allConsumerData, allCableData, allDistributorData, producer]);
 
   function onConnect(connection: ReactFlow.Connection) {
     if (!connection.source || !connection.target) return;
