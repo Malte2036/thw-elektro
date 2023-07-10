@@ -224,7 +224,7 @@ export default function FlowPage() {
 
     allCableData.forEach((cableData) => {
       updateCableDataEdge(
-        cableData,
+        cableData.cable,
         allVoltageDrops.get(cableData.toTargetSourceString()) ?? 0
       );
     });
@@ -247,7 +247,21 @@ export default function FlowPage() {
         onConnect={(connection) => {
           const cableData = addCableDataEdge(
             connection,
-            () => {},
+            (cable: Cable) => {
+              cable.length = getNextCableLength(cable.length);
+              setAllCableData((state) =>
+                state.map((cableData) => {
+                  if (cableData.cable.id === cable.id) {
+                    return new CableData(
+                      cable,
+                      cableData.source,
+                      cableData.target
+                    );
+                  }
+                  return cableData;
+                })
+              );
+            },
             allVoltageDrops.get(
               toTargetSourceString(
                 connection.target ?? "",

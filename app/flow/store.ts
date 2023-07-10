@@ -8,7 +8,6 @@ import {
   addEdge,
   OnNodesChange,
   OnEdgesChange,
-  OnConnect,
   applyNodeChanges,
   applyEdgeChanges,
 } from "reactflow";
@@ -23,10 +22,10 @@ type RFState = {
   onEdgesChange: OnEdgesChange;
   addCableDataEdge: (
     connection: Connection,
-    onClickCallback: () => void,
+    onClickCallback: (cableData: CableData) => void,
     voltageDrop: number
   ) => CableData | undefined;
-  updateCableDataEdge: (cableData: CableData, voltageDrop: number) => void;
+  updateCableDataEdge: (cable: Cable, voltageDrop: number) => void;
   addProducerDataNode: (producerData: ProducerData, energyFlow: number) => void;
   updateProducerDataNode: (
     producerData: ProducerData,
@@ -70,7 +69,7 @@ const useStore = create<RFState>((set, get) => ({
   },
   addCableDataEdge: (
     connection: Connection,
-    onClickCallback: () => void,
+    onClickCallback: (cableData: CableData) => void,
     voltageDrop: number
   ): CableData | undefined => {
     if (!connection.source || !connection.target) return;
@@ -121,7 +120,7 @@ const useStore = create<RFState>((set, get) => ({
       data: {
         cable: cableData.cable,
         voltageDrop,
-        onClickCallback: () => {},
+        onClickCallback,
       },
     };
     set({
@@ -129,12 +128,13 @@ const useStore = create<RFState>((set, get) => ({
     });
     return cableData;
   },
-  updateCableDataEdge(cableData: CableData, voltageDrop: number) {
+  updateCableDataEdge(cable: Cable, voltageDrop: number) {
     set({
       edges: get().edges.map((edge) => {
-        if (edge.id === cableData.cable.id) {
+        if (edge.id === cable.id) {
           edge.data = {
-            cable: cableData.cable,
+            ...edge.data,
+            cable,
             voltageDrop,
           };
         }
