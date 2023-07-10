@@ -10,7 +10,7 @@ import { isVoltageDropTooHigh } from "../lib/calculation/energy";
 export type CableEdgeData = {
   cable: Cable;
   voltageDrop: number;
-  onClickCallback: () => void;
+  onClickCallback: (cable: Cable) => void;
 };
 
 export default function CableEdge(edgeProps: EdgeProps<CableEdgeData>) {
@@ -22,6 +22,7 @@ export default function CableEdge(edgeProps: EdgeProps<CableEdgeData>) {
     targetY: edgeProps.targetY,
     targetPosition: edgeProps.targetPosition,
   });
+
   return (
     <>
       <BaseEdge
@@ -47,7 +48,14 @@ export default function CableEdge(edgeProps: EdgeProps<CableEdgeData>) {
                 ? "border-red-600 text-red-600 font-bold border-4"
                 : "border-black  border-2"
             } rounded-md px-1 py-0.5 flex flex-col items-center justify-center`}
-            onClick={() => edgeProps.data?.onClickCallback()}
+            onClick={() => {
+              const onClickCallback = edgeProps.data?.onClickCallback;
+              if (onClickCallback == undefined) {
+                throw "onClickCallback of CableEdge is undefined";
+              }
+
+              edgeProps.data?.onClickCallback(edgeProps.data.cable);
+            }}
           >
             <div>{edgeProps.data?.cable.length}m</div>
             <div>
