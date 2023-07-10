@@ -181,12 +181,12 @@ function getDependingDistributorsEnergyConsumption(
 
 export function isCircularConnection(
   connection: ReactFlow.Connection,
-  allCableData: CableData[],
+  allEdges: ReactFlow.Edge[],
   visited: Set<string> = new Set<string>(),
   currentNode?: string
 ): boolean {
   visited.add(currentNode || connection.target!);
-  const neighbors = allCableData.filter(
+  const neighbors = allEdges.filter(
     (edge) => edge.source === (currentNode || connection.target)
   );
 
@@ -197,7 +197,7 @@ export function isCircularConnection(
 
     if (!visited.has(neighbor.target)) {
       if (
-        isCircularConnection(connection, allCableData, visited, neighbor.target)
+        isCircularConnection(connection, allEdges, visited, neighbor.target)
       ) {
         return true; // Circular connection found
       }

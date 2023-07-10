@@ -21,6 +21,24 @@ import { DistributorNode } from "./DistributorNode";
 import { Distributor } from "../lib/data/Distributor";
 import { toTargetSourceString } from "../lib/utils";
 
+import useStore from "./store";
+import { shallow } from "zustand/shallow";
+
+const selector = (state: any) => ({
+  nodes: state.nodes,
+  edges: state.edges,
+  onNodesChange: state.onNodesChange,
+  onEdgesChange: state.onEdgesChange,
+  addCableDataEdge: state.addCableDataEdge,
+  updateCableDataEdge: state.updateCableDataEdge,
+  addProducerDataNode: state.addProducerDataNode,
+  updateProducerDataNode: state.updateProducerDataNode,
+  addDistributorDataNode: state.addDistributorDataNode,
+  updateDistributorDataNode: state.updateDistributorDataNode,
+  addConsumerDataNode: state.addConsumerDataNode,
+  updateConsumerDataNode: state.updateConsumerDataNode,
+});
+
 export class CableData {
   cable: Cable;
   source: string;
@@ -36,6 +54,7 @@ export class CableData {
   }
 }
 
+export type ProducerData = { producer: Producer; position: Position };
 export type ConsumerData = { consumer: Consumer; position: Position };
 export type DistributorData = { distributor: Distributor; position: Position };
 
@@ -93,88 +112,43 @@ export default function FlowPage() {
     Map<string, number>
   >(new Map());
 
-  const [nodes, setNodes, onNodesChange] = ReactFlow.useNodesState([]);
-  const [edges, setEdges, onEdgesChange] =
-    ReactFlow.useEdgesState<CableEdgeData>([]);
+  //const [nodes, setNodes, onNodesChange] = ReactFlow.useNodesState([]);
+  //const [edges, setEdges, onEdgesChange] =
+  //  ReactFlow.useEdgesState<CableEdgeData>([]);
 
-  function updateNodes() {
-    setNodes([
-      {
-        id: producer.producer.id,
-        type: "producerNode",
-        position: producer.position,
-        data: {
-          producer: producer.producer,
-          energyFlow: allEnergyConsumptions.get(producer.producer.id) ?? 0,
-        },
-        draggable: true,
-      },
+  const {
+    nodes,
+    edges,
+    onNodesChange,
+    onEdgesChange,
+    addCableDataEdge,
+    updateCableDataEdge,
+    addProducerDataNode,
+    updateProducerDataNode,
+    addDistributorDataNode,
+    updateDistributorDataNode,
+    addConsumerDataNode,
+    updateConsumerDataNode,
+  } = useStore(selector, shallow);
 
-      ...allDistributorData.map((distributorData) => {
-        return {
-          id: distributorData.distributor.id,
-          type: "distributorNode",
-          position: distributorData.position,
-          data: {
-            distributor: distributorData.distributor,
-            energyFlow:
-              allEnergyConsumptions.get(distributorData.distributor.id) ?? 0,
-            hasEnergy: allEnergyConsumptions.has(
-              distributorData.distributor.id
-            ),
-          },
-          draggable: true,
-        };
-      }),
-      ...allConsumerData.map((consumerData) => {
-        return {
-          id: consumerData.consumer.id,
-          type: "consumerNode",
-          position: consumerData.position,
-          data: {
-            consumer: consumerData.consumer,
-            hasEnergy: allEnergyConsumptions.has(consumerData.consumer.id),
-            totalVoltageDrop:
-              allTotalVoltageDrops.get(consumerData.consumer.id) ?? 0,
-          },
-          draggable: true,
-        };
-      }),
-    ]);
-    setEdges(
-      allCableData.map((cableData) => {
-        return {
-          id: cableData.cable.id,
-          source: cableData.source,
-          sourceHandle: "output",
-          target: cableData.target,
-          targetHandle: "input",
-          animated: true,
-          type: "cableEdge",
-          data: {
-            cable: cableData.cable,
-            onClickCallback: () => {
-              setAllCableData((state) => [
-                ...state.filter(
-                  (stateCable) => stateCable.cable.id !== cableData.cable.id
-                ),
-                new CableData(
-                  new Cable(
-                    "cable-" + Math.floor(Math.random() * 1_000_000),
-                    getNextCableLength(cableData.cable.length),
-                    cableData.cable.voltage,
-                    cableData.cable.current
-                  ),
-                  cableData.source,
-                  cableData.target
-                ),
-              ]);
-            },
-            voltageDrop:
-              allVoltageDrops.get(cableData.toTargetSourceString()) ?? 0,
-          },
-        };
-      })
+  function createInitialNodes() {
+    addProducerDataNode(
+      producer,
+      allEnergyConsumptions.get(producer.producer.id) ?? 0
+    );
+    allDistributorData.forEach((distributorData) =>
+      addDistributorDataNode(
+        distributorData,
+        allEnergyConsumptions.get(distributorData.distributor.id) ?? 0,
+        allEnergyConsumptions.has(distributorData.distributor.id)
+      )
+    );
+    allConsumerData.forEach((consumerData) =>
+      addConsumerDataNode(
+        consumerData,
+        allEnergyConsumptions.has(consumerData.consumer.id),
+        allTotalVoltageDrops.get(consumerData.consumer.id) ?? 0
+      )
     );
   }
 
@@ -219,58 +193,47 @@ export default function FlowPage() {
   }
 
   useEffect(() => {
+    createInitialNodes();
+  }, []);
+
+  useEffect(() => {
     updateEnergyConsumptions();
-    updateNodes();
   }, [allConsumerData, allCableData, allDistributorData, producer]);
 
   useEffect(() => {
-    // bug fix: update nodes after voltage drop calculation
-    updateNodes();
-  }, [allEnergyConsumptions, allVoltageDrops, allTotalVoltageDrops]);
+    updateProducerDataNode(
+      producer,
+      allEnergyConsumptions.get(producer.producer.id) ?? 0
+    );
 
-  function onConnect(connection: ReactFlow.Connection) {
-    if (!connection.source || !connection.target) return;
+    allDistributorData.forEach((distributorData) => {
+      updateDistributorDataNode(
+        distributorData,
+        allEnergyConsumptions.get(distributorData.distributor.id) ?? 0,
+        allEnergyConsumptions.has(distributorData.distributor.id)
+      );
+    });
 
-    // Check for circular connection
-    if (isCircularConnection(connection, allCableData)) {
-      console.log("Circular connection detected");
-      alert("Circular connection detected");
-      return;
-    }
+    allConsumerData.forEach((consumerData) => {
+      updateConsumerDataNode(
+        consumerData,
+        allEnergyConsumptions.has(consumerData.consumer.id),
+        allTotalVoltageDrops.get(consumerData.consumer.id) ?? 0
+      );
+    });
 
-    // Check if the edge already exists
-    if (
-      edges.find(
-        (edge) =>
-          edge.source === connection.source && edge.target === connection.target
-      )
-    ) {
-      console.log("Edge already exists");
-      alert("Edge already exists");
-      return;
-    }
-
-    // Check if node does not already has an input edge
-    if (edges.find((edge) => edge.target === connection.target)) {
-      console.log("Node already has an input edge");
-      alert("Node already has an input edge");
-      return;
-    }
-
-    setAllCableData([
-      ...allCableData,
-      new CableData(
-        new Cable(
-          "cable-" + Math.floor(Math.random() * 1_000_000),
-          50,
-          connection.source == "SEA" ? 400 : 230,
-          16
-        ),
-        connection.source,
-        connection.target
-      ),
-    ]);
-  }
+    allCableData.forEach((cableData) => {
+      updateCableDataEdge(
+        cableData,
+        allVoltageDrops.get(cableData.toTargetSourceString()) ?? 0
+      );
+    });
+  }, [
+    allEnergyConsumptions,
+    allVoltageDrops,
+    allTotalVoltageDrops,
+    allConsumerData,
+  ]);
 
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
@@ -281,7 +244,23 @@ export default function FlowPage() {
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
+        onConnect={(connection) => {
+          const cableData = addCableDataEdge(
+            connection,
+            () => {},
+            allVoltageDrops.get(
+              toTargetSourceString(
+                connection.target ?? "",
+                connection.source ?? ""
+              )
+            ) ?? 0
+          );
+
+          if (cableData != undefined) {
+            setAllCableData((state) => [...state, cableData]);
+          }
+        }}
+        fitView
       >
         <ReactFlow.Background />
         <ReactFlow.Controls />
