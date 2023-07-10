@@ -280,7 +280,7 @@ export default function FlowPage() {
         </ReactFlow.Panel>
       </ReactFlow.ReactFlow>
       {showMenu ? (
-        <div className="w-screen h-screen bg-red-200 xl:w-96 absolute md:relative ">
+        <div className="w-screen h-screen xl:w-96 absolute md:relative ">
           <FlowMenu
             addConsumerNodeCallback={(consumerData: ConsumerData) => {
               addConsumerDataNode(consumerData, false, 0);

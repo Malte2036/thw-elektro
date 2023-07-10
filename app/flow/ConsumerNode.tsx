@@ -11,7 +11,7 @@ export function ConsumerNode({
       <div
         className={`${
           data.hasEnergy ? "bg-thw" : "bg-thw-400"
-        } text-white px-6 py-2`}
+        } transition-colors text-white px-6 py-2`}
       >
         <div className="text-xs">Verbraucher:</div>
         {data.consumer.energyConsumption / 1000}kW
