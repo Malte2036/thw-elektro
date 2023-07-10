@@ -1,7 +1,21 @@
-import { CableData, ConsumerData, DistributorData } from "@/app/flow/page";
+import { ConsumerData, DistributorData } from "@/app/flow/page";
 import { Cable } from "../data/Cable";
 import { sumArray, toTargetSourceString } from "../utils";
 import * as ReactFlow from "reactflow";
+export class CableData {
+  cable: Cable;
+  source: string;
+  target: string;
+  constructor(cable: Cable, source: string, target: string) {
+    this.cable = cable;
+    this.source = source;
+    this.target = target;
+  }
+
+  toTargetSourceString() {
+    return toTargetSourceString(this.target, this.source);
+  }
+}
 
 export function calculateVoltageDropPercent(
   cable: Cable,

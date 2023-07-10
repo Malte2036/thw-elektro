@@ -12,6 +12,7 @@ import CableEdge, { CableEdgeData } from "./CableEdge";
 import { Cable, getNextCableLength } from "../lib/data/Cable";
 import { Position } from "../lib/Position";
 import {
+  CableData,
   calculateTotalVoltageDropPercent,
   getRecursiveEnergyConsumption,
   getVoltageDropForCableData,
@@ -20,21 +21,6 @@ import {
 import { DistributorNode } from "./DistributorNode";
 import { Distributor } from "../lib/data/Distributor";
 import { toTargetSourceString } from "../lib/utils";
-
-export class CableData {
-  cable: Cable;
-  source: string;
-  target: string;
-  constructor(cable: Cable, source: string, target: string) {
-    this.cable = cable;
-    this.source = source;
-    this.target = target;
-  }
-
-  toTargetSourceString() {
-    return toTargetSourceString(this.target, this.source);
-  }
-}
 
 export type ConsumerData = { consumer: Consumer; position: Position };
 export type DistributorData = { distributor: Distributor; position: Position };
