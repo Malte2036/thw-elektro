@@ -93,9 +93,9 @@ export default function FlowPage() {
     Map<string, number>
   >(new Map());
 
-  var [nodes, setNodes] = useState<ReactFlow.Node<any, string>[]>();
-
-  const [edges, setEdges] = useState<ReactFlow.Edge<CableEdgeData>[]>([]);
+  const [nodes, setNodes, onNodesChange] = ReactFlow.useNodesState([]);
+  const [edges, setEdges, onEdgesChange] =
+    ReactFlow.useEdgesState<CableEdgeData>([]);
 
   function updateNodes() {
     setNodes([
@@ -201,7 +201,6 @@ export default function FlowPage() {
         cableData
       );
       voltageDrops.set(cableData.toTargetSourceString(), voltageDrop);
-      console.log(`setAllVoltageDrops`);
     });
 
     setAllVoltageDrops(voltageDrops);
@@ -227,8 +226,7 @@ export default function FlowPage() {
   useEffect(() => {
     // bug fix: update nodes after voltage drop calculation
     updateNodes();
-    console.log("update nodes again", allVoltageDrops);
-  }, [allEnergyConsumptions, allVoltageDrops]);
+  }, [allEnergyConsumptions, allVoltageDrops, allTotalVoltageDrops]);
 
   function onConnect(connection: ReactFlow.Connection) {
     if (!connection.source || !connection.target) return;
@@ -281,6 +279,8 @@ export default function FlowPage() {
         nodes={nodes}
         edgeTypes={edgeTypes}
         edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
         onConnect={onConnect}
       >
         <ReactFlow.Background />

@@ -109,9 +109,6 @@ export function getRecursiveEnergyConsumption(
   const energyConsumptionMap = new Map<string, number>();
 
   const outputEdges = allCableData.filter((c) => c.source === headCableTarget);
-  if (outputEdges.length === 0) {
-    console.log("No output edges found for", headCableTarget);
-  }
 
   const dependingConsumers = getDependingConsumersEnergyConsumption(
     allConsumerData,
