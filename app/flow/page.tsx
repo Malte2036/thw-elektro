@@ -10,7 +10,7 @@ import { ProducerNode } from "./ProducerNode";
 import { Producer } from "../lib/data/Producer";
 import CableEdge, { CableEdgeData } from "./CableEdge";
 import { Cable, getNextCableLength } from "../lib/data/Cable";
-import { Position } from "../lib/Position";
+import { Position, getRandomPosition } from "../lib/Position";
 import {
   CableData,
   calculateTotalVoltageDropPercent,
@@ -24,6 +24,8 @@ import { toTargetSourceString } from "../lib/utils";
 
 import useStore from "./store";
 import { shallow } from "zustand/shallow";
+import Menu from "./FlowMenu";
+import FlowMenu from "./FlowMenu";
 
 const selector = (state: any) => ({
   nodes: state.nodes,
@@ -45,6 +47,8 @@ export type ConsumerData = { consumer: Consumer; position: Position };
 export type DistributorData = { distributor: Distributor; position: Position };
 
 export default function FlowPage() {
+  const [showMenu, setShowMenu] = useState<boolean>(false);
+
   const nodeTypes = useMemo(
     () => ({
       consumerNode: ConsumerNode,
@@ -55,7 +59,7 @@ export default function FlowPage() {
   );
   const edgeTypes = useMemo(() => ({ cableEdge: CableEdge }), []);
 
-  const [allConsumerData] = useState<ConsumerData[]>([
+  const [allConsumerData, setAllConsumerData] = useState<ConsumerData[]>([
     {
       consumer: new Consumer("consumer-1", 1500),
       position: { x: 550, y: 100 },
@@ -69,7 +73,9 @@ export default function FlowPage() {
       position: { x: 550, y: 500 },
     },
   ]);
-  const [allDistributorData] = useState<DistributorData[]>([
+  const [allDistributorData, setAllDistributorData] = useState<
+    DistributorData[]
+  >([
     {
       distributor: new Distributor("distributor-1"),
       position: { x: 300, y: 200 },
@@ -222,7 +228,7 @@ export default function FlowPage() {
   ]);
 
   return (
-    <div style={{ width: "100vw", height: "100vh" }}>
+    <div className="w-screen h-screen flex flex-row">
       <ReactFlow.ReactFlow
         nodeTypes={nodeTypes}
         nodes={nodes}
@@ -264,7 +270,30 @@ export default function FlowPage() {
       >
         <ReactFlow.Background />
         <ReactFlow.Controls />
+        <ReactFlow.Panel position="top-right">
+          <button
+            className="bg-thw text-white rounded-md p-2"
+            onClick={() => setShowMenu((state) => !state)}
+          >
+            {showMenu ? "Close" : "Open"} Menu
+          </button>
+        </ReactFlow.Panel>
       </ReactFlow.ReactFlow>
+      {showMenu ? (
+        <div className="w-screen h-screen bg-red-200 xl:w-96 absolute md:relative ">
+          <FlowMenu
+            addConsumerNodeCallback={(consumerData: ConsumerData) => {
+              addConsumerDataNode(consumerData, false, 0);
+              setAllConsumerData((state) => [...state, consumerData]);
+            }}
+            addDistributorNodeCallback={(distributorData: DistributorData) => {
+              addDistributorDataNode(distributorData, false, 0);
+              setAllDistributorData((state) => [...state, distributorData]);
+            }}
+            closeMenu={() => setShowMenu(false)}
+          />
+        </div>
+      ) : undefined}
     </div>
   );
 }
