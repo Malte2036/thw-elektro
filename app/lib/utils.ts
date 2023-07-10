@@ -4,3 +4,7 @@ export function sumArray(array: number[]) {
     0
   );
 }
+
+export function toTargetSourceString(source: string, target: string) {
+  return `${source} -> ${target}`;
+}

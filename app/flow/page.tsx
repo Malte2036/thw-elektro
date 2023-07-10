@@ -12,13 +12,14 @@ import CableEdge, { CableEdgeData } from "./CableEdge";
 import { Cable, getNextCableLength } from "../lib/data/Cable";
 import { Position } from "../lib/Position";
 import {
-  calculateVoltageDropPercentTraverseSum,
+  calculateTotalVoltageDropPercent,
   getRecursiveEnergyConsumption,
   getVoltageDropForCableData,
   isCircularConnection,
 } from "../lib/calculation/energy";
 import { DistributorNode } from "./DistributorNode";
 import { Distributor } from "../lib/data/Distributor";
+import { toTargetSourceString } from "../lib/utils";
 
 export class CableData {
   cable: Cable;
@@ -31,7 +32,7 @@ export class CableData {
   }
 
   toTargetSourceString() {
-    return `${this.source} -> ${this.target}`;
+    return toTargetSourceString(this.target, this.source);
   }
 }
 
@@ -88,6 +89,10 @@ export default function FlowPage() {
     new Map()
   );
 
+  const [allTotalVoltageDrops, setAllTotalVoltageDrops] = useState<
+    Map<string, number>
+  >(new Map());
+
   var [nodes, setNodes] = useState<ReactFlow.Node<any, string>[]>();
 
   const [edges, setEdges] = useState<ReactFlow.Edge<CableEdgeData>[]>([]);
@@ -129,6 +134,8 @@ export default function FlowPage() {
           data: {
             consumer: consumerData.consumer,
             hasEnergy: allEnergyConsumptions.has(consumerData.consumer.id),
+            totalVoltageDrop:
+              allTotalVoltageDrops.get(consumerData.consumer.id) ?? 0,
           },
           draggable: true,
         };
@@ -172,24 +179,25 @@ export default function FlowPage() {
   }
 
   function updateEnergyConsumptions() {
-    const res = getRecursiveEnergyConsumption(
+    const currentAllEnergyConsumptions = getRecursiveEnergyConsumption(
       allConsumerData,
       allDistributorData,
       allCableData,
       producer.producer.id
     );
-    setAllEnergyConsumptions(res);
-    return res;
+    setAllEnergyConsumptions(currentAllEnergyConsumptions);
+
+    updateVoltageDrops(currentAllEnergyConsumptions);
   }
 
-  function updateVoltageDrops() {
+  function updateVoltageDrops(currentAllEnergyConsumptions: any) {
     const voltageDrops = new Map();
 
     allCableData.forEach((cableData) => {
       let voltageDrop = getVoltageDropForCableData(
         allConsumerData,
         allDistributorData,
-        allEnergyConsumptions,
+        currentAllEnergyConsumptions,
         cableData
       );
       voltageDrops.set(cableData.toTargetSourceString(), voltageDrop);
@@ -197,23 +205,23 @@ export default function FlowPage() {
     });
 
     setAllVoltageDrops(voltageDrops);
+
+    const totalVoltageDrops = new Map(
+      allConsumerData.map((consumerData) => [
+        consumerData.consumer.id,
+        calculateTotalVoltageDropPercent(
+          allCableData,
+          voltageDrops,
+          consumerData.consumer.id
+        ),
+      ])
+    );
+    setAllTotalVoltageDrops(totalVoltageDrops);
   }
 
   useEffect(() => {
     updateEnergyConsumptions();
     updateNodes();
-
-    // allConsumerData.forEach((consumerData) => {
-    //   const res = calculateVoltageDropPercentTraverseSum(
-    //     allConsumerData,
-    //     allDistributorData,
-    //     allCableData,
-    //     allVoltageDrops,
-    //     producer.producer.id,
-    //     consumerData.consumer.id
-    //   );
-    //   console.log(`Voltage drop for ${consumerData.consumer.id}: ${res}`);
-    // });
   }, [allConsumerData, allCableData, allDistributorData, producer]);
 
   useEffect(() => {
@@ -221,10 +229,6 @@ export default function FlowPage() {
     updateNodes();
     console.log("update nodes again", allVoltageDrops);
   }, [allEnergyConsumptions, allVoltageDrops]);
-
-  useEffect(() => {
-    updateVoltageDrops();
-  }, [allEnergyConsumptions]);
 
   function onConnect(connection: ReactFlow.Connection) {
     if (!connection.source || !connection.target) return;

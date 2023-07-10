@@ -4,7 +4,7 @@ import { Consumer } from "../lib/data/Consumer";
 export function ConsumerNode({
   data,
 }: {
-  data: { consumer: Consumer; hasEnergy: boolean };
+  data: { consumer: Consumer; hasEnergy: boolean; totalVoltageDrop: number };
 }) {
   return (
     <div>
@@ -15,6 +15,7 @@ export function ConsumerNode({
       >
         <div className="text-xs">Verbraucher:</div>
         {data.consumer.energyConsumption / 1000}kW
+        <div>{data.totalVoltageDrop.toFixed(2)}%</div>
       </div>
       <Handle
         type="target"

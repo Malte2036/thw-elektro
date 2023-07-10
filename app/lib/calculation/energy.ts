@@ -1,6 +1,6 @@
 import { CableData, ConsumerData, DistributorData } from "@/app/flow/page";
 import { Cable } from "../data/Cable";
-import { sumArray } from "../utils";
+import { sumArray, toTargetSourceString } from "../utils";
 import * as ReactFlow from "reactflow";
 
 export function calculateVoltageDropPercent(
@@ -31,36 +31,30 @@ export function calculateVoltageDropPercent(
   throw new Error("Invalid voltage. Only 230V and 400V are supported.");
 }
 
-export function calculateVoltageDropPercentTraverseSum(
-  allConsumerData: ConsumerData[],
-  allDistributorData: DistributorData[],
+export function calculateTotalVoltageDropPercent(
   allCableData: CableData[],
   allVoltageDrops: Map<string, number>,
-  headCableTarget: string,
   leafCableSource: string
 ): number {
-  if (headCableTarget === leafCableSource) {
-    console.log(allVoltageDrops);
-
-    return allVoltageDrops.get(`${headCableTarget} -> ${leafCableSource}`) ?? 0;
+  const inputEdge = allCableData.find((c) => c.target === leafCableSource);
+  if (inputEdge === undefined) {
+    // is (maybe) producer leaf
+    return 0;
   }
 
-  const outputEdges = allCableData.filter((c) => c.source === headCableTarget);
-  console.log("output edges found for", headCableTarget, leafCableSource);
+  const drop =
+    allVoltageDrops.get(
+      toTargetSourceString(inputEdge.target, inputEdge.source)
+    ) ?? 0;
 
-  let voltageDropPercentSum = 0;
-  for (const edge of outputEdges) {
-    voltageDropPercentSum += calculateVoltageDropPercentTraverseSum(
-      allConsumerData,
-      allDistributorData,
+  return (
+    drop +
+    calculateTotalVoltageDropPercent(
       allCableData,
       allVoltageDrops,
-      edge.target,
-      leafCableSource
-    );
-  }
-
-  return voltageDropPercentSum;
+      inputEdge.source
+    )
+  );
 }
 
 export function isVoltageDropTooHigh(voltageDropPercent: number): boolean {
