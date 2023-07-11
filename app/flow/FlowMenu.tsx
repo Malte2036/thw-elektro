@@ -18,11 +18,21 @@ export default function FlowMenu({
 }) {
   const [consumerEnergyConsumption, setConsumerEnergyConsumption] =
     useState<number>(5.2);
+  const [consumerName, setConsumerName] = useState<string>("");
+  const [distributorName, setDistributorName] = useState<string>("");
+  const [producerName, setProducerName] = useState<string>("");
+
+  function generateId(name: String, prefix: string) {
+    if (name.length === 0) {
+      name = `random-${Date.now().toString()}`;
+    }
+    return `${prefix}-${name}`;
+  }
 
   function clickAddConsumerNode() {
     const consumerNode: ConsumerData = {
       consumer: new Consumer(
-        "consumer-" + Math.random() * 1_000_000,
+        generateId(consumerName, "consumer"),
         consumerEnergyConsumption * 1000
       ),
       position: getRandomPosition(),
@@ -33,7 +43,7 @@ export default function FlowMenu({
 
   function clickAddDistributorNode() {
     const distributorNode: DistributorData = {
-      distributor: new Distributor("distributor-" + Math.random() * 1_000_000),
+      distributor: new Distributor(generateId(distributorName, "distributor")),
       position: getRandomPosition(),
     };
     addDistributorNodeCallback(distributorNode);
@@ -42,7 +52,7 @@ export default function FlowMenu({
 
   function clickAddProducerNode() {
     const producerNode: ProducerData = {
-      producer: new Producer("producer-" + Math.random() * 1_000_000),
+      producer: new Producer(generateId(producerName, "producer")),
       position: getRandomPosition(),
     };
     addProducerNodeCallback(producerNode);
@@ -54,15 +64,27 @@ export default function FlowMenu({
       <div className="flex flex-col gap-4">
         <div className="w-full bg-white text-thw rounded-md p-4 flex flex-col gap-2 items-start">
           <div className="text-xl font-bold">Erzeuger</div>
+          <label>Name:</label>
+          <input
+            className="bg-thw text-white px-2 rounded-md"
+            value={producerName}
+            onChange={(e) => setProducerName(e.target.value)}
+          />
           <button
             className="bg-thw text-white px-2 rounded-md"
             onClick={clickAddProducerNode}
           >
             Hinzufügen
           </button>
-        </div>{" "}
+        </div>
         <div className="w-full bg-white text-thw rounded-md p-4 flex flex-col gap-2 items-start">
           <div className="text-xl font-bold">Verteiler</div>
+          <label>Name:</label>
+          <input
+            className="bg-thw text-white px-2 rounded-md"
+            value={distributorName}
+            onChange={(e) => setDistributorName(e.target.value)}
+          />
           <button
             className="bg-thw text-white px-2 rounded-md"
             onClick={clickAddDistributorNode}
@@ -71,7 +93,13 @@ export default function FlowMenu({
           </button>
         </div>
         <div className="w-full bg-white text-thw rounded-md p-4 flex flex-col gap-2 items-start">
-          <button className="text-xl font-bold">Verbraucher</button>
+          <button className="text-xl font-bold">Verbraucher</button>{" "}
+          <label>Name:</label>
+          <input
+            className="bg-thw text-white px-2 rounded-md"
+            value={consumerName}
+            onChange={(e) => setConsumerName(e.target.value)}
+          />
           <label>Energiebedarf in kW:</label>
           <input
             className="bg-thw text-white px-2 rounded-md"
