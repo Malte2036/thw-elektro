@@ -118,36 +118,46 @@ export function getRecursiveEnergyConsumption(
   allConsumerData: ConsumerData[],
   allDistributorData: DistributorData[],
   allCableData: CableData[],
-  headCableTarget: string
+  headCableTargets: string[]
 ): Map<string, number> {
   const energyConsumptionMap = new Map<string, number>();
 
-  const outputEdges = allCableData.filter((c) => c.source === headCableTarget);
+  for (const headCableTarget of headCableTargets) {
+    const localEnergyConsumptionMap = new Map<string, number>();
 
-  const dependingConsumers = getDependingConsumersEnergyConsumption(
-    allConsumerData,
-    outputEdges
-  );
-  dependingConsumers.forEach((value, key) =>
-    energyConsumptionMap.set(key, value)
-  );
+    const outputEdges = allCableData.filter(
+      (c) => c.source === headCableTarget
+    );
 
-  const dependingDistributors = getDependingDistributorsEnergyConsumption(
-    allConsumerData,
-    allDistributorData,
-    allCableData,
-    outputEdges
-  );
-  dependingDistributors.forEach((value, key) =>
-    energyConsumptionMap.set(key, value)
-  );
+    const dependingConsumers = getDependingConsumersEnergyConsumption(
+      allConsumerData,
+      outputEdges
+    );
+    dependingConsumers.forEach((value, key) =>
+      localEnergyConsumptionMap.set(key, value)
+    );
 
-  const energyConsumption = sumArray(
-    Array.from(energyConsumptionMap.entries())
-      .filter((v) => !v[0].includes("distributor"))
-      .map((v) => v[1])
-  );
-  energyConsumptionMap.set(headCableTarget, energyConsumption);
+    const dependingDistributors = getDependingDistributorsEnergyConsumption(
+      allConsumerData,
+      allDistributorData,
+      allCableData,
+      outputEdges
+    );
+    dependingDistributors.forEach((value, key) =>
+      localEnergyConsumptionMap.set(key, value)
+    );
+
+    const energyConsumption = sumArray(
+      Array.from(localEnergyConsumptionMap.entries())
+        .filter((v) => !v[0].includes("distributor"))
+        .map((v) => v[1])
+    );
+    energyConsumptionMap.set(headCableTarget, energyConsumption);
+
+    localEnergyConsumptionMap.forEach((value, key) =>
+      energyConsumptionMap.set(key, value)
+    );
+  }
 
   return energyConsumptionMap;
 }
@@ -186,7 +196,7 @@ function getDependingDistributorsEnergyConsumption(
       allConsumerData,
       allDistributorData,
       allCableData,
-      edge.target
+      [edge.target]
     );
     res.forEach((value, key) => energyConsumptionMap.set(key, value));
   }

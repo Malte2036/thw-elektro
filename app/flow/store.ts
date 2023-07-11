@@ -103,7 +103,7 @@ const useStore = create<RFState>((set, get) => ({
       new Cable(
         "cable-" + Math.floor(Math.random() * 1_000_000),
         50,
-        connection.source == "SEA" ? 400 : 230,
+        connection.source.includes("producer-") ? 400 : 230,
         16
       ),
       connection.source,

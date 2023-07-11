@@ -8,15 +8,14 @@ import { Consumer } from "../lib/data/Consumer";
 import { ConsumerNode } from "./ConsumerNode";
 import { ProducerNode } from "./ProducerNode";
 import { Producer } from "../lib/data/Producer";
-import CableEdge, { CableEdgeData } from "./CableEdge";
+import CableEdge from "./CableEdge";
 import { Cable, getNextCableLength } from "../lib/data/Cable";
-import { Position, getRandomPosition } from "../lib/Position";
+import { Position } from "../lib/Position";
 import {
   CableData,
   calculateTotalVoltageDropPercent,
   getRecursiveEnergyConsumption,
   getVoltageDropForCableData,
-  isCircularConnection,
 } from "../lib/calculation/energy";
 import { DistributorNode } from "./DistributorNode";
 import { Distributor } from "../lib/data/Distributor";
@@ -24,7 +23,6 @@ import { toTargetSourceString } from "../lib/utils";
 
 import useStore from "./store";
 import { shallow } from "zustand/shallow";
-import Menu from "./FlowMenu";
 import FlowMenu from "./FlowMenu";
 
 const selector = (state: any) => ({
@@ -85,10 +83,9 @@ export default function FlowPage() {
       position: { x: 300, y: 400 },
     },
   ]);
-  const [producer] = useState<{ producer: Producer; position: Position }>({
-    producer: new Producer("SEA"),
-    position: { x: 50, y: 300 },
-  });
+  const [allProducerData, setAllProducerData] = useState<ProducerData[]>([
+    { producer: new Producer("producer-SEA"), position: { x: 50, y: 300 } },
+  ]);
 
   const [allCableData, setAllCableData] = useState<CableData[]>([]);
 
@@ -124,9 +121,11 @@ export default function FlowPage() {
   } = useStore(selector, shallow);
 
   function createInitialNodes() {
-    addProducerDataNode(
-      producer,
-      allEnergyConsumptions.get(producer.producer.id) ?? 0
+    allProducerData.forEach((producerData) =>
+      addProducerDataNode(
+        producerData,
+        allEnergyConsumptions.get(producerData.producer.id)
+      )
     );
     allDistributorData.forEach((distributorData) =>
       addDistributorDataNode(
@@ -149,7 +148,7 @@ export default function FlowPage() {
       allConsumerData,
       allDistributorData,
       allCableData,
-      producer.producer.id
+      allProducerData.map((producerData) => producerData.producer.id) ?? []
     );
     setAllEnergyConsumptions(currentAllEnergyConsumptions);
 
@@ -190,13 +189,15 @@ export default function FlowPage() {
 
   useEffect(() => {
     updateEnergyConsumptions();
-  }, [allConsumerData, allCableData, allDistributorData, producer]);
+  }, [allConsumerData, allCableData, allDistributorData, allProducerData]);
 
   useEffect(() => {
-    updateProducerDataNode(
-      producer,
-      allEnergyConsumptions.get(producer.producer.id) ?? 0
-    );
+    allProducerData.forEach((producerData) => {
+      updateProducerDataNode(
+        producerData,
+        allEnergyConsumptions.get(producerData.producer.id) ?? 0
+      );
+    });
 
     allDistributorData.forEach((distributorData) => {
       updateDistributorDataNode(
@@ -289,6 +290,10 @@ export default function FlowPage() {
             addDistributorNodeCallback={(distributorData: DistributorData) => {
               addDistributorDataNode(distributorData, false, 0);
               setAllDistributorData((state) => [...state, distributorData]);
+            }}
+            addProducerNodeCallback={(producerData: ProducerData) => {
+              addProducerDataNode(producerData, 0);
+              setAllProducerData((state) => [...state, producerData]);
             }}
             closeMenu={() => setShowMenu(false)}
           />
