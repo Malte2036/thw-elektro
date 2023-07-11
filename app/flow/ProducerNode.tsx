@@ -8,7 +8,7 @@ export function ProducerNode({
 }) {
   return (
     <>
-      <div className="bg-thw text-white px-6 py-2">
+      <div className="bg-thw text-white px-6 py-2 rounded-sm">
         <div className="text-xs">Erzeuger ({data.producer.id}):</div>
         {data.energyFlow / 1000}kW
       </div>

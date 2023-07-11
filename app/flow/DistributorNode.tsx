@@ -11,7 +11,7 @@ export function DistributorNode({
       <div
         className={`${
           data.hasEnergy ? "bg-thw" : "bg-thw-400"
-        } transition-colors text-white px-6 py-2`}
+        } transition-colors text-white px-6 py-2 rounded-sm`}
       >
         <div className="text-xs">Verteiler:</div>
         {data.energyFlow / 1000}kW
