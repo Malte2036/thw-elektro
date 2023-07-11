@@ -59,15 +59,15 @@ export default function FlowPage() {
 
   const [allConsumerData, setAllConsumerData] = useState<ConsumerData[]>([
     {
-      consumer: new Consumer("consumer-random-1", 1500),
+      consumer: new Consumer("consumer-1", undefined, 1500),
       position: { x: 550, y: 100 },
     },
     {
-      consumer: new Consumer("consumer-random-2", 800),
+      consumer: new Consumer("consumer-2", undefined, 800),
       position: { x: 550, y: 300 },
     },
     {
-      consumer: new Consumer("consumer-random-3", 1800),
+      consumer: new Consumer("consumer-3", undefined, 1800),
       position: { x: 550, y: 500 },
     },
   ]);
@@ -75,16 +75,19 @@ export default function FlowPage() {
     DistributorData[]
   >([
     {
-      distributor: new Distributor("distributor-random-1"),
+      distributor: new Distributor("distributor-1", undefined),
       position: { x: 300, y: 200 },
     },
     {
-      distributor: new Distributor("distributor-random-2"),
+      distributor: new Distributor("distributor-2", undefined),
       position: { x: 300, y: 400 },
     },
   ]);
   const [allProducerData, setAllProducerData] = useState<ProducerData[]>([
-    { producer: new Producer("producer-SEA"), position: { x: 50, y: 300 } },
+    {
+      producer: new Producer("producer-1", "SEA"),
+      position: { x: 50, y: 300 },
+    },
   ]);
 
   const [allCableData, setAllCableData] = useState<CableData[]>([]);

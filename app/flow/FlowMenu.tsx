@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getRandomPosition } from "../lib/Position";
+import { Position, getRandomPosition } from "../lib/Position";
 import { Consumer } from "../lib/data/Consumer";
 import { Distributor } from "../lib/data/Distributor";
 import { Producer } from "../lib/data/Producer";
@@ -22,20 +22,20 @@ export default function FlowMenu({
   const [distributorName, setDistributorName] = useState<string>("");
   const [producerName, setProducerName] = useState<string>("");
 
-  function generateId(name: String, prefix: string) {
-    if (name.length === 0) {
-      name = `random-${Date.now().toString()}`;
-    }
-    return `${prefix}-${name}`;
+  function generateId(prefix: string) {
+    return `${prefix}-${Date.now().toString()}`;
   }
+
+  const initialPosition: Position = { x: 100, y: 100 };
 
   function clickAddConsumerNode() {
     const consumerNode: ConsumerData = {
       consumer: new Consumer(
-        generateId(consumerName, "consumer"),
+        generateId("consumer"),
+        consumerName.length > 0 ? consumerName : undefined,
         consumerEnergyConsumption * 1000
       ),
-      position: getRandomPosition(),
+      position: initialPosition,
     };
     addConsumerNodeCallback(consumerNode);
     closeMenu();
@@ -43,8 +43,11 @@ export default function FlowMenu({
 
   function clickAddDistributorNode() {
     const distributorNode: DistributorData = {
-      distributor: new Distributor(generateId(distributorName, "distributor")),
-      position: getRandomPosition(),
+      distributor: new Distributor(
+        generateId("distributor"),
+        distributorName.length > 0 ? distributorName : undefined
+      ),
+      position: initialPosition,
     };
     addDistributorNodeCallback(distributorNode);
     closeMenu();
@@ -52,8 +55,11 @@ export default function FlowMenu({
 
   function clickAddProducerNode() {
     const producerNode: ProducerData = {
-      producer: new Producer(generateId(producerName, "producer")),
-      position: getRandomPosition(),
+      producer: new Producer(
+        generateId("producer"),
+        producerName.length > 0 ? producerName : undefined
+      ),
+      position: initialPosition,
     };
     addProducerNodeCallback(producerNode);
     closeMenu();

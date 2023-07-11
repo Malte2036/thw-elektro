@@ -1,13 +1,11 @@
 import { Handle, Position } from "reactflow";
 import { Distributor } from "../lib/data/Distributor";
-import { getNodeNameById } from "../lib/utils";
 
 export function DistributorNode({
   data,
 }: {
   data: { distributor: Distributor; energyFlow: number; hasEnergy: boolean };
 }) {
-  const nodeName = getNodeNameById(data.distributor.id, "distributor");
   return (
     <div>
       <div
@@ -16,7 +14,11 @@ export function DistributorNode({
         } transition-colors text-white px-6 py-2 rounded-sm`}
       >
         <div className="text-xs">
-          Verteiler{nodeName.length > 0 ? ` (${nodeName})` : ""}:
+          Verteiler
+          {data?.distributor.name != undefined
+            ? ` (${data.distributor.name})`
+            : ""}
+          :
         </div>
         {data.energyFlow / 1000}kW
       </div>
