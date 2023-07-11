@@ -1,5 +1,6 @@
 import { Handle, Position } from "reactflow";
 import { Consumer } from "../lib/data/Consumer";
+import { isVoltageDropTooHigh } from "../lib/calculation/energy";
 
 export function ConsumerNode({
   data,
@@ -15,7 +16,15 @@ export function ConsumerNode({
       >
         <div className="text-xs">Verbraucher:</div>
         {data.consumer.energyConsumption / 1000}kW
-        <div>{data.totalVoltageDrop.toFixed(2)}%</div>
+        <div
+          className={
+            isVoltageDropTooHigh(data.totalVoltageDrop)
+              ? "text-red-600 font-bold"
+              : ""
+          }
+        >
+          {data.totalVoltageDrop.toFixed(2)}%
+        </div>
       </div>
       <Handle
         type="target"
