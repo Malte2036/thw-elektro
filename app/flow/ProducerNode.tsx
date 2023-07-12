@@ -1,13 +1,23 @@
-import { Handle, Position } from "reactflow";
+import { Handle, NodeProps, NodeToolbar, Position } from "reactflow";
 import { Producer } from "../lib/data/Producer";
 
-export function ProducerNode({
-  data,
-}: {
-  data: { producer: Producer; energyFlow: number };
-}) {
+type ProducerNodeProps = {
+  producer: Producer;
+  energyFlow: number;
+  deleteNode: () => void;
+};
+
+export function ProducerNode({ data, selected }: NodeProps<ProducerNodeProps>) {
   return (
     <>
+      <NodeToolbar isVisible={selected}>
+        <button
+          className="border-2 rounded-md border-thw bg-white p-1"
+          onClick={data.deleteNode}
+        >
+          Delete
+        </button>
+      </NodeToolbar>
       <div className="bg-thw text-white px-6 py-2 rounded-sm">
         <div className="text-xs">
           Erzeuger

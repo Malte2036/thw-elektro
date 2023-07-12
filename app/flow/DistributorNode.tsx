@@ -1,13 +1,27 @@
-import { Handle, Position } from "reactflow";
+import { Handle, NodeProps, NodeToolbar, Position } from "reactflow";
 import { Distributor } from "../lib/data/Distributor";
+
+type DistributorNodeProps = {
+  distributor: Distributor;
+  energyFlow: number;
+  hasEnergy: boolean;
+  deleteNode: () => void;
+};
 
 export function DistributorNode({
   data,
-}: {
-  data: { distributor: Distributor; energyFlow: number; hasEnergy: boolean };
-}) {
+  selected,
+}: NodeProps<DistributorNodeProps>) {
   return (
     <div>
+      <NodeToolbar isVisible={selected}>
+        <button
+          className="border-2 rounded-md border-thw bg-white p-1"
+          onClick={data.deleteNode}
+        >
+          Delete
+        </button>
+      </NodeToolbar>
       <div
         className={`${
           data.hasEnergy ? "bg-thw" : "bg-thw-400"

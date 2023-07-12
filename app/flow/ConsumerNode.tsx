@@ -1,14 +1,25 @@
-import { Handle, Position } from "reactflow";
+import { Handle, NodeProps, NodeToolbar, Position } from "reactflow";
 import { Consumer } from "../lib/data/Consumer";
 import { isVoltageDropTooHigh } from "../lib/calculation/energy";
 
-export function ConsumerNode({
-  data,
-}: {
-  data: { consumer: Consumer; hasEnergy: boolean; totalVoltageDrop: number };
-}) {
+type ConsumerNodeProps = {
+  consumer: Consumer;
+  hasEnergy: boolean;
+  totalVoltageDrop: number;
+  deleteNode: () => void;
+};
+
+export function ConsumerNode({ data, selected }: NodeProps<ConsumerNodeProps>) {
   return (
     <div>
+      <NodeToolbar isVisible={selected}>
+        <button
+          className="border-2 rounded-md border-thw bg-white p-1"
+          onClick={data.deleteNode}
+        >
+          Delete
+        </button>
+      </NodeToolbar>
       <div
         className={`${
           data.hasEnergy ? "bg-thw" : "bg-thw-400"

@@ -20,13 +20,18 @@ type RFState = {
   edges: Edge[];
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
+  removeNode: (id: string) => void;
   addCableDataEdge: (
     connection: Connection,
     onClickCallback: (cableData: CableData) => void,
     voltageDrop: number
   ) => CableData | undefined;
   updateCableDataEdge: (cable: Cable, voltageDrop: number) => void;
-  addProducerDataNode: (producerData: ProducerData, energyFlow: number) => void;
+  addProducerDataNode: (
+    producerData: ProducerData,
+    energyFlow: number,
+    deleteNode: () => void
+  ) => void;
   updateProducerDataNode: (
     producerData: ProducerData,
     energyFlow: number
@@ -34,7 +39,8 @@ type RFState = {
   addDistributorDataNode: (
     distributorData: DistributorData,
     energyFlow: number,
-    hasEnergy: boolean
+    hasEnergy: boolean,
+    deleteNode: () => void
   ) => void;
   updateDistributorDataNode: (
     distributorData: DistributorData,
@@ -44,7 +50,8 @@ type RFState = {
   addConsumerDataNode: (
     consumerData: ConsumerData,
     hasEnergy: boolean,
-    totalVoltageDrop: number
+    totalVoltageDrop: number,
+    deleteNode: () => void
   ) => void;
   updateConsumerDataNode: (
     consumerData: ConsumerData,
@@ -65,6 +72,11 @@ const useStore = create<RFState>((set, get) => ({
   onEdgesChange: (changes: EdgeChange[]) => {
     set({
       edges: applyEdgeChanges(changes, get().edges),
+    });
+  },
+  removeNode: (id: string) => {
+    set({
+      nodes: get().nodes.filter((node) => node.id !== id),
     });
   },
   addCableDataEdge: (
@@ -142,14 +154,19 @@ const useStore = create<RFState>((set, get) => ({
       }),
     });
   },
-  addProducerDataNode: (producerData: ProducerData, energyFlow: number) => {
+  addProducerDataNode: (
+    producerData: ProducerData,
+    energyFlow: number,
+    deleteNode: () => void
+  ) => {
     const producerNode = {
       id: producerData.producer.id,
       type: "producerNode",
       position: producerData.position,
       data: {
         producer: producerData.producer,
-        energyFlow: energyFlow,
+        energyFlow,
+        deleteNode,
       },
       draggable: true,
     };
@@ -164,6 +181,7 @@ const useStore = create<RFState>((set, get) => ({
           node.data = {
             producer: producerData.producer,
             energyFlow,
+            deleteNode: node.data.deleteNode,
           };
         }
         return node;
@@ -173,7 +191,8 @@ const useStore = create<RFState>((set, get) => ({
   addDistributorDataNode: (
     distributorData: DistributorData,
     energyFlow: number,
-    hasEnergy: boolean
+    hasEnergy: boolean,
+    deleteNode: () => void
   ) => {
     const distributorNode = {
       id: distributorData.distributor.id,
@@ -183,6 +202,7 @@ const useStore = create<RFState>((set, get) => ({
         distributor: distributorData.distributor,
         energyFlow,
         hasEnergy,
+        deleteNode,
       },
       draggable: true,
     };
@@ -202,6 +222,7 @@ const useStore = create<RFState>((set, get) => ({
             distributor: distributorData.distributor,
             energyFlow,
             hasEnergy,
+            deleteNode: node.data.deleteNode,
           };
         }
         return node;
@@ -211,7 +232,8 @@ const useStore = create<RFState>((set, get) => ({
   addConsumerDataNode: (
     consumerData: ConsumerData,
     hasEnergy: boolean,
-    totalVoltageDrop: number
+    totalVoltageDrop: number,
+    deleteNode: () => void
   ) => {
     const consumerNode = {
       id: consumerData.consumer.id,
@@ -221,6 +243,7 @@ const useStore = create<RFState>((set, get) => ({
         consumer: consumerData.consumer,
         hasEnergy,
         totalVoltageDrop,
+        deleteNode,
       },
       draggable: true,
     };
@@ -240,6 +263,7 @@ const useStore = create<RFState>((set, get) => ({
             consumer: consumerData.consumer,
             hasEnergy,
             totalVoltageDrop,
+            deleteNode: node.data.deleteNode,
           };
         }
         return node;

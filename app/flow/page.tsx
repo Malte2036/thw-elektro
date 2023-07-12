@@ -30,6 +30,7 @@ const selector = (state: any) => ({
   edges: state.edges,
   onNodesChange: state.onNodesChange,
   onEdgesChange: state.onEdgesChange,
+  removeNode: state.removeNode,
   addCableDataEdge: state.addCableDataEdge,
   updateCableDataEdge: state.updateCableDataEdge,
   addProducerDataNode: state.addProducerDataNode,
@@ -56,6 +57,10 @@ export default function FlowPage() {
     []
   );
   const edgeTypes = useMemo(() => ({ cableEdge: CableEdge }), []);
+
+  const [selectedNodeId, setSelectedNodeId] = useState<string | undefined>(
+    undefined
+  );
 
   const [allConsumerData, setAllConsumerData] = useState<ConsumerData[]>([
     {
@@ -113,6 +118,7 @@ export default function FlowPage() {
     edges,
     onNodesChange,
     onEdgesChange,
+    removeNode,
     addCableDataEdge,
     updateCableDataEdge,
     addProducerDataNode,
@@ -127,21 +133,41 @@ export default function FlowPage() {
     allProducerData.forEach((producerData) =>
       addProducerDataNode(
         producerData,
-        allEnergyConsumptions.get(producerData.producer.id)
+        allEnergyConsumptions.get(producerData.producer.id),
+        () => {
+          setAllProducerData((state) =>
+            state.filter((p) => p.producer.id !== producerData.producer.id)
+          );
+          removeNode(producerData.producer.id);
+        }
       )
     );
     allDistributorData.forEach((distributorData) =>
       addDistributorDataNode(
         distributorData,
         allEnergyConsumptions.get(distributorData.distributor.id) ?? 0,
-        allEnergyConsumptions.has(distributorData.distributor.id)
+        allEnergyConsumptions.has(distributorData.distributor.id),
+        () => {
+          setAllDistributorData((state) =>
+            state.filter(
+              (p) => p.distributor.id !== distributorData.distributor.id
+            )
+          );
+          removeNode(distributorData.distributor.id);
+        }
       )
     );
     allConsumerData.forEach((consumerData) =>
       addConsumerDataNode(
         consumerData,
         allEnergyConsumptions.has(consumerData.consumer.id),
-        allTotalVoltageDrops.get(consumerData.consumer.id) ?? 0
+        allTotalVoltageDrops.get(consumerData.consumer.id) ?? 0,
+        () => {
+          setAllConsumerData((state) =>
+            state.filter((p) => p.consumer.id !== consumerData.consumer.id)
+          );
+          removeNode(consumerData.consumer.id);
+        }
       )
     );
   }
@@ -270,6 +296,9 @@ export default function FlowPage() {
             setAllCableData((state) => [...state, cableData]);
           }
         }}
+        onNodeClick={(event, node) => {
+          setSelectedNodeId(node.id);
+        }}
         fitView
       >
         <ReactFlow.Background />
@@ -287,15 +316,36 @@ export default function FlowPage() {
         <div className="w-screen h-screen xl:w-96 absolute md:relative ">
           <FlowMenu
             addConsumerNodeCallback={(consumerData: ConsumerData) => {
-              addConsumerDataNode(consumerData, false, 0);
+              addConsumerDataNode(consumerData, false, 0, () => {
+                setAllConsumerData((state) =>
+                  state.filter(
+                    (p) => p.consumer.id !== consumerData.consumer.id
+                  )
+                );
+                removeNode(consumerData.consumer.id);
+              });
               setAllConsumerData((state) => [...state, consumerData]);
             }}
             addDistributorNodeCallback={(distributorData: DistributorData) => {
-              addDistributorDataNode(distributorData, false, 0);
+              addDistributorDataNode(distributorData, false, 0, () => {
+                setAllDistributorData((state) =>
+                  state.filter(
+                    (p) => p.distributor.id !== distributorData.distributor.id
+                  )
+                );
+                removeNode(distributorData.distributor.id);
+              });
               setAllDistributorData((state) => [...state, distributorData]);
             }}
             addProducerNodeCallback={(producerData: ProducerData) => {
-              addProducerDataNode(producerData, 0);
+              addProducerDataNode(producerData, 0, () => {
+                setAllProducerData((state) =>
+                  state.filter(
+                    (p) => p.producer.id !== producerData.producer.id
+                  )
+                );
+                removeNode(producerData.producer.id);
+              });
               setAllProducerData((state) => [...state, producerData]);
             }}
             closeMenu={() => setShowMenu(false)}
