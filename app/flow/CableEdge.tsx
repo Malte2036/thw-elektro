@@ -12,6 +12,7 @@ export type CableEdgeData = {
   cable: Cable;
   nextLength: (cable: Cable) => void;
   nextType: (cable: Cable) => void;
+  deleteEdge: (cable: Cable) => void;
 };
 
 export default function CableEdge(edgeProps: EdgeProps<CableEdgeData>) {
@@ -56,6 +57,12 @@ export default function CableEdge(edgeProps: EdgeProps<CableEdgeData>) {
                 onClick={() => edgeProps.data?.nextType(edgeProps.data.cable)}
               >
                 Type
+              </Button>
+              <Button
+                type="secondary"
+                onClick={() => edgeProps.data?.deleteEdge(edgeProps.data.cable)}
+              >
+                Delete
               </Button>
             </div>
           )}

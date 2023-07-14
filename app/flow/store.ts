@@ -21,10 +21,12 @@ export type RFState = {
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
   removeNode: (id: string) => void;
+  removeEdge: (id: string) => void;
   addCableEdge: (
     connection: Connection,
     nextLength: (cable: Cable) => void,
     nextType: (cable: Cable) => void,
+    deleteEdge: (cable: Cable) => void,
     voltageDrop: number
   ) => void;
   updateCableEdge: (cable: Cable) => void;
@@ -57,10 +59,16 @@ const useStore = create<RFState>((set, get) => ({
         .filter((edge) => edge.target !== id),
     });
   },
+  removeEdge: (id: string) => {
+    set({
+      edges: get().edges.filter((edge) => edge.id !== id),
+    });
+  },
   addCableEdge: (
     connection: Connection,
     nextLength: (cable: Cable) => void,
     nextType: (cable: Cable) => void,
+    deleteEdge: (cable: Cable) => void,
     voltageDrop: number
   ): void => {
     if (!connection.source || !connection.target) return;
@@ -112,6 +120,7 @@ const useStore = create<RFState>((set, get) => ({
         cable,
         nextLength,
         nextType,
+        deleteEdge,
       },
     };
 

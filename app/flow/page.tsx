@@ -28,6 +28,7 @@ const selector = (state: RFState) => ({
   onNodesChange: state.onNodesChange,
   onEdgesChange: state.onEdgesChange,
   removeNode: state.removeNode,
+  removeEdge: state.removeEdge,
   addCableEdge: state.addCableEdge,
   updateCableEdge: state.updateCableEdge,
   addElectroInterfaceNode: state.addElectroInterfaceNode,
@@ -60,6 +61,7 @@ export default function FlowPage() {
     onNodesChange,
     onEdgesChange,
     removeNode,
+    removeEdge,
     addCableEdge,
     updateCableEdge,
     addElectroInterfaceNode,
@@ -201,6 +203,10 @@ export default function FlowPage() {
               cable.nextType();
 
               updateCableEdge(cable);
+              setRecalculateFlip((state) => !state);
+            },
+            (cable: Cable) => {
+              removeEdge(cable.id);
               setRecalculateFlip((state) => !state);
             },
             0
