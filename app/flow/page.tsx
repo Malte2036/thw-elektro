@@ -20,6 +20,7 @@ import { shallow } from "zustand/shallow";
 import FlowMenu from "./FlowMenu";
 import { ElectroInterface } from "../lib/data/Electro";
 import { ElectroInterfaceNode } from "./ElectroInterfaceNode";
+import { Button } from "@/components/Button";
 
 const selector = (state: RFState) => ({
   nodes: state.nodes,
@@ -79,7 +80,6 @@ export default function FlowPage() {
     return (edges as ReactFlow.Edge[])
       .filter((e) => e.type == "cableEdge")
       .map((e) => e.data.cable) as Cable[];
-    //return cablesBugFix;
   }
 
   function createInitialNodes() {
@@ -205,12 +205,9 @@ export default function FlowPage() {
         <ReactFlow.Background />
         <ReactFlow.Controls />
         <ReactFlow.Panel position="top-right">
-          <button
-            className="bg-thw text-white rounded-md p-2"
-            onClick={() => setShowMenu((state) => !state)}
-          >
+          <Button type="primary" onClick={() => setShowMenu((state) => !state)}>
             {showMenu ? "Close" : "Open"} Menu
-          </button>
+          </Button>
         </ReactFlow.Panel>
       </ReactFlow.ReactFlow>
       {showMenu ? (

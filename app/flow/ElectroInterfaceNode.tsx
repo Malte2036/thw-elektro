@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 import { Consumer } from "../lib/data/Consumer";
 import { isVoltageDropTooHigh } from "../lib/calculation/energy";
 import { Distributor } from "../lib/data/Distributor";
+import { Button } from "@/components/Button";
 
 type ElectroInterfaceNodeProps = {
   electroInterface: ElectroInterface;
@@ -88,6 +89,20 @@ export function ElectroInterfaceNode({
     }
   }
 
+  function getNodeToolbar(): ReactNode {
+    const buttons = [
+      <Button type="secondary" onClick={data.deleteNode}>
+        Delete
+      </Button>,
+    ];
+
+    return (
+      <NodeToolbar isVisible={selected} className="flex flex-row gap-2">
+        {...buttons}
+      </NodeToolbar>
+    );
+  }
+
   function hasEnergy(): boolean {
     switch (data.electroInterface.type) {
       case "Consumer":
@@ -103,14 +118,7 @@ export function ElectroInterfaceNode({
 
   return (
     <div>
-      <NodeToolbar isVisible={selected}>
-        <button
-          className="border-2 rounded-md border-thw bg-white p-1"
-          onClick={data.deleteNode}
-        >
-          Delete
-        </button>
-      </NodeToolbar>
+      {getNodeToolbar()}
       <div
         className={`${
           hasEnergy() ? "bg-thw" : "bg-thw-400"

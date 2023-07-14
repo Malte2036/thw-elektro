@@ -4,6 +4,7 @@ import { Consumer } from "../lib/data/Consumer";
 import { Distributor } from "../lib/data/Distributor";
 import { Producer } from "../lib/data/Producer";
 import { ElectroInterface } from "../lib/data/Electro";
+import { Button } from "@/components/Button";
 
 export default function FlowMenu({
   addElectroInterfaceNodeCallback,
@@ -67,12 +68,9 @@ export default function FlowMenu({
             value={producerName}
             onChange={(e) => setProducerName(e.target.value)}
           />
-          <button
-            className="bg-thw text-white px-2 rounded-md"
-            onClick={clickAddProducerNode}
-          >
+          <Button type="primary" onClick={clickAddProducerNode}>
             Hinzufügen
-          </button>
+          </Button>
         </div>
         <div className="w-full bg-white text-thw rounded-md p-4 flex flex-col gap-2 items-start">
           <div className="text-xl font-bold">Verteiler</div>
@@ -82,15 +80,12 @@ export default function FlowMenu({
             value={distributorName}
             onChange={(e) => setDistributorName(e.target.value)}
           />
-          <button
-            className="bg-thw text-white px-2 rounded-md"
-            onClick={clickAddDistributorNode}
-          >
+          <Button type="primary" onClick={clickAddDistributorNode}>
             Hinzufügen
-          </button>
+          </Button>
         </div>
         <div className="w-full bg-white text-thw rounded-md p-4 flex flex-col gap-2 items-start">
-          <button className="text-xl font-bold">Verbraucher</button>{" "}
+          <div className="text-xl font-bold">Verbraucher</div>
           <label>Name:</label>
           <input
             className="bg-thw text-white px-2 rounded-md"
@@ -106,12 +101,9 @@ export default function FlowMenu({
               setConsumerEnergyConsumption(parseFloat(e.target.value))
             }
           />
-          <button
-            className="bg-thw text-white px-2 rounded-md"
-            onClick={clickAddConsumerNode}
-          >
+          <Button type="primary" onClick={clickAddConsumerNode}>
             Hinzufügen
-          </button>
+          </Button>
         </div>
       </div>
       <button onClick={closeMenu}>Schliessen</button>
