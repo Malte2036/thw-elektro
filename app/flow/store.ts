@@ -11,7 +11,7 @@ import {
   applyNodeChanges,
   applyEdgeChanges,
 } from "reactflow";
-import { CableData, isCircularConnection } from "../lib/calculation/energy";
+import { isCircularConnection } from "../lib/calculation/energy";
 import { Cable } from "../lib/data/Cable";
 import { ElectroInterface } from "../lib/data/Electro";
 
@@ -21,12 +21,12 @@ export type RFState = {
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
   removeNode: (id: string) => void;
-  addCableDataEdge: (
+  addCableEdge: (
     connection: Connection,
     onClickCallback: (cable: Cable) => void,
     voltageDrop: number
-  ) => CableData | undefined;
-  updateCableDataEdge: (cable: Cable, voltageDrop: number) => void;
+  ) => void;
+  updateCableEdge: (cable: Cable) => void;
   addElectroInterfaceNode: (
     electroInterface: ElectroInterface,
     deleteNode: () => void
@@ -49,15 +49,17 @@ const useStore = create<RFState>((set, get) => ({
     });
   },
   removeNode: (id: string) => {
+    console.log("removeNode", id);
+
     set({
       nodes: get().nodes.filter((node) => node.id !== id),
     });
   },
-  addCableDataEdge: (
+  addCableEdge: (
     connection: Connection,
     onClickCallback: (cable: Cable) => void,
     voltageDrop: number
-  ): CableData | undefined => {
+  ): void => {
     if (!connection.source || !connection.target) return;
 
     // Check for circular connection
@@ -85,43 +87,41 @@ const useStore = create<RFState>((set, get) => ({
       alert("Node already has an input edge");
       return;
     }
-    const cableData = new CableData(
-      new Cable(
-        "cable-" + Math.floor(Math.random() * 1_000_000),
-        50,
-        connection.source.includes("producer-") ? 400 : 230,
-        16
-      ),
+
+    const cable = new Cable(
+      "cable-" + Date.now(),
+      50,
+      connection.source.includes("producer-") ? 400 : 230,
+      16,
       connection.source,
-      connection.target
+      connection.target,
+      voltageDrop
     );
     const cableNode: Edge = {
-      id: cableData.cable.id,
-      source: cableData.source,
+      id: cable.id,
+      source: cable.source,
       sourceHandle: "output",
-      target: cableData.target,
+      target: cable.target,
       targetHandle: "input",
       animated: true,
       type: "cableEdge",
       data: {
-        cable: cableData.cable,
-        voltageDrop,
+        cable,
         onClickCallback,
       },
     };
+
     set({
-      edges: addEdge(cableNode, get().edges),
+      edges: [...get().edges, cableNode],
     });
-    return cableData;
   },
-  updateCableDataEdge(cable: Cable, voltageDrop: number) {
+  updateCableEdge(cable: Cable) {
     set({
       edges: get().edges.map((edge) => {
         if (edge.id === cable.id) {
           edge.data = {
             ...edge.data,
             cable,
-            voltageDrop,
           };
         }
         return edge;

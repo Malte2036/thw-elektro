@@ -10,9 +10,7 @@ import { ProducerNode } from "./ProducerNode";
 import { Producer } from "../lib/data/Producer";
 import CableEdge from "./CableEdge";
 import { Cable, getNextCableLength } from "../lib/data/Cable";
-import { Position } from "../lib/Position";
 import {
-  CableData,
   calculateTotalVoltageDropPercent,
   getRecursiveEnergyConsumption,
   getVoltageDropForCableData,
@@ -33,8 +31,8 @@ const selector = (state: RFState) => ({
   onNodesChange: state.onNodesChange,
   onEdgesChange: state.onEdgesChange,
   removeNode: state.removeNode,
-  addCableDataEdge: state.addCableDataEdge,
-  updateCableDataEdge: state.updateCableDataEdge,
+  addCableEdge: state.addCableEdge,
+  updateCableEdge: state.updateCableEdge,
   addElectroInterfaceNode: state.addElectroInterfaceNode,
   updateElectroInterfaceNode: state.updateElectroInterfaceNode,
 });
@@ -66,16 +64,14 @@ export default function FlowPage() {
     new Producer("producer-1", "SEA", { x: 50, y: 300 }),
   ];
 
-  const [allCableData, setAllCableData] = useState<CableData[]>([]);
-
   const {
     nodes,
     edges,
     onNodesChange,
     onEdgesChange,
     removeNode,
-    addCableDataEdge,
-    updateCableDataEdge,
+    addCableEdge: addCableDataEdge,
+    updateCableEdge: updateCableDataEdge,
     addElectroInterfaceNode,
     updateElectroInterfaceNode,
   } = useStore(selector, shallow);
@@ -84,6 +80,17 @@ export default function FlowPage() {
     return (nodes as ReactFlow.Node[])
       .filter((n) => n.type == "electroInterfaceNode")
       .map((n) => n.data.electroInterface) as ElectroInterface[];
+  }
+
+  // bug fix (replace later with a better solution)
+  // edges does not update correctly when adding a new cable, so we need to keep track of it ourselves...
+  const [cablesBugFix, setCablesBugFix] = useState<Cable[]>([]);
+
+  function getAllCables(): Cable[] {
+    //return (edges as ReactFlow.Edge[])
+    //  .filter((e) => e.type == "cableEdge")
+    //  .map((e) => e.data.cable) as Cable[];
+    return cablesBugFix;
   }
 
   function createInitialNodes() {
@@ -102,10 +109,11 @@ export default function FlowPage() {
 
   function getEnergyConsumptions(): Map<string, number> {
     const allElectro = getAllElectro();
+    const allCables = getAllCables();
 
     const allEnergyConsumptions = getRecursiveEnergyConsumption(
       allElectro,
-      allCableData,
+      allCables,
       allElectro.filter((e) => e.type == "Producer").map((p) => p.id) ?? []
     );
 
@@ -116,15 +124,17 @@ export default function FlowPage() {
     currentAllEnergyConsumptions: Map<string, number>
   ): Map<string, number> {
     const allElectro = getAllElectro();
+    const allCable = getAllCables();
+
     const voltageDrops = new Map();
 
-    allCableData.forEach((cableData) => {
+    allCable.forEach((c) => {
       let voltageDrop = getVoltageDropForCableData(
         allElectro,
         currentAllEnergyConsumptions,
-        cableData
+        c
       );
-      voltageDrops.set(cableData.toTargetSourceString(), voltageDrop);
+      voltageDrops.set(c.toTargetSourceString(), voltageDrop);
     });
 
     return voltageDrops;
@@ -135,10 +145,17 @@ export default function FlowPage() {
   }, []);
 
   function recalculate() {
+    console.log(
+      "recalculate",
+      `found ${nodes.length} nodes`,
+      `found ${edges.length} edges`
+    );
+
     const allEnergyConsumptions = getEnergyConsumptions();
     const voltageDrops = getVoltageDrops(allEnergyConsumptions);
 
     const allElectro = getAllElectro();
+    const allCables = getAllCables();
 
     allElectro.forEach((electro) => {
       switch (electro.type) {
@@ -146,7 +163,7 @@ export default function FlowPage() {
           const consumer = electro as Consumer;
           consumer.hasEnergy = allEnergyConsumptions.has(consumer.id);
           consumer.totalVoltageDrop = calculateTotalVoltageDropPercent(
-            allCableData,
+            allCables,
             voltageDrops,
             consumer.id
           );
@@ -165,17 +182,29 @@ export default function FlowPage() {
       updateElectroInterfaceNode(electro);
     });
 
-    allCableData.forEach((cableData) => {
-      updateCableDataEdge(
-        cableData.cable,
-        voltageDrops.get(cableData.toTargetSourceString()) ?? 0
-      );
+    allCables.forEach((c) => {
+      c.voltageDrop = voltageDrops.get(c.toTargetSourceString()) ?? 0;
+
+      updateCableDataEdge(c);
     });
   }
 
   useEffect(() => {
     recalculate();
-  }, [allCableData]);
+  }, [cablesBugFix]);
+
+  useEffect(() => {
+    const newCables = edges
+      .filter((e) => e.type == "cableEdge")
+      .map((e) => e.data.cable) as Cable[];
+
+    const changes =
+      newCables.map((c) => c.id).toString() !=
+      cablesBugFix.map((c) => c.id).toString();
+    if (!changes) return;
+
+    setCablesBugFix(newCables);
+  }, [edges]);
 
   return (
     <div className="w-screen h-screen flex flex-row">
@@ -187,29 +216,16 @@ export default function FlowPage() {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={(connection) => {
-          const cableData = addCableDataEdge(
+          addCableDataEdge(
             connection,
             (cable: Cable) => {
               cable.length = getNextCableLength(cable.length);
-              setAllCableData((state) =>
-                state.map((cableData) => {
-                  if (cableData.cable.id === cable.id) {
-                    return new CableData(
-                      cable,
-                      cableData.source,
-                      cableData.target
-                    );
-                  }
-                  return cableData;
-                })
-              );
+              updateCableDataEdge(cable);
             },
             0
           );
-
-          if (cableData != undefined) {
-            setAllCableData((state) => [...state, cableData]);
-          }
+          console.log("end");
+          recalculate();
         }}
         onNodeClick={(event, node) => {
           setSelectedNodeId(node.id);

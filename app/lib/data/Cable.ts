@@ -1,3 +1,5 @@
+import { toTargetSourceString } from "../utils";
+
 export type CableLength = 25 | 50 | 75 | 100;
 export type Voltage = 230 | 400; // Voltage (U): Volts (V)
 export type Current = 16 | 32 | 63; // Current (I): Amperes (A)
@@ -8,16 +10,27 @@ export class Cable {
   public readonly voltage: Voltage;
   public readonly current: Current;
 
+  public readonly source: string;
+  public readonly target: string;
+
+  public voltageDrop: number;
+
   constructor(
     id: string,
     length: CableLength,
     voltage: Voltage,
-    current: Current
+    current: Current,
+    source: string,
+    target: string,
+    voltageDrop: number = 0
   ) {
     this.id = id;
     this.length = length;
     this.voltage = voltage;
     this.current = current;
+    this.source = source;
+    this.target = target;
+    this.voltageDrop = voltageDrop;
   }
 
   getDiameter(): number {
@@ -33,6 +46,10 @@ export class Cable {
           "Invalid current. Only 16A, 32A and 63A are supported."
         );
     }
+  }
+
+  toTargetSourceString() {
+    return toTargetSourceString(this.target, this.source);
   }
 }
 

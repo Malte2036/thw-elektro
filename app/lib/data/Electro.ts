@@ -1,18 +1,18 @@
 import { Position } from "../Position";
 
-export type ElektroType = "Consumer" | "Distributor" | "Producer";
+export type ElectroType = "Consumer" | "Distributor" | "Producer";
 
 export abstract class ElectroInterface {
   public readonly id: string;
   public readonly name: string | undefined;
   public position: Position;
-  public readonly type: ElektroType;
+  public readonly type: ElectroType;
 
   constructor(
     id: string,
     name: string | undefined,
     position: Position,
-    type: ElektroType
+    type: ElectroType
   ) {
     this.id = id;
     this.name = name;
@@ -21,7 +21,7 @@ export abstract class ElectroInterface {
   }
 }
 
-export function translateElectroType(type: ElektroType) {
+export function translateElectroType(type: ElectroType) {
   switch (type) {
     case "Consumer":
       return "Verbraucher";

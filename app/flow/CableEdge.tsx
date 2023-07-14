@@ -9,7 +9,6 @@ import { isVoltageDropTooHigh } from "../lib/calculation/energy";
 
 export type CableEdgeData = {
   cable: Cable;
-  voltageDrop: number;
   onClickCallback: (cable: Cable) => void;
 };
 
@@ -44,7 +43,7 @@ export default function CableEdge(edgeProps: EdgeProps<CableEdgeData>) {
         >
           <button
             className={`edgebutton bg-white ${
-              isVoltageDropTooHigh(edgeProps.data?.voltageDrop ?? 0)
+              isVoltageDropTooHigh(edgeProps.data?.cable.voltageDrop ?? 0)
                 ? "border-red-600 text-red-600 font-bold border-4"
                 : "border-black  border-2"
             } rounded-md px-1 py-0.5 flex flex-col items-center justify-center`}
@@ -61,7 +60,7 @@ export default function CableEdge(edgeProps: EdgeProps<CableEdgeData>) {
             <div>
               {edgeProps.data?.cable.current}A/{edgeProps.data?.cable.voltage}V
             </div>
-            <div>{edgeProps.data?.voltageDrop.toFixed(2)}%</div>
+            <div>{edgeProps.data?.cable.voltageDrop.toFixed(2)}%</div>
           </button>
         </div>
       </EdgeLabelRenderer>
