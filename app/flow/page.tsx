@@ -7,7 +7,7 @@ import "reactflow/dist/style.css";
 import { Consumer } from "../lib/data/Consumer";
 import { Producer } from "../lib/data/Producer";
 import CableEdge from "./CableEdge";
-import { Cable, getNextCableLength } from "../lib/data/Cable";
+import { Cable } from "../lib/data/Cable";
 import {
   calculateTotalVoltageDropPercent,
   getRecursiveEnergyConsumption,
@@ -192,7 +192,14 @@ export default function FlowPage() {
           addCableEdge(
             connection,
             (cable: Cable) => {
-              cable.length = getNextCableLength(cable.length);
+              cable.nextLength();
+
+              updateCableEdge(cable);
+              setRecalculateFlip((state) => !state);
+            },
+            (cable: Cable) => {
+              cable.nextType();
+
               updateCableEdge(cable);
               setRecalculateFlip((state) => !state);
             },

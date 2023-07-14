@@ -1,3 +1,4 @@
+import next from "next/types";
 import { toTargetSourceString } from "../utils";
 
 export type CableLength = 25 | 50 | 75 | 100;
@@ -7,8 +8,8 @@ export type Current = 16 | 32 | 63; // Current (I): Amperes (A)
 export class Cable {
   public readonly id: string;
   public length: CableLength;
-  public readonly voltage: Voltage;
-  public readonly current: Current;
+  public voltage: Voltage;
+  public current: Current;
 
   public readonly source: string;
   public readonly target: string;
@@ -63,9 +64,19 @@ export class Cable {
       this.voltageDrop === other.voltageDrop
     );
   }
+
+  nextLength(): void {
+    this.length = getNextCableLength(this.length);
+  }
+
+  nextType(): void {
+    const { voltage, current } = getNextCableType(this.voltage, this.current);
+    this.voltage = voltage;
+    this.current = current;
+  }
 }
 
-export function getNextCableLength(length: CableLength): CableLength {
+function getNextCableLength(length: CableLength): CableLength {
   switch (length) {
     case 25:
       return 50;
@@ -75,5 +86,22 @@ export function getNextCableLength(length: CableLength): CableLength {
       return 100;
     case 100:
       return 25;
+  }
+}
+
+function getNextCableType(
+  voltage: Voltage,
+  current: Current
+): { voltage: Voltage; current: Current } {
+  switch (current) {
+    case 16:
+      if (voltage === 230) return { voltage: 400, current: 16 };
+      return { voltage: 400, current: 32 };
+    case 32:
+      return { voltage: 400, current: 63 };
+    case 63:
+      return { voltage: 230, current: 16 };
+    default:
+      throw new Error("Invalid current. Only 16A, 32A and 63A are supported.");
   }
 }

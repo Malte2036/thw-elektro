@@ -6,10 +6,12 @@ import {
 } from "reactflow";
 import { Cable } from "../lib/data/Cable";
 import { isVoltageDropTooHigh } from "../lib/calculation/energy";
+import { Button } from "@/components/Button";
 
 export type CableEdgeData = {
   cable: Cable;
-  onClickCallback: (cable: Cable) => void;
+  nextLength: (cable: Cable) => void;
+  nextType: (cable: Cable) => void;
 };
 
 export default function CableEdge(edgeProps: EdgeProps<CableEdgeData>) {
@@ -39,29 +41,37 @@ export default function CableEdge(edgeProps: EdgeProps<CableEdgeData>) {
             // if you have an interactive element, set pointer-events: all
             pointerEvents: "all",
           }}
-          className="nodrag nopan"
+          className="nodrag nopan flex flex-col gap-1 items-center"
         >
-          <button
+          {edgeProps.selected && (
+            <div className="flex flex-row gap-1">
+              <Button
+                type="secondary"
+                onClick={() => edgeProps.data?.nextLength(edgeProps.data.cable)}
+              >
+                Länge
+              </Button>
+              <Button
+                type="secondary"
+                onClick={() => edgeProps.data?.nextType(edgeProps.data.cable)}
+              >
+                Type
+              </Button>
+            </div>
+          )}
+          <div
             className={`edgebutton bg-white ${
               isVoltageDropTooHigh(edgeProps.data?.cable.voltageDrop ?? 0)
                 ? "border-red-600 text-red-600 font-bold border-4"
                 : "border-black  border-2"
             } rounded-md px-1 py-0.5 flex flex-col items-center justify-center`}
-            onClick={() => {
-              const onClickCallback = edgeProps.data?.onClickCallback;
-              if (onClickCallback == undefined) {
-                throw "onClickCallback of CableEdge is undefined";
-              }
-
-              edgeProps.data?.onClickCallback(edgeProps.data.cable);
-            }}
           >
             <div>{edgeProps.data?.cable.length}m</div>
             <div>
-              {edgeProps.data?.cable.current}A/{edgeProps.data?.cable.voltage}V
+              {edgeProps.data?.cable.voltage}V/{edgeProps.data?.cable.current}A
             </div>
             <div>{edgeProps.data?.cable.voltageDrop.toFixed(2)}%</div>
-          </button>
+          </div>
         </div>
       </EdgeLabelRenderer>
     </>

@@ -23,7 +23,8 @@ export type RFState = {
   removeNode: (id: string) => void;
   addCableEdge: (
     connection: Connection,
-    onClickCallback: (cable: Cable) => void,
+    nextLength: (cable: Cable) => void,
+    nextType: (cable: Cable) => void,
     voltageDrop: number
   ) => void;
   updateCableEdge: (cable: Cable) => void;
@@ -58,7 +59,8 @@ const useStore = create<RFState>((set, get) => ({
   },
   addCableEdge: (
     connection: Connection,
-    onClickCallback: (cable: Cable) => void,
+    nextLength: (cable: Cable) => void,
+    nextType: (cable: Cable) => void,
     voltageDrop: number
   ): void => {
     if (!connection.source || !connection.target) return;
@@ -108,7 +110,8 @@ const useStore = create<RFState>((set, get) => ({
       type: "cableEdge",
       data: {
         cable,
-        onClickCallback,
+        nextLength,
+        nextType,
       },
     };
 
