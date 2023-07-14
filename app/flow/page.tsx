@@ -5,8 +5,6 @@ import * as ReactFlow from "reactflow";
 
 import "reactflow/dist/style.css";
 import { Consumer } from "../lib/data/Consumer";
-import { ConsumerNode } from "./ConsumerNode";
-import { ProducerNode } from "./ProducerNode";
 import { Producer } from "../lib/data/Producer";
 import CableEdge from "./CableEdge";
 import { Cable, getNextCableLength } from "../lib/data/Cable";
@@ -15,9 +13,7 @@ import {
   getRecursiveEnergyConsumption,
   getVoltageDropForCableData,
 } from "../lib/calculation/energy";
-import { DistributorNode } from "./DistributorNode";
 import { Distributor } from "../lib/data/Distributor";
-import { toTargetSourceString } from "../lib/utils";
 
 import useStore, { RFState } from "./store";
 import { shallow } from "zustand/shallow";
@@ -42,9 +38,6 @@ export default function FlowPage() {
 
   const nodeTypes = useMemo(
     () => ({
-      consumerNode: ConsumerNode,
-      producerNode: ProducerNode,
-      distributorNode: DistributorNode,
       electroInterfaceNode: ElectroInterfaceNode,
     }),
     []
