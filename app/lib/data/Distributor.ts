@@ -1,9 +1,11 @@
-export class Distributor {
-  public readonly id: string;
-  public readonly name: string | undefined;
+import { Position } from "../Position";
+import { ElectroInterface } from "./Electro";
 
-  constructor(id: string, name: string | undefined) {
-    this.id = id;
-    this.name = name;
+export class Distributor extends ElectroInterface {
+  public energyFlow: number = 0;
+  public hasEnergy: boolean = false;
+
+  constructor(id: string, name: string | undefined, position: Position) {
+    super(id, name, position, "Distributor");
   }
 }

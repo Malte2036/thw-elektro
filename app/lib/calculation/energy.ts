@@ -1,7 +1,9 @@
-import { ConsumerData, DistributorData } from "@/app/flow/page";
 import { Cable } from "../data/Cable";
 import { sumArray, toTargetSourceString } from "../utils";
 import * as ReactFlow from "reactflow";
+import { ElectroInterface } from "../data/Electro";
+import { Consumer } from "../data/Consumer";
+import { Distributor } from "../data/Distributor";
 export class CableData {
   cable: Cable;
   source: string;
@@ -90,33 +92,34 @@ export function calculatePowerInWatt(cable: Cable): number {
 }
 
 export function getVoltageDropForCableData(
-  allConsumerData: ConsumerData[],
-  allDistributorData: DistributorData[],
+  allElectroInterfaces: ElectroInterface[],
   allEnergyConsumptions: Map<string, number>,
   headCableData: CableData
 ): number {
-  const consumerData = allConsumerData.find(
-    (c) => c.consumer.id === headCableData.target
-  );
-  const distributorData = allDistributorData.find(
-    (d) => d.distributor.id === headCableData.target
+  const allConsumers = allElectroInterfaces.filter(
+    (e) => e.type === "Consumer"
+  ) as Consumer[];
+  const allDistributors = allElectroInterfaces.filter(
+    (e) => e.type === "Distributor"
+  ) as Distributor[];
+  const consumerData = allConsumers.find((c) => c.id === headCableData.target);
+  const distributorData = allDistributors.find(
+    (d) => d.id === headCableData.target
   );
 
   let energyConsumption = 0;
 
   if (consumerData !== undefined) {
-    energyConsumption = consumerData.consumer.energyConsumption;
+    energyConsumption = consumerData.energyConsumption;
   } else if (distributorData !== undefined) {
-    energyConsumption =
-      allEnergyConsumptions.get(distributorData.distributor.id) ?? 0;
+    energyConsumption = allEnergyConsumptions.get(distributorData.id) ?? 0;
   }
 
   return calculateVoltageDropPercent(headCableData.cable, energyConsumption);
 }
 
 export function getRecursiveEnergyConsumption(
-  allConsumerData: ConsumerData[],
-  allDistributorData: DistributorData[],
+  allElectroInterfaces: ElectroInterface[],
   allCableData: CableData[],
   headCableTargets: string[]
 ): Map<string, number> {
@@ -129,8 +132,8 @@ export function getRecursiveEnergyConsumption(
       (c) => c.source === headCableTarget
     );
 
-    const dependingConsumers = getDependingConsumersEnergyConsumption(
-      allConsumerData,
+    const dependingConsumers = _getDependingConsumersEnergyConsumption(
+      allElectroInterfaces,
       outputEdges
     );
     dependingConsumers.forEach((value, key) =>
@@ -138,8 +141,7 @@ export function getRecursiveEnergyConsumption(
     );
 
     const dependingDistributors = getDependingDistributorsEnergyConsumption(
-      allConsumerData,
-      allDistributorData,
+      allElectroInterfaces,
       allCableData,
       outputEdges
     );
@@ -162,16 +164,17 @@ export function getRecursiveEnergyConsumption(
   return energyConsumptionMap;
 }
 
-function getDependingConsumersEnergyConsumption(
-  allConsumerData: ConsumerData[],
+export function _getDependingConsumersEnergyConsumption(
+  allElectroInterfaces: ElectroInterface[],
   outputEdges: CableData[]
 ): Map<string, number> {
   const energyConsumptionMap = new Map<string, number>();
 
   for (const edge of outputEdges) {
-    const consumption = allConsumerData.find(
-      (c) => c.consumer.id === edge.target
-    )?.consumer?.energyConsumption;
+    const consumption = allElectroInterfaces
+      .filter((e) => e.type == "Consumer")
+      .map((e) => e as Consumer)
+      .find((c) => c.id === edge.target)?.energyConsumption;
 
     if (consumption !== undefined) {
       energyConsumptionMap.set(edge.target, consumption);
@@ -181,20 +184,22 @@ function getDependingConsumersEnergyConsumption(
 }
 
 function getDependingDistributorsEnergyConsumption(
-  allConsumerData: ConsumerData[],
-  allDistributorData: DistributorData[],
+  allElectroInterfaces: ElectroInterface[],
   allCableData: CableData[],
   outputEdges: CableData[]
 ): Map<string, number> {
   const energyConsumptionMap = new Map<string, number>();
 
+  const allDistributor = allElectroInterfaces
+    .filter((e) => e.type == "Distributor")
+    .map((e) => e as Distributor);
+
   const dependingEdges = outputEdges.filter((e) =>
-    allDistributorData.find((d) => d.distributor.id === e.target)
+    allDistributor.find((d) => d.id === e.target)
   );
   for (const edge of dependingEdges) {
     const res = getRecursiveEnergyConsumption(
-      allConsumerData,
-      allDistributorData,
+      allElectroInterfaces,
       allCableData,
       [edge.target]
     );

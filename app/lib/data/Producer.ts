@@ -1,9 +1,10 @@
-export class Producer {
-  public readonly id: string;
-  public readonly name: string | undefined;
+import { Position } from "../Position";
+import { ElectroInterface } from "./Electro";
 
-  constructor(id: string, name: string | undefined) {
-    this.id = id;
-    this.name = name;
+export class Producer extends ElectroInterface {
+  public energyFlow: number = 0;
+
+  constructor(id: string, name: string | undefined, position: Position) {
+    super(id, name, position, "Producer");
   }
 }

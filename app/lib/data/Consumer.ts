@@ -1,11 +1,19 @@
-export class Consumer {
-  public readonly id: string;
-  public readonly name: string | undefined;
-  public readonly energyConsumption: number;
+import { Position } from "../Position";
+import { ElectroInterface } from "./Electro";
 
-  constructor(id: string, name: string | undefined, energyConsumption: number) {
-    this.id = id;
-    this.name = name;
+export class Consumer extends ElectroInterface {
+  public readonly energyConsumption: number;
+  public hasEnergy: boolean = false;
+  public totalVoltageDrop: number | undefined = undefined;
+
+  constructor(
+    id: string,
+    name: string | undefined,
+    position: Position,
+    energyConsumption: number
+  ) {
+    super(id, name, position, "Consumer");
+
     this.energyConsumption = energyConsumption;
   }
 }

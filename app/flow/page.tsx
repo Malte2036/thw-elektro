@@ -21,11 +21,13 @@ import { DistributorNode } from "./DistributorNode";
 import { Distributor } from "../lib/data/Distributor";
 import { toTargetSourceString } from "../lib/utils";
 
-import useStore from "./store";
+import useStore, { RFState } from "./store";
 import { shallow } from "zustand/shallow";
 import FlowMenu from "./FlowMenu";
+import { ElectroInterface } from "../lib/data/Electro";
+import { ElectroInterfaceNode } from "./ElectroInterfaceNode";
 
-const selector = (state: any) => ({
+const selector = (state: RFState) => ({
   nodes: state.nodes,
   edges: state.edges,
   onNodesChange: state.onNodesChange,
@@ -33,17 +35,9 @@ const selector = (state: any) => ({
   removeNode: state.removeNode,
   addCableDataEdge: state.addCableDataEdge,
   updateCableDataEdge: state.updateCableDataEdge,
-  addProducerDataNode: state.addProducerDataNode,
-  updateProducerDataNode: state.updateProducerDataNode,
-  addDistributorDataNode: state.addDistributorDataNode,
-  updateDistributorDataNode: state.updateDistributorDataNode,
-  addConsumerDataNode: state.addConsumerDataNode,
-  updateConsumerDataNode: state.updateConsumerDataNode,
+  addElectroInterfaceNode: state.addElectroInterfaceNode,
+  updateElectroInterfaceNode: state.updateElectroInterfaceNode,
 });
-
-export type ProducerData = { producer: Producer; position: Position };
-export type ConsumerData = { consumer: Consumer; position: Position };
-export type DistributorData = { distributor: Distributor; position: Position };
 
 export default function FlowPage() {
   const [showMenu, setShowMenu] = useState<boolean>(false);
@@ -53,6 +47,7 @@ export default function FlowPage() {
       consumerNode: ConsumerNode,
       producerNode: ProducerNode,
       distributorNode: DistributorNode,
+      electroInterfaceNode: ElectroInterfaceNode,
     }),
     []
   );
@@ -62,56 +57,16 @@ export default function FlowPage() {
     undefined
   );
 
-  const [allConsumerData, setAllConsumerData] = useState<ConsumerData[]>([
-    {
-      consumer: new Consumer("consumer-1", undefined, 1500),
-      position: { x: 550, y: 100 },
-    },
-    {
-      consumer: new Consumer("consumer-2", undefined, 800),
-      position: { x: 550, y: 300 },
-    },
-    {
-      consumer: new Consumer("consumer-3", undefined, 1800),
-      position: { x: 550, y: 500 },
-    },
-  ]);
-  const [allDistributorData, setAllDistributorData] = useState<
-    DistributorData[]
-  >([
-    {
-      distributor: new Distributor("distributor-1", undefined),
-      position: { x: 300, y: 200 },
-    },
-    {
-      distributor: new Distributor("distributor-2", undefined),
-      position: { x: 300, y: 400 },
-    },
-  ]);
-  const [allProducerData, setAllProducerData] = useState<ProducerData[]>([
-    {
-      producer: new Producer("producer-1", "SEA"),
-      position: { x: 50, y: 300 },
-    },
-  ]);
+  const initialElectroInterfaceNodes = [
+    new Consumer("consumer-1", undefined, { x: 550, y: 100 }, 1500),
+    new Consumer("consumer-2", undefined, { x: 550, y: 300 }, 800),
+    new Consumer("consumer-3", undefined, { x: 550, y: 500 }, 1800),
+    new Distributor("distributor-1", undefined, { x: 300, y: 200 }),
+    new Distributor("distributor-2", undefined, { x: 300, y: 400 }),
+    new Producer("producer-1", "SEA", { x: 50, y: 300 }),
+  ];
 
   const [allCableData, setAllCableData] = useState<CableData[]>([]);
-
-  const [allEnergyConsumptions, setAllEnergyConsumptions] = useState<
-    Map<string, number>
-  >(new Map());
-
-  const [allVoltageDrops, setAllVoltageDrops] = useState<Map<string, number>>(
-    new Map()
-  );
-
-  const [allTotalVoltageDrops, setAllTotalVoltageDrops] = useState<
-    Map<string, number>
-  >(new Map());
-
-  //const [nodes, setNodes, onNodesChange] = ReactFlow.useNodesState([]);
-  //const [edges, setEdges, onEdgesChange] =
-  //  ReactFlow.useEdgesState<CableEdgeData>([]);
 
   const {
     nodes,
@@ -121,141 +76,106 @@ export default function FlowPage() {
     removeNode,
     addCableDataEdge,
     updateCableDataEdge,
-    addProducerDataNode,
-    updateProducerDataNode,
-    addDistributorDataNode,
-    updateDistributorDataNode,
-    addConsumerDataNode,
-    updateConsumerDataNode,
+    addElectroInterfaceNode,
+    updateElectroInterfaceNode,
   } = useStore(selector, shallow);
 
+  function getAllElectro(): ElectroInterface[] {
+    return (nodes as ReactFlow.Node[])
+      .filter((n) => n.type == "electroInterfaceNode")
+      .map((n) => n.data.electroInterface) as ElectroInterface[];
+  }
+
   function createInitialNodes() {
-    allProducerData.forEach((producerData) =>
-      addProducerDataNode(
-        producerData,
-        allEnergyConsumptions.get(producerData.producer.id),
-        () => {
-          setAllProducerData((state) =>
-            state.filter((p) => p.producer.id !== producerData.producer.id)
-          );
-          removeNode(producerData.producer.id);
-        }
-      )
-    );
-    allDistributorData.forEach((distributorData) =>
-      addDistributorDataNode(
-        distributorData,
-        allEnergyConsumptions.get(distributorData.distributor.id) ?? 0,
-        allEnergyConsumptions.has(distributorData.distributor.id),
-        () => {
-          setAllDistributorData((state) =>
-            state.filter(
-              (p) => p.distributor.id !== distributorData.distributor.id
-            )
-          );
-          removeNode(distributorData.distributor.id);
-        }
-      )
-    );
-    allConsumerData.forEach((consumerData) =>
-      addConsumerDataNode(
-        consumerData,
-        allEnergyConsumptions.has(consumerData.consumer.id),
-        allTotalVoltageDrops.get(consumerData.consumer.id) ?? 0,
-        () => {
-          setAllConsumerData((state) =>
-            state.filter((p) => p.consumer.id !== consumerData.consumer.id)
-          );
-          removeNode(consumerData.consumer.id);
-        }
-      )
-    );
+    if (nodes.length > 0) {
+      console.log("nodes already exist");
+      return;
+    }
+
+    initialElectroInterfaceNodes.forEach((electro) => {
+      addElectroInterfaceNode(electro, () => {
+        removeNode(electro.id);
+      });
+    });
+    recalculate();
   }
 
-  function updateEnergyConsumptions() {
-    const currentAllEnergyConsumptions = getRecursiveEnergyConsumption(
-      allConsumerData,
-      allDistributorData,
+  function getEnergyConsumptions(): Map<string, number> {
+    const allElectro = getAllElectro();
+
+    const allEnergyConsumptions = getRecursiveEnergyConsumption(
+      allElectro,
       allCableData,
-      allProducerData.map((producerData) => producerData.producer.id) ?? []
+      allElectro.filter((e) => e.type == "Producer").map((p) => p.id) ?? []
     );
-    setAllEnergyConsumptions(currentAllEnergyConsumptions);
 
-    updateVoltageDrops(currentAllEnergyConsumptions);
+    return allEnergyConsumptions;
   }
 
-  function updateVoltageDrops(currentAllEnergyConsumptions: any) {
+  function getVoltageDrops(
+    currentAllEnergyConsumptions: Map<string, number>
+  ): Map<string, number> {
+    const allElectro = getAllElectro();
     const voltageDrops = new Map();
 
     allCableData.forEach((cableData) => {
       let voltageDrop = getVoltageDropForCableData(
-        allConsumerData,
-        allDistributorData,
+        allElectro,
         currentAllEnergyConsumptions,
         cableData
       );
       voltageDrops.set(cableData.toTargetSourceString(), voltageDrop);
     });
 
-    setAllVoltageDrops(voltageDrops);
-
-    const totalVoltageDrops = new Map(
-      allConsumerData.map((consumerData) => [
-        consumerData.consumer.id,
-        calculateTotalVoltageDropPercent(
-          allCableData,
-          voltageDrops,
-          consumerData.consumer.id
-        ),
-      ])
-    );
-    setAllTotalVoltageDrops(totalVoltageDrops);
+    return voltageDrops;
   }
 
   useEffect(() => {
     createInitialNodes();
   }, []);
 
-  useEffect(() => {
-    updateEnergyConsumptions();
-  }, [allConsumerData, allCableData, allDistributorData, allProducerData]);
+  function recalculate() {
+    const allEnergyConsumptions = getEnergyConsumptions();
+    const voltageDrops = getVoltageDrops(allEnergyConsumptions);
 
-  useEffect(() => {
-    allProducerData.forEach((producerData) => {
-      updateProducerDataNode(
-        producerData,
-        allEnergyConsumptions.get(producerData.producer.id) ?? 0
-      );
-    });
+    const allElectro = getAllElectro();
 
-    allDistributorData.forEach((distributorData) => {
-      updateDistributorDataNode(
-        distributorData,
-        allEnergyConsumptions.get(distributorData.distributor.id) ?? 0,
-        allEnergyConsumptions.has(distributorData.distributor.id)
-      );
-    });
+    allElectro.forEach((electro) => {
+      switch (electro.type) {
+        case "Consumer":
+          const consumer = electro as Consumer;
+          consumer.hasEnergy = allEnergyConsumptions.has(consumer.id);
+          consumer.totalVoltageDrop = calculateTotalVoltageDropPercent(
+            allCableData,
+            voltageDrops,
+            consumer.id
+          );
+          break;
+        case "Distributor":
+          const distributor = electro as Distributor;
+          distributor.energyFlow = allEnergyConsumptions.get(electro.id) ?? 0;
+          distributor.hasEnergy = allEnergyConsumptions.has(distributor.id);
+          break;
+        case "Producer":
+          const producer = electro as Producer;
+          producer.energyFlow = allEnergyConsumptions.get(producer.id) ?? 0;
+          break;
+      }
 
-    allConsumerData.forEach((consumerData) => {
-      updateConsumerDataNode(
-        consumerData,
-        allEnergyConsumptions.has(consumerData.consumer.id),
-        allTotalVoltageDrops.get(consumerData.consumer.id) ?? 0
-      );
+      updateElectroInterfaceNode(electro);
     });
 
     allCableData.forEach((cableData) => {
       updateCableDataEdge(
         cableData.cable,
-        allVoltageDrops.get(cableData.toTargetSourceString()) ?? 0
+        voltageDrops.get(cableData.toTargetSourceString()) ?? 0
       );
     });
-  }, [
-    allEnergyConsumptions,
-    allVoltageDrops,
-    allTotalVoltageDrops,
-    allConsumerData,
-  ]);
+  }
+
+  useEffect(() => {
+    recalculate();
+  }, [allCableData]);
 
   return (
     <div className="w-screen h-screen flex flex-row">
@@ -284,12 +204,7 @@ export default function FlowPage() {
                 })
               );
             },
-            allVoltageDrops.get(
-              toTargetSourceString(
-                connection.target ?? "",
-                connection.source ?? ""
-              )
-            ) ?? 0
+            0
           );
 
           if (cableData != undefined) {
@@ -314,42 +229,16 @@ export default function FlowPage() {
       </ReactFlow.ReactFlow>
       {showMenu ? (
         <div className="w-screen h-screen xl:w-96 absolute md:relative ">
-          <FlowMenu
-            addConsumerNodeCallback={(consumerData: ConsumerData) => {
-              addConsumerDataNode(consumerData, false, 0, () => {
-                setAllConsumerData((state) =>
-                  state.filter(
-                    (p) => p.consumer.id !== consumerData.consumer.id
-                  )
-                );
-                removeNode(consumerData.consumer.id);
-              });
-              setAllConsumerData((state) => [...state, consumerData]);
-            }}
-            addDistributorNodeCallback={(distributorData: DistributorData) => {
-              addDistributorDataNode(distributorData, false, 0, () => {
-                setAllDistributorData((state) =>
-                  state.filter(
-                    (p) => p.distributor.id !== distributorData.distributor.id
-                  )
-                );
-                removeNode(distributorData.distributor.id);
-              });
-              setAllDistributorData((state) => [...state, distributorData]);
-            }}
-            addProducerNodeCallback={(producerData: ProducerData) => {
-              addProducerDataNode(producerData, 0, () => {
-                setAllProducerData((state) =>
-                  state.filter(
-                    (p) => p.producer.id !== producerData.producer.id
-                  )
-                );
-                removeNode(producerData.producer.id);
-              });
-              setAllProducerData((state) => [...state, producerData]);
-            }}
-            closeMenu={() => setShowMenu(false)}
-          />
+          {
+            <FlowMenu
+              addElectroInterfaceNodeCallback={(electro: ElectroInterface) => {
+                addElectroInterfaceNode(electro, () => {
+                  removeNode(electro.id);
+                });
+              }}
+              closeMenu={() => setShowMenu(false)}
+            />
+          }
         </div>
       ) : undefined}
     </div>

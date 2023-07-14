@@ -3,17 +3,13 @@ import { Position, getRandomPosition } from "../lib/Position";
 import { Consumer } from "../lib/data/Consumer";
 import { Distributor } from "../lib/data/Distributor";
 import { Producer } from "../lib/data/Producer";
-import { ConsumerData, DistributorData, ProducerData } from "./page";
+import { ElectroInterface } from "../lib/data/Electro";
 
 export default function FlowMenu({
-  addConsumerNodeCallback,
-  addDistributorNodeCallback,
-  addProducerNodeCallback,
+  addElectroInterfaceNodeCallback,
   closeMenu,
 }: {
-  addConsumerNodeCallback: (consumerData: ConsumerData) => void;
-  addDistributorNodeCallback: (distributorData: DistributorData) => void;
-  addProducerNodeCallback: (producerData: ProducerData) => void;
+  addElectroInterfaceNodeCallback: (electroInterface: ElectroInterface) => void;
   closeMenu: () => void;
 }) {
   const [consumerEnergyConsumption, setConsumerEnergyConsumption] =
@@ -29,39 +25,34 @@ export default function FlowMenu({
   const initialPosition: Position = { x: 100, y: 100 };
 
   function clickAddConsumerNode() {
-    const consumerNode: ConsumerData = {
-      consumer: new Consumer(
-        generateId("consumer"),
-        consumerName.length > 0 ? consumerName : undefined,
-        consumerEnergyConsumption * 1000
-      ),
-      position: initialPosition,
-    };
-    addConsumerNodeCallback(consumerNode);
+    const consumer = new Consumer(
+      generateId("consumer"),
+      consumerName.length > 0 ? consumerName : undefined,
+      initialPosition,
+      consumerEnergyConsumption * 1000
+    );
+
+    addElectroInterfaceNodeCallback(consumer);
     closeMenu();
   }
 
   function clickAddDistributorNode() {
-    const distributorNode: DistributorData = {
-      distributor: new Distributor(
-        generateId("distributor"),
-        distributorName.length > 0 ? distributorName : undefined
-      ),
-      position: initialPosition,
-    };
-    addDistributorNodeCallback(distributorNode);
+    const distributor = new Distributor(
+      generateId("distributor"),
+      distributorName.length > 0 ? distributorName : undefined,
+      initialPosition
+    );
+    addElectroInterfaceNodeCallback(distributor);
     closeMenu();
   }
 
   function clickAddProducerNode() {
-    const producerNode: ProducerData = {
-      producer: new Producer(
-        generateId("producer"),
-        producerName.length > 0 ? producerName : undefined
-      ),
-      position: initialPosition,
-    };
-    addProducerNodeCallback(producerNode);
+    const producer = new Producer(
+      generateId("producer"),
+      producerName.length > 0 ? producerName : undefined,
+      initialPosition
+    );
+    addElectroInterfaceNodeCallback(producer);
     closeMenu();
   }
 

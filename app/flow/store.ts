@@ -12,10 +12,10 @@ import {
   applyEdgeChanges,
 } from "reactflow";
 import { CableData, isCircularConnection } from "../lib/calculation/energy";
-import { ConsumerData, DistributorData, ProducerData } from "./page";
 import { Cable } from "../lib/data/Cable";
+import { ElectroInterface } from "../lib/data/Electro";
 
-type RFState = {
+export type RFState = {
   nodes: Node[];
   edges: Edge[];
   onNodesChange: OnNodesChange;
@@ -23,41 +23,15 @@ type RFState = {
   removeNode: (id: string) => void;
   addCableDataEdge: (
     connection: Connection,
-    onClickCallback: (cableData: CableData) => void,
+    onClickCallback: (cable: Cable) => void,
     voltageDrop: number
   ) => CableData | undefined;
   updateCableDataEdge: (cable: Cable, voltageDrop: number) => void;
-  addProducerDataNode: (
-    producerData: ProducerData,
-    energyFlow: number,
+  addElectroInterfaceNode: (
+    electroInterface: ElectroInterface,
     deleteNode: () => void
   ) => void;
-  updateProducerDataNode: (
-    producerData: ProducerData,
-    energyFlow: number
-  ) => void;
-  addDistributorDataNode: (
-    distributorData: DistributorData,
-    energyFlow: number,
-    hasEnergy: boolean,
-    deleteNode: () => void
-  ) => void;
-  updateDistributorDataNode: (
-    distributorData: DistributorData,
-    energyFlow: number,
-    hasEnergy: boolean
-  ) => void;
-  addConsumerDataNode: (
-    consumerData: ConsumerData,
-    hasEnergy: boolean,
-    totalVoltageDrop: number,
-    deleteNode: () => void
-  ) => void;
-  updateConsumerDataNode: (
-    consumerData: ConsumerData,
-    hasEnergy: boolean,
-    totalVoltageDrop: number
-  ) => void;
+  updateElectroInterfaceNode: (electroInterface: ElectroInterface) => void;
 };
 
 // this is our useStore hook that we can use in our components to get parts of the store and call actions
@@ -81,7 +55,7 @@ const useStore = create<RFState>((set, get) => ({
   },
   addCableDataEdge: (
     connection: Connection,
-    onClickCallback: (cableData: CableData) => void,
+    onClickCallback: (cable: Cable) => void,
     voltageDrop: number
   ): CableData | undefined => {
     if (!connection.source || !connection.target) return;
@@ -154,116 +128,31 @@ const useStore = create<RFState>((set, get) => ({
       }),
     });
   },
-  addProducerDataNode: (
-    producerData: ProducerData,
-    energyFlow: number,
+  addElectroInterfaceNode: (
+    electroInterface: ElectroInterface,
     deleteNode: () => void
   ) => {
-    const producerNode = {
-      id: producerData.producer.id,
-      type: "producerNode",
-      position: producerData.position,
+    const electroInterfaceNode = {
+      id: electroInterface.id,
+      type: "electroInterfaceNode",
+      position: electroInterface.position,
       data: {
-        producer: producerData.producer,
-        energyFlow,
+        electroInterface,
         deleteNode,
       },
       draggable: true,
     };
     set({
-      nodes: [...get().nodes, producerNode],
+      nodes: [...get().nodes, electroInterfaceNode],
     });
   },
-  updateProducerDataNode: (producerData: ProducerData, energyFlow: number) => {
+  updateElectroInterfaceNode: (electroInterface: ElectroInterface) => {
     set({
       nodes: get().nodes.map((node) => {
-        if (node.id === producerData.producer.id) {
+        if (node.id === electroInterface.id) {
           node.data = {
-            producer: producerData.producer,
-            energyFlow,
-            deleteNode: node.data.deleteNode,
-          };
-        }
-        return node;
-      }),
-    });
-  },
-  addDistributorDataNode: (
-    distributorData: DistributorData,
-    energyFlow: number,
-    hasEnergy: boolean,
-    deleteNode: () => void
-  ) => {
-    const distributorNode = {
-      id: distributorData.distributor.id,
-      type: "distributorNode",
-      position: distributorData.position,
-      data: {
-        distributor: distributorData.distributor,
-        energyFlow,
-        hasEnergy,
-        deleteNode,
-      },
-      draggable: true,
-    };
-    set({
-      nodes: [...get().nodes, distributorNode],
-    });
-  },
-  updateDistributorDataNode: (
-    distributorData: DistributorData,
-    energyFlow: number,
-    hasEnergy: boolean
-  ) => {
-    set({
-      nodes: get().nodes.map((node) => {
-        if (node.id === distributorData.distributor.id) {
-          node.data = {
-            distributor: distributorData.distributor,
-            energyFlow,
-            hasEnergy,
-            deleteNode: node.data.deleteNode,
-          };
-        }
-        return node;
-      }),
-    });
-  },
-  addConsumerDataNode: (
-    consumerData: ConsumerData,
-    hasEnergy: boolean,
-    totalVoltageDrop: number,
-    deleteNode: () => void
-  ) => {
-    const consumerNode = {
-      id: consumerData.consumer.id,
-      type: "consumerNode",
-      position: consumerData.position,
-      data: {
-        consumer: consumerData.consumer,
-        hasEnergy,
-        totalVoltageDrop,
-        deleteNode,
-      },
-      draggable: true,
-    };
-    set({
-      nodes: [...get().nodes, consumerNode],
-    });
-  },
-  updateConsumerDataNode: (
-    consumerData: ConsumerData,
-    hasEnergy: boolean,
-    totalVoltageDrop: number
-  ) => {
-    set({
-      nodes: get().nodes.map((node) => {
-        if (node.id === consumerData.consumer.id) {
-          node.data = {
-            consumer: consumerData.consumer,
-            hasEnergy,
-            totalVoltageDrop,
-            deleteNode: node.data.deleteNode,
+            ...node.data,
+            electroInterface,
           };
         }
         return node;
