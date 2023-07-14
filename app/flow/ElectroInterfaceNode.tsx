@@ -91,7 +91,7 @@ export function ElectroInterfaceNode({
 
   function getNodeToolbar(): ReactNode {
     const buttons = [
-      <Button type="secondary" onClick={data.deleteNode}>
+      <Button key={"delete"} type="secondary" onClick={data.deleteNode}>
         Delete
       </Button>,
     ];
