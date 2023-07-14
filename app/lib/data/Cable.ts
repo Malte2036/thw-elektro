@@ -51,6 +51,18 @@ export class Cable {
   toTargetSourceString() {
     return toTargetSourceString(this.target, this.source);
   }
+
+  equals(other: Cable): boolean {
+    return (
+      this.id === other.id &&
+      this.length === other.length &&
+      this.voltage === other.voltage &&
+      this.current === other.current &&
+      this.source === other.source &&
+      this.target === other.target &&
+      this.voltageDrop === other.voltageDrop
+    );
+  }
 }
 
 export function getNextCableLength(length: CableLength): CableLength {

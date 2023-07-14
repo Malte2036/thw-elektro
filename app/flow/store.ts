@@ -51,7 +51,9 @@ const useStore = create<RFState>((set, get) => ({
   removeNode: (id: string) => {
     set({
       nodes: get().nodes.filter((node) => node.id !== id),
-      edges: get().edges.filter((edge) => edge.source !== id),
+      edges: get()
+        .edges.filter((edge) => edge.source !== id)
+        .filter((edge) => edge.target !== id),
     });
   },
   addCableEdge: (

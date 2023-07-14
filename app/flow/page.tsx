@@ -79,14 +79,14 @@ export default function FlowPage() {
   }
 
   // bug fix (replace later with a better solution)
-  // edges does not update correctly when adding a new cable, so we need to keep track of it ourselves...
-  const [cablesBugFix, setCablesBugFix] = useState<Cable[]>([]);
+  // need to force rerender to trigger recalculation. Just invert the value
+  const [recalculateFlip, setRecalculateFlip] = useState<boolean>(false);
 
   function getAllCables(): Cable[] {
-    //return (edges as ReactFlow.Edge[])
-    //  .filter((e) => e.type == "cableEdge")
-    //  .map((e) => e.data.cable) as Cable[];
-    return cablesBugFix;
+    return (edges as ReactFlow.Edge[])
+      .filter((e) => e.type == "cableEdge")
+      .map((e) => e.data.cable) as Cable[];
+    //return cablesBugFix;
   }
 
   function createInitialNodes() {
@@ -173,7 +173,10 @@ export default function FlowPage() {
     });
 
     allCables.forEach((c) => {
-      c.voltageDrop = voltageDrops.get(c.toTargetSourceString()) ?? 0;
+      const voltageDrop = voltageDrops.get(c.toTargetSourceString()) ?? 0;
+      if (voltageDrop == c.voltageDrop) return;
+
+      c.voltageDrop = voltageDrop;
 
       updateCableEdge(c);
     });
@@ -181,20 +184,7 @@ export default function FlowPage() {
 
   useEffect(() => {
     recalculate();
-  }, [cablesBugFix]);
-
-  useEffect(() => {
-    const newCables = edges
-      .filter((e) => e.type == "cableEdge")
-      .map((e) => e.data.cable) as Cable[];
-
-    const changes =
-      newCables.map((c) => c.id).toString() !=
-      cablesBugFix.map((c) => c.id).toString();
-    if (!changes) return;
-
-    setCablesBugFix(newCables);
-  }, [edges]);
+  }, [recalculateFlip]);
 
   return (
     <div className="w-screen h-screen flex flex-row">
@@ -211,10 +201,11 @@ export default function FlowPage() {
             (cable: Cable) => {
               cable.length = getNextCableLength(cable.length);
               updateCableEdge(cable);
+              setRecalculateFlip((state) => !state);
             },
             0
           );
-          recalculate();
+          setRecalculateFlip((state) => !state);
         }}
         fitView
       >
