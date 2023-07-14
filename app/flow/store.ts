@@ -5,11 +5,11 @@ import {
   EdgeChange,
   Node,
   NodeChange,
-  addEdge,
   OnNodesChange,
   OnEdgesChange,
   applyNodeChanges,
   applyEdgeChanges,
+  addEdge,
 } from "reactflow";
 import { isCircularConnection } from "../lib/calculation/energy";
 import { Cable } from "../lib/data/Cable";
@@ -49,10 +49,9 @@ const useStore = create<RFState>((set, get) => ({
     });
   },
   removeNode: (id: string) => {
-    console.log("removeNode", id);
-
     set({
       nodes: get().nodes.filter((node) => node.id !== id),
+      edges: get().edges.filter((edge) => edge.source !== id),
     });
   },
   addCableEdge: (
@@ -112,7 +111,7 @@ const useStore = create<RFState>((set, get) => ({
     };
 
     set({
-      edges: [...get().edges, cableNode],
+      edges: addEdge(cableNode, get().edges),
     });
   },
   updateCableEdge(cable: Cable) {

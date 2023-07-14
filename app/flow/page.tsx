@@ -51,10 +51,6 @@ export default function FlowPage() {
   );
   const edgeTypes = useMemo(() => ({ cableEdge: CableEdge }), []);
 
-  const [selectedNodeId, setSelectedNodeId] = useState<string | undefined>(
-    undefined
-  );
-
   const initialElectroInterfaceNodes = [
     new Consumer("consumer-1", undefined, { x: 550, y: 100 }, 1500),
     new Consumer("consumer-2", undefined, { x: 550, y: 300 }, 800),
@@ -70,8 +66,8 @@ export default function FlowPage() {
     onNodesChange,
     onEdgesChange,
     removeNode,
-    addCableEdge: addCableDataEdge,
-    updateCableEdge: updateCableDataEdge,
+    addCableEdge,
+    updateCableEdge,
     addElectroInterfaceNode,
     updateElectroInterfaceNode,
   } = useStore(selector, shallow);
@@ -145,12 +141,6 @@ export default function FlowPage() {
   }, []);
 
   function recalculate() {
-    console.log(
-      "recalculate",
-      `found ${nodes.length} nodes`,
-      `found ${edges.length} edges`
-    );
-
     const allEnergyConsumptions = getEnergyConsumptions();
     const voltageDrops = getVoltageDrops(allEnergyConsumptions);
 
@@ -185,7 +175,7 @@ export default function FlowPage() {
     allCables.forEach((c) => {
       c.voltageDrop = voltageDrops.get(c.toTargetSourceString()) ?? 0;
 
-      updateCableDataEdge(c);
+      updateCableEdge(c);
     });
   }
 
@@ -216,19 +206,15 @@ export default function FlowPage() {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={(connection) => {
-          addCableDataEdge(
+          addCableEdge(
             connection,
             (cable: Cable) => {
               cable.length = getNextCableLength(cable.length);
-              updateCableDataEdge(cable);
+              updateCableEdge(cable);
             },
             0
           );
-          console.log("end");
           recalculate();
-        }}
-        onNodeClick={(event, node) => {
-          setSelectedNodeId(node.id);
         }}
         fitView
       >
