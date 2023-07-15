@@ -28,11 +28,15 @@ export default function FlowMenu({
   function generateElectroInterface(type: ElectroType): ElectroInterface {
     switch (type) {
       case "Consumer":
+        const parsedEnergyConsumption = parseFloat(consumerEnergyConsumption);
+        if (isNaN(parsedEnergyConsumption)) {
+          throw new Error("Invalid energy consumption");
+        }
         return new Consumer(
           generateId("consumer"),
           consumerName.length > 0 ? consumerName : undefined,
           initialPosition,
-          parseFloat(consumerEnergyConsumption) * 1000
+          parsedEnergyConsumption * 1000
         );
       case "Distributor":
         return new Distributor(
@@ -96,7 +100,13 @@ export default function FlowMenu({
             className="bg-thw text-white px-2 rounded-md"
             value={consumerEnergyConsumption}
             type="number"
-            onChange={(e) => setConsumerEnergyConsumption(e.target.value)}
+            min={0}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value.includes("-")) return;
+
+              setConsumerEnergyConsumption(value);
+            }}
           />
           <Button type="primary" onClick={() => clickAddNode("Consumer")}>
             Hinzufügen
