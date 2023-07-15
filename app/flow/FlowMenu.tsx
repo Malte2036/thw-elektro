@@ -3,7 +3,7 @@ import { Position, getRandomPosition } from "../lib/Position";
 import { Consumer } from "../lib/data/Consumer";
 import { Distributor } from "../lib/data/Distributor";
 import { Producer } from "../lib/data/Producer";
-import { ElectroInterface } from "../lib/data/Electro";
+import { ElectroInterface, ElectroType } from "../lib/data/Electro";
 import { Button } from "@/components/Button";
 
 export default function FlowMenu({
@@ -14,7 +14,7 @@ export default function FlowMenu({
   closeMenu: () => void;
 }) {
   const [consumerEnergyConsumption, setConsumerEnergyConsumption] =
-    useState<number>(5.2);
+    useState<string>("5.2");
   const [consumerName, setConsumerName] = useState<string>("");
   const [distributorName, setDistributorName] = useState<string>("");
   const [producerName, setProducerName] = useState<string>("");
@@ -25,35 +25,34 @@ export default function FlowMenu({
 
   const initialPosition: Position = { x: 100, y: 100 };
 
-  function clickAddConsumerNode() {
-    const consumer = new Consumer(
-      generateId("consumer"),
-      consumerName.length > 0 ? consumerName : undefined,
-      initialPosition,
-      consumerEnergyConsumption * 1000
-    );
-
-    addElectroInterfaceNodeCallback(consumer);
-    closeMenu();
+  function generateElectroInterface(type: ElectroType): ElectroInterface {
+    switch (type) {
+      case "Consumer":
+        return new Consumer(
+          generateId("consumer"),
+          consumerName.length > 0 ? consumerName : undefined,
+          initialPosition,
+          parseFloat(consumerEnergyConsumption) * 1000
+        );
+      case "Distributor":
+        return new Distributor(
+          generateId("distributor"),
+          distributorName.length > 0 ? distributorName : undefined,
+          initialPosition
+        );
+      case "Producer":
+        return new Producer(
+          generateId("producer"),
+          producerName.length > 0 ? producerName : undefined,
+          initialPosition
+        );
+    }
   }
 
-  function clickAddDistributorNode() {
-    const distributor = new Distributor(
-      generateId("distributor"),
-      distributorName.length > 0 ? distributorName : undefined,
-      initialPosition
-    );
-    addElectroInterfaceNodeCallback(distributor);
-    closeMenu();
-  }
+  function clickAddNode(type: ElectroType) {
+    const electroInterface = generateElectroInterface(type);
 
-  function clickAddProducerNode() {
-    const producer = new Producer(
-      generateId("producer"),
-      producerName.length > 0 ? producerName : undefined,
-      initialPosition
-    );
-    addElectroInterfaceNodeCallback(producer);
+    addElectroInterfaceNodeCallback(electroInterface);
     closeMenu();
   }
 
@@ -68,7 +67,7 @@ export default function FlowMenu({
             value={producerName}
             onChange={(e) => setProducerName(e.target.value)}
           />
-          <Button type="primary" onClick={clickAddProducerNode}>
+          <Button type="primary" onClick={() => clickAddNode("Producer")}>
             Hinzufügen
           </Button>
         </div>
@@ -80,7 +79,7 @@ export default function FlowMenu({
             value={distributorName}
             onChange={(e) => setDistributorName(e.target.value)}
           />
-          <Button type="primary" onClick={clickAddDistributorNode}>
+          <Button type="primary" onClick={() => clickAddNode("Distributor")}>
             Hinzufügen
           </Button>
         </div>
@@ -97,11 +96,9 @@ export default function FlowMenu({
             className="bg-thw text-white px-2 rounded-md"
             value={consumerEnergyConsumption}
             type="number"
-            onChange={(e) =>
-              setConsumerEnergyConsumption(parseFloat(e.target.value))
-            }
+            onChange={(e) => setConsumerEnergyConsumption(e.target.value)}
           />
-          <Button type="primary" onClick={clickAddConsumerNode}>
+          <Button type="primary" onClick={() => clickAddNode("Consumer")}>
             Hinzufügen
           </Button>
         </div>
