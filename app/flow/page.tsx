@@ -93,6 +93,7 @@ export default function FlowPage() {
     initialElectroInterfaceNodes.forEach((electro) => {
       addElectroInterfaceNode(electro, () => {
         removeNode(electro.id);
+        setRecalculateFlip((state) => !state);
       });
     });
     recalculate();
@@ -230,6 +231,7 @@ export default function FlowPage() {
               addElectroInterfaceNodeCallback={(electro: ElectroInterface) => {
                 addElectroInterfaceNode(electro, () => {
                   removeNode(electro.id);
+                  setRecalculateFlip((state) => !state);
                 });
               }}
               closeMenu={() => setShowMenu(false)}
