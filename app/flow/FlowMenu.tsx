@@ -63,6 +63,7 @@ export default function FlowMenu({
   return (
     <div className="w-full h-full bg-thw text-white p-4 flex flex-col justify-between">
       <div className="flex flex-col gap-4">
+        <div className="text-2xl font-bold">Elektro Spannungsfall</div>
         <div className="w-full bg-white text-thw rounded-md p-4 flex flex-col gap-2 items-start">
           <div className="text-xl font-bold">Erzeuger</div>
           <label>Name:</label>
