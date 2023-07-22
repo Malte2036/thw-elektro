@@ -11,6 +11,7 @@ import { Predefined } from "../lib/data/Predefined";
 import { deletePredefined, savePredefined } from "../lib/db/save";
 import { generateId } from "../lib/utils";
 import { Button } from "@/components/Button";
+import FlowMenuSettings from "./FlowMenuSettings";
 
 export default function FlowMenu({
   addElectroInterfaceNodeCallback,
@@ -93,6 +94,16 @@ export default function FlowMenu({
             }
           />
         );
+      case FlowMenuHeaderOptions.Settings:
+        return (
+          <FlowMenuSettings
+            openPredefinedPage={() =>
+              setSelectedOption(FlowMenuHeaderOptions.Predefined)
+            }
+          />
+        );
+      default:
+        return <div>Not implemented</div>;
     }
   }
 
