@@ -73,7 +73,7 @@ export default function FlowMenuSettings({
           Hiermit kann die Konfiguration eines anderen Nutzers importiert
           werden.
         </div>
-        <input type="file" onChange={handleFileChange} />
+        <input type="file" accept=".json" onChange={handleFileChange} />
         <Button
           onClick={startImport}
           type="secondary"

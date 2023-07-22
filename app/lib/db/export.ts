@@ -6,7 +6,7 @@ export function exportPredefinedData(predefinedData: Predefined[]) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = "template.json"; // File name for the downloaded JSON file
+  link.download = "exported_templates.json"; // File name for the downloaded JSON file
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
