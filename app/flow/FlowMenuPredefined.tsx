@@ -56,9 +56,11 @@ export default function FlowMenuPredefined({
   if (sortedNodes.length === 0) {
     return (
       <div className="w-full bg-white text-thw rounded-md p-4 flex flex-col gap-2 items-start">
-        Keine vordefinierten Templates vorhanden. Erstelle erst welche.
+        <span>
+          Keine vordefinierten <b>Templates</b> vorhanden. Erstelle erst welche.
+        </span>
         <Button onClick={openAddPredefinedPage} type="primary">
-          Gehe zur "{FlowMenuHeaderOptions.Create}"
+          Gehe zur &quot;{FlowMenuHeaderOptions.Create}&quot;
         </Button>
       </div>
     );

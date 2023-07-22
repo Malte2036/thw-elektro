@@ -28,7 +28,9 @@ export default function FlowMenuHeader({
             type={option === selectedOption ? "secondary" : "primary"}
             key={option}
           >
-            {option}
+            <div className={option === selectedOption ? "font-bold" : ""}>
+              {option}
+            </div>
           </Button>
         ))}
       </div>
