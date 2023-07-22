@@ -1,14 +1,11 @@
 import { Button } from "@/components/Button";
-import {
-  ElectroInterface,
-  ElectroType,
-  translateElectroType,
-} from "../lib/data/Electro";
+import { ElectroType, translateElectroType } from "../lib/data/Electro";
 import { Consumer } from "../lib/data/Consumer";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
+import { Predefined } from "../lib/data/Predefined";
+import { getPredefined, savePredefined } from "../lib/db/save";
 
 type FlowMenuPredefinedProps = {
-  allPredefinedNodes: ElectroInterface[];
   addNodeCallback: (
     type: ElectroType,
     name: string,
@@ -17,9 +14,12 @@ type FlowMenuPredefinedProps = {
 };
 
 export default function FlowMenuPredefined({
-  allPredefinedNodes,
   addNodeCallback,
 }: FlowMenuPredefinedProps) {
+  const [allPredefinedNodes, setAllPredefinedNodes] = useState<Predefined[]>(
+    []
+  );
+
   const sortedNodes = allPredefinedNodes.slice().sort((a, b) => {
     // Compare types first
     const typeComparison = a.type.localeCompare(b.type);
@@ -34,9 +34,18 @@ export default function FlowMenuPredefined({
       return nameA.localeCompare(nameB);
     }
   });
+
   function getConsumerData(consumer: Consumer): ReactNode {
     return <div>Energiebedarf in kW: {consumer.energyConsumption / 1000}</div>;
   }
+
+  useEffect(() => {
+    async function fetchPredefined() {
+      const data = await getPredefined();
+      setAllPredefinedNodes(data);
+    }
+    fetchPredefined();
+  }, []);
 
   return sortedNodes.map((node) => (
     <div

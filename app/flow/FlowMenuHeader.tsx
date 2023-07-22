@@ -25,7 +25,7 @@ export default function FlowMenuHeader({
             onClick={() => {
               selectOptionCallback(option);
             }}
-            type={option === selectedOption ? "primary" : "secondary"}
+            type={option === selectedOption ? "secondary" : "primary"}
             key={option}
           >
             {option}
