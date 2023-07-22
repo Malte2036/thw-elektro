@@ -34,12 +34,16 @@ export default function FlowMenuSettings({
       return;
     }
 
-    const data: Predefined[] = await importPredefinedData(file);
-    if (data.length > 0) {
-      await bulkSavePredefined(data);
-      console.log("Imported predefined data");
+    try {
+      const data: Predefined[] = await importPredefinedData(file);
+      if (data.length > 0) {
+        await bulkSavePredefined(data);
+        console.log("Imported predefined data");
 
-      openPredefinedPage();
+        openPredefinedPage();
+      }
+    } catch (error) {
+      alert("Fehler beim Importieren der Konfiguration");
     }
   }
 
@@ -70,7 +74,11 @@ export default function FlowMenuSettings({
           werden.
         </div>
         <input type="file" onChange={handleFileChange} />
-        <Button onClick={startImport} type="secondary">
+        <Button
+          onClick={startImport}
+          type="secondary"
+          disabled={file == undefined}
+        >
           Importieren
         </Button>
       </FlowMenuItem>
