@@ -58,7 +58,7 @@ export default function FlowMenuCreate({
               })
             }
           >
-            Save
+            als Template speichern
           </Button>
         </div>
       </div>
@@ -87,7 +87,7 @@ export default function FlowMenuCreate({
               })
             }
           >
-            Save
+            als Template speichern
           </Button>
         </div>
       </div>
@@ -136,7 +136,7 @@ export default function FlowMenuCreate({
               });
             }}
           >
-            Save
+            als Template speichern
           </Button>
         </div>
       </div>

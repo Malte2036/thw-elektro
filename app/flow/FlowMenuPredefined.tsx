@@ -4,6 +4,7 @@ import { Consumer } from "../lib/data/Consumer";
 import { ReactNode, useEffect, useState } from "react";
 import { Predefined } from "../lib/data/Predefined";
 import { getPredefined } from "../lib/db/save";
+import { FlowMenuHeaderOptions } from "./FlowMenuHeader";
 
 type FlowMenuPredefinedProps = {
   addNode: (
@@ -12,11 +13,13 @@ type FlowMenuPredefinedProps = {
     consumerEnergyConsumption?: number
   ) => void;
   deleteNode: (id: string) => void;
+  openAddPredefinedPage: () => void;
 };
 
 export default function FlowMenuPredefined({
   addNode,
   deleteNode,
+  openAddPredefinedPage,
 }: FlowMenuPredefinedProps) {
   const [allPredefinedNodes, setAllPredefinedNodes] = useState<Predefined[]>(
     []
@@ -49,6 +52,17 @@ export default function FlowMenuPredefined({
   useEffect(() => {
     fetchPredefined();
   }, []);
+
+  if (sortedNodes.length === 0) {
+    return (
+      <div className="w-full bg-white text-thw rounded-md p-4 flex flex-col gap-2 items-start">
+        Keine vordefinierten Templates vorhanden. Erstelle erst welche.
+        <Button onClick={openAddPredefinedPage} type="primary">
+          Gehe zur "{FlowMenuHeaderOptions.Create}"
+        </Button>
+      </div>
+    );
+  }
 
   return sortedNodes.map((node) => (
     <div

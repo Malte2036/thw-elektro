@@ -52,7 +52,7 @@ export default function FlowMenu({
   }
 
   const [selectedOption, setSelectedOption] = useState<FlowMenuHeaderOptions>(
-    FlowMenuHeaderOptions.Create
+    FlowMenuHeaderOptions.Predefined
   );
 
   async function clickAddNode(
@@ -88,6 +88,9 @@ export default function FlowMenu({
           <FlowMenuPredefined
             addNode={clickAddNode}
             deleteNode={(id: string) => deletePredefined(id)}
+            openAddPredefinedPage={() =>
+              setSelectedOption(FlowMenuHeaderOptions.Create)
+            }
           />
         );
     }
