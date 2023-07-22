@@ -3,18 +3,20 @@ import { ElectroType, translateElectroType } from "../lib/data/Electro";
 import { Consumer } from "../lib/data/Consumer";
 import { ReactNode, useEffect, useState } from "react";
 import { Predefined } from "../lib/data/Predefined";
-import { getPredefined, savePredefined } from "../lib/db/save";
+import { getPredefined } from "../lib/db/save";
 
 type FlowMenuPredefinedProps = {
-  addNodeCallback: (
+  addNode: (
     type: ElectroType,
     name: string,
     consumerEnergyConsumption?: number
   ) => void;
+  deleteNode: (id: string) => void;
 };
 
 export default function FlowMenuPredefined({
-  addNodeCallback,
+  addNode,
+  deleteNode,
 }: FlowMenuPredefinedProps) {
   const [allPredefinedNodes, setAllPredefinedNodes] = useState<Predefined[]>(
     []
@@ -39,11 +41,12 @@ export default function FlowMenuPredefined({
     return <div>Energiebedarf in kW: {consumer.energyConsumption / 1000}</div>;
   }
 
+  async function fetchPredefined() {
+    const data = await getPredefined();
+    setAllPredefinedNodes(data);
+  }
+
   useEffect(() => {
-    async function fetchPredefined() {
-      const data = await getPredefined();
-      setAllPredefinedNodes(data);
-    }
     fetchPredefined();
   }, []);
 
@@ -58,18 +61,29 @@ export default function FlowMenuPredefined({
         }`}
       </div>
       {node.type === "Consumer" && getConsumerData(node as Consumer)}
-      <Button
-        type="primary"
-        onClick={() => {
-          const energyConsumption =
-            node.type === "Consumer"
-              ? (node as Consumer).energyConsumption
-              : undefined;
-          addNodeCallback(node.type, node.name || "", energyConsumption);
-        }}
-      >
-        Hinzufügen
-      </Button>
+      <div className="flex flex-row gap-2">
+        <Button
+          type="primary"
+          onClick={() => {
+            const energyConsumption =
+              node.type === "Consumer"
+                ? (node as Consumer).energyConsumption
+                : undefined;
+            addNode(node.type, node.name || "", energyConsumption);
+          }}
+        >
+          Hinzufügen
+        </Button>
+        <Button
+          onClick={() => {
+            deleteNode(node.id);
+            fetchPredefined();
+          }}
+          type="secondary"
+        >
+          Löschen
+        </Button>
+      </div>
     </div>
   ));
 }

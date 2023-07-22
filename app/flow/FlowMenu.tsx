@@ -8,7 +8,7 @@ import FlowMenuHeader, { FlowMenuHeaderOptions } from "./FlowMenuHeader";
 import FlowMenuCreate from "./FlowMenuCreate";
 import FlowMenuPredefined from "./FlowMenuPredefined";
 import { Predefined } from "../lib/data/Predefined";
-import { savePredefined } from "../lib/db/save";
+import { deletePredefined, savePredefined } from "../lib/db/save";
 import { generateId } from "../lib/utils";
 import { Button } from "@/components/Button";
 
@@ -84,7 +84,12 @@ export default function FlowMenu({
           />
         );
       case FlowMenuHeaderOptions.Predefined:
-        return <FlowMenuPredefined addNodeCallback={clickAddNode} />;
+        return (
+          <FlowMenuPredefined
+            addNode={clickAddNode}
+            deleteNode={(id: string) => deletePredefined(id)}
+          />
+        );
     }
   }
 
