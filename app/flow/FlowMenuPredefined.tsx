@@ -61,7 +61,7 @@ export default function FlowMenuPredefined({
           Keine vordefinierten <b>Templates</b> vorhanden. Erstelle erst welche.
         </span>
         <Button onClick={openAddPredefinedPage} type="primary">
-          Gehe zur &quot;{FlowMenuHeaderOptions.Create}&quot;
+          Gehe zu &quot;{FlowMenuHeaderOptions.Create}&quot;
         </Button>
       </FlowMenuItem>
     );
