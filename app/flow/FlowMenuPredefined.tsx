@@ -71,7 +71,7 @@ export default function FlowMenuPredefined({
     >
       <div className="text-xl font-bold">
         {`${translateElectroType(node.type)}${
-          node.name != undefined ? ": " + node.name : ""
+          node.name != undefined && node.name.length > 0 ? ": " + node.name : ""
         }`}
       </div>
       {node.type === "Consumer" && getConsumerData(node as Consumer)}
