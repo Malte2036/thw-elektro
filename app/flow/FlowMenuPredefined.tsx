@@ -5,6 +5,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { Predefined } from "../lib/data/Predefined";
 import { getPredefined } from "../lib/db/save";
 import { FlowMenuHeaderOptions } from "./FlowMenuHeader";
+import FlowMenuItem from "./FlowMenuItem";
 
 type FlowMenuPredefinedProps = {
   addNode: (
@@ -55,22 +56,19 @@ export default function FlowMenuPredefined({
 
   if (sortedNodes.length === 0) {
     return (
-      <div className="w-full bg-white text-thw rounded-md p-4 flex flex-col gap-2 items-start">
+      <FlowMenuItem>
         <span>
           Keine vordefinierten <b>Templates</b> vorhanden. Erstelle erst welche.
         </span>
         <Button onClick={openAddPredefinedPage} type="primary">
           Gehe zur &quot;{FlowMenuHeaderOptions.Create}&quot;
         </Button>
-      </div>
+      </FlowMenuItem>
     );
   }
 
   return sortedNodes.map((node) => (
-    <div
-      key={node.id}
-      className="w-full bg-white text-thw rounded-md p-4 flex flex-col gap-2 items-start"
-    >
+    <FlowMenuItem key={node.id}>
       <div className="text-xl font-bold">
         {`${translateElectroType(node.type)}${
           node.name != undefined && node.name.length > 0 ? ": " + node.name : ""
@@ -100,6 +98,6 @@ export default function FlowMenuPredefined({
           Löschen
         </Button>
       </div>
-    </div>
+    </FlowMenuItem>
   ));
 }

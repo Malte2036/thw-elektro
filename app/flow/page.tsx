@@ -225,7 +225,7 @@ export default function FlowPage() {
         </ReactFlow.Panel>
       </ReactFlow.ReactFlow>
       {showMenu ? (
-        <div className="w-screen h-screen xl:w-96 absolute md:relative ">
+        <div className="w-screen h-screen flowmenu-small-width absolute md:relative ">
           {
             <FlowMenu
               addElectroInterfaceNodeCallback={(electro: ElectroInterface) => {

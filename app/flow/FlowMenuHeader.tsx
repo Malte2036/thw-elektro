@@ -3,6 +3,7 @@ import { Button } from "@/components/Button";
 export enum FlowMenuHeaderOptions {
   Predefined = "Template Page",
   Create = "Erstellen Page",
+  Settings = "Einstellungen",
 }
 
 export type FlowMenuHeaderProps = {

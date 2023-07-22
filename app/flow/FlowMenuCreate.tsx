@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ElectroType } from "../lib/data/Electro";
 import { Predefined } from "../lib/data/Predefined";
 import { generateId } from "../lib/utils";
+import FlowMenuItem from "./FlowMenuItem";
 
 type FlowMenuCreateProps = {
   addNodeCallback: (
@@ -33,7 +34,7 @@ export default function FlowMenuCreate({
 
   return (
     <>
-      <div className="w-full bg-white text-thw rounded-md p-4 flex flex-col gap-2 items-start">
+      <FlowMenuItem>
         <div className="text-xl font-bold">Erzeuger</div>
         <label>Name:</label>
         <input
@@ -58,11 +59,11 @@ export default function FlowMenuCreate({
               })
             }
           >
-            als Template speichern
+            Template speichern
           </Button>
         </div>
-      </div>
-      <div className="w-full bg-white text-thw rounded-md p-4 flex flex-col gap-2 items-start">
+      </FlowMenuItem>
+      <FlowMenuItem>
         <div className="text-xl font-bold">Verteiler</div>
         <label>Name:</label>
         <input
@@ -87,11 +88,11 @@ export default function FlowMenuCreate({
               })
             }
           >
-            als Template speichern
+            Template speichern
           </Button>
         </div>
-      </div>
-      <div className="w-full bg-white text-thw rounded-md p-4 flex flex-col gap-2 items-start">
+      </FlowMenuItem>
+      <FlowMenuItem>
         <div className="text-xl font-bold">Verbraucher</div>
         <label>Name:</label>
         <input
@@ -136,10 +137,10 @@ export default function FlowMenuCreate({
               });
             }}
           >
-            als Template speichern
+            Template speichern
           </Button>
         </div>
-      </div>
+      </FlowMenuItem>
     </>
   );
 }
