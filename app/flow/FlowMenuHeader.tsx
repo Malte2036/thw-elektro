@@ -1,0 +1,37 @@
+import { Button } from "@/components/Button";
+
+export enum FlowMenuHeaderOptions {
+  Create = "Erstellen Page",
+  Predefined = "Vordefiniert Page",
+}
+
+export type FlowMenuHeaderProps = {
+  selectedOption: FlowMenuHeaderOptions;
+  selectOptionCallback: (option: FlowMenuHeaderOptions) => void;
+};
+
+export default function FlowMenuHeader({
+  selectedOption,
+  selectOptionCallback,
+}: FlowMenuHeaderProps) {
+  const allOptions = Object.values(FlowMenuHeaderOptions);
+
+  return (
+    <>
+      <div className="text-2xl font-bold">Elektro Spannungsfall</div>
+      <div className="flex flex-row gap-2">
+        {allOptions.map((option) => (
+          <Button
+            onClick={() => {
+              selectOptionCallback(option);
+            }}
+            type={option === selectedOption ? "primary" : "secondary"}
+            key={option}
+          >
+            {option}
+          </Button>
+        ))}
+      </div>
+    </>
+  );
+}

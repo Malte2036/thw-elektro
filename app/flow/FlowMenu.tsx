@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { Position, getRandomPosition } from "../lib/Position";
 import { Consumer } from "../lib/data/Consumer";
 import { Distributor } from "../lib/data/Distributor";
 import { Producer } from "../lib/data/Producer";
 import { ElectroInterface, ElectroType } from "../lib/data/Electro";
 import { Button } from "@/components/Button";
+import FlowMenuHeader, { FlowMenuHeaderOptions } from "./FlowMenuHeader";
+import FlowMenuCreate from "./FlowMenuCreate";
+import FlowMenuPredefined from "./FlowMenuPredefined";
 
 export default function FlowMenu({
   addElectroInterfaceNodeCallback,
@@ -13,106 +16,90 @@ export default function FlowMenu({
   addElectroInterfaceNodeCallback: (electroInterface: ElectroInterface) => void;
   closeMenu: () => void;
 }) {
-  const [consumerEnergyConsumption, setConsumerEnergyConsumption] =
-    useState<string>("5.2");
-  const [consumerName, setConsumerName] = useState<string>("");
-  const [distributorName, setDistributorName] = useState<string>("");
-  const [producerName, setProducerName] = useState<string>("");
-
   function generateId(prefix: string) {
-    return `${prefix}-${Date.now().toString()}`;
+    return `${prefix}-${Date.now().toString()}-${(Math.random() * 1000).toFixed(
+      0
+    )}-}`;
   }
 
   const initialPosition: Position = { x: 100, y: 100 };
 
-  function generateElectroInterface(type: ElectroType): ElectroInterface {
+  function generateElectroInterface(
+    type: ElectroType,
+    name: string | undefined,
+    consumerEnergyConsumption?: number
+  ): ElectroInterface {
     switch (type) {
       case "Consumer":
-        const parsedEnergyConsumption = parseFloat(consumerEnergyConsumption);
-        if (isNaN(parsedEnergyConsumption)) {
-          throw new Error("Invalid energy consumption");
-        }
+        if (!consumerEnergyConsumption)
+          throw new Error(
+            "Consumer energy consumption is undefined" +
+              consumerEnergyConsumption
+          );
+
         return new Consumer(
           generateId("consumer"),
-          consumerName.length > 0 ? consumerName : undefined,
+          name,
           initialPosition,
-          parsedEnergyConsumption * 1000
+          consumerEnergyConsumption
         );
       case "Distributor":
         return new Distributor(
           generateId("distributor"),
-          distributorName.length > 0 ? distributorName : undefined,
+          name,
           initialPosition
         );
       case "Producer":
-        return new Producer(
-          generateId("producer"),
-          producerName.length > 0 ? producerName : undefined,
-          initialPosition
-        );
+        return new Producer(generateId("producer"), name, initialPosition);
     }
   }
 
-  function clickAddNode(type: ElectroType) {
-    const electroInterface = generateElectroInterface(type);
+  function clickAddNode(
+    type: ElectroType,
+    name: string,
+    consumerEnergyConsumption?: number
+  ) {
+    const electroInterface = generateElectroInterface(
+      type,
+      name.length > 0 ? name : undefined,
+      consumerEnergyConsumption
+    );
 
     addElectroInterfaceNodeCallback(electroInterface);
     closeMenu();
   }
 
+  const [selectedOption, setSelectedOption] = useState<FlowMenuHeaderOptions>(
+    FlowMenuHeaderOptions.Create
+  );
+
+  const allPredefinedNodes = [
+    new Consumer(generateId("consumer"), "Chiemsee", { x: 0, y: 0 }, 3200),
+    new Producer(generateId("producer"), "SEA", { x: 0, y: 0 }),
+  ];
+
+  function getFlowMenuPart(): ReactNode {
+    switch (selectedOption) {
+      case FlowMenuHeaderOptions.Create:
+        return <FlowMenuCreate addNodeCallback={clickAddNode} />;
+      case FlowMenuHeaderOptions.Predefined:
+        return (
+          <FlowMenuPredefined
+            allPredefinedNodes={allPredefinedNodes}
+            addNodeCallback={clickAddNode}
+          />
+        );
+    }
+  }
+
   return (
     <div className="w-full h-full bg-thw text-white p-4 flex flex-col justify-between">
       <div className="flex flex-col gap-4">
-        <div className="text-2xl font-bold">Elektro Spannungsfall</div>
-        <div className="w-full bg-white text-thw rounded-md p-4 flex flex-col gap-2 items-start">
-          <div className="text-xl font-bold">Erzeuger</div>
-          <label>Name:</label>
-          <input
-            className="bg-thw text-white px-2 rounded-md"
-            value={producerName}
-            onChange={(e) => setProducerName(e.target.value)}
-          />
-          <Button type="primary" onClick={() => clickAddNode("Producer")}>
-            Hinzufügen
-          </Button>
-        </div>
-        <div className="w-full bg-white text-thw rounded-md p-4 flex flex-col gap-2 items-start">
-          <div className="text-xl font-bold">Verteiler</div>
-          <label>Name:</label>
-          <input
-            className="bg-thw text-white px-2 rounded-md"
-            value={distributorName}
-            onChange={(e) => setDistributorName(e.target.value)}
-          />
-          <Button type="primary" onClick={() => clickAddNode("Distributor")}>
-            Hinzufügen
-          </Button>
-        </div>
-        <div className="w-full bg-white text-thw rounded-md p-4 flex flex-col gap-2 items-start">
-          <div className="text-xl font-bold">Verbraucher</div>
-          <label>Name:</label>
-          <input
-            className="bg-thw text-white px-2 rounded-md"
-            value={consumerName}
-            onChange={(e) => setConsumerName(e.target.value)}
-          />
-          <label>Energiebedarf in kW:</label>
-          <input
-            className="bg-thw text-white px-2 rounded-md"
-            value={consumerEnergyConsumption}
-            type="number"
-            min={0}
-            onChange={(e) => {
-              const value = e.target.value;
-              if (value.includes("-")) return;
-
-              setConsumerEnergyConsumption(value);
-            }}
-          />
-          <Button type="primary" onClick={() => clickAddNode("Consumer")}>
-            Hinzufügen
-          </Button>
-        </div>
+        <FlowMenuHeader
+          selectedOption={selectedOption}
+          selectOptionCallback={setSelectedOption}
+        />
+        {getFlowMenuPart()}
       </div>
       <button onClick={closeMenu}>Schliessen</button>
     </div>
