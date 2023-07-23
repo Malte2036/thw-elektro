@@ -6,6 +6,7 @@ import { getPredefined } from "../../lib/db/save";
 import { FlowMenuHeaderOptions } from "./FlowMenuHeader";
 import FlowMenuItem from "./FlowMenuItem";
 import { Plug } from "../../lib/data/Plug";
+import { formatNumberWithMaxTwoDecimals } from "../../lib/utils";
 
 type FlowMenuPredefinedProps = {
   allPlacedNodeTemplateIds: string[];
@@ -78,7 +79,10 @@ export default function FlowMenuPredefined({
 
         return (
           <>
-            <div>Energiebedarf: {energyConsumption / 1000}kW</div>
+            <div>
+              Energiebedarf:{" "}
+              {formatNumberWithMaxTwoDecimals(energyConsumption / 1000)}kW
+            </div>
             {defaultPlugText}
           </>
         );
@@ -92,7 +96,10 @@ export default function FlowMenuPredefined({
 
         return (
           <>
-            <div>Produktion: {energyProduction / 1000}kVA</div>
+            <div>
+              Produktion:{" "}
+              {formatNumberWithMaxTwoDecimals(energyProduction / 1000)}kVA
+            </div>
           </>
         );
       default:

@@ -14,3 +14,8 @@ export function generateId(prefix: string) {
     0
   )}`;
 }
+
+export function formatNumberWithMaxTwoDecimals(value: number): string {
+  const roundedValue = Math.round(value * 100) / 100;
+  return roundedValue.toString();
+}

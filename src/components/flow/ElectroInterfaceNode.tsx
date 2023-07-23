@@ -6,6 +6,7 @@ import { isVoltageDropTooHigh } from "../../lib/calculation/energy";
 import { Distributor } from "../../lib/data/Distributor";
 import { Button } from "../../components/Button";
 import { Producer } from "../../lib/data/Producer";
+import { formatNumberWithMaxTwoDecimals } from "../../lib/utils";
 
 export type ElectroInterfaceNodeProps = {
   electroInterface: ElectroInterface;
@@ -29,7 +30,12 @@ export function ElectroInterfaceNode({
         const totalVoltageDrop = consumer.totalVoltageDrop ?? 0;
         return (
           <>
-            <div>{consumer.energyConsumption / 1000}kW</div>
+            <div>
+              {formatNumberWithMaxTwoDecimals(
+                consumer.energyConsumption / 1000
+              )}
+              kW
+            </div>
             <div
               className={
                 isVoltageDropTooHigh(totalVoltageDrop)
@@ -37,7 +43,7 @@ export function ElectroInterfaceNode({
                   : ""
               }
             >
-              {totalVoltageDrop.toFixed(2)}%
+              {formatNumberWithMaxTwoDecimals(totalVoltageDrop)}%
             </div>
           </>
         );
@@ -45,7 +51,9 @@ export function ElectroInterfaceNode({
         const distributor = data.electroInterface as Distributor;
         return (
           <>
-            <div>{distributor.energyFlow / 1000}kW</div>
+            <div>
+              {formatNumberWithMaxTwoDecimals(distributor.energyFlow / 1000)}kW
+            </div>
             <div
               className={`text-xs ${
                 distributor.energyFlow > distributor.allowedEnergyFlow
@@ -53,7 +61,11 @@ export function ElectroInterfaceNode({
                   : "opacity-75"
               }`}
             >
-              max Leistung: {distributor.allowedEnergyFlow / 1000}kW
+              max Leistung:{" "}
+              {formatNumberWithMaxTwoDecimals(
+                distributor.allowedEnergyFlow / 1000
+              )}
+              kW
             </div>
           </>
         );
@@ -61,7 +73,9 @@ export function ElectroInterfaceNode({
         const producer = data.electroInterface as Producer;
         return (
           <>
-            <div>{producer.energyFlow / 1000}kW</div>
+            <div>
+              {formatNumberWithMaxTwoDecimals(producer.energyFlow / 1000)}kW
+            </div>
             <div
               className={`text-xs ${
                 producer.energyFlow > producer.allowedEnergyFlow
@@ -69,10 +83,16 @@ export function ElectroInterfaceNode({
                   : "opacity-75"
               }`}
             >
-              max Leistung: {producer.allowedEnergyFlow / 1000}kW
+              max Leistung:{" "}
+              {formatNumberWithMaxTwoDecimals(
+                producer.allowedEnergyFlow / 1000
+              )}
+              kW
             </div>
             <div className="text-xs opacity-75">
-              Produktion: {producer.energyProduction / 1000}kVA
+              Produktion:{" "}
+              {formatNumberWithMaxTwoDecimals(producer.energyProduction / 1000)}
+              kVA
             </div>
           </>
         );

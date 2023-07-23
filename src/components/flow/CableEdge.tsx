@@ -7,6 +7,7 @@ import {
 import { Cable } from "../../lib/data/Cable";
 import { isVoltageDropTooHigh } from "../../lib/calculation/energy";
 import { Button } from "../../components/Button";
+import { formatNumberWithMaxTwoDecimals } from "../../lib/utils";
 
 export type CableEdgeData = {
   cable: Cable;
@@ -78,7 +79,12 @@ export default function CableEdge(edgeProps: EdgeProps<CableEdgeData>) {
               {edgeProps.data?.cable.plug.voltage}V/
               {edgeProps.data?.cable.plug.current}A
             </div>
-            <div>{edgeProps.data?.cable.voltageDrop.toFixed(2)}%</div>
+            <div>
+              {formatNumberWithMaxTwoDecimals(
+                edgeProps.data?.cable.voltageDrop ?? 0
+              )}
+              %
+            </div>
           </div>
         </div>
       </EdgeLabelRenderer>
