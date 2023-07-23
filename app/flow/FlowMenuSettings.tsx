@@ -43,13 +43,13 @@ export default function FlowMenuSettings({
         openPredefinedPage();
       }
     } catch (error) {
-      alert("Fehler beim Importieren der Konfiguration");
+      alert("Fehler beim Importieren der Templates.");
     }
   }
 
   async function startDelete() {
     const confirmed = window.confirm(
-      "Bist du dir sicher, dass du die Konfiguration unwiderruflich löschen möchtest?"
+      "Bist du dir sicher, dass du alle Templates unwiderruflich löschen möchtest?"
     );
 
     if (confirmed) {
@@ -63,15 +63,14 @@ export default function FlowMenuSettings({
   return (
     <>
       <FlowMenuItem>
-        <div>Hiermit kann die aktuelle Konfiguration exportiert werden.</div>
+        <div>Hiermit können alle aktuellen Templates exportiert werden.</div>
         <Button onClick={startExport} type="secondary">
           Exportieren
         </Button>
       </FlowMenuItem>
       <FlowMenuItem>
         <div>
-          Hiermit kann die Konfiguration eines anderen Nutzers importiert
-          werden.
+          Hiermit können alle Templates eines anderen Nutzers importiert werden.
         </div>
         <input type="file" accept=".json" onChange={handleFileChange} />
         <Button
@@ -83,9 +82,12 @@ export default function FlowMenuSettings({
         </Button>
       </FlowMenuItem>
       <FlowMenuItem>
-        <div>Hiermit kann die aktuelle Konfiguration gelöscht werden.</div>
+        <div>
+          Hiermit können alle aktuellen Templates unwiderruflich gelöscht
+          werden.
+        </div>
         <Button onClick={startDelete} type="secondary">
-          Konfiguration löschen
+          Templates löschen
         </Button>
       </FlowMenuItem>
     </>
