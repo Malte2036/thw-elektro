@@ -25,8 +25,6 @@ export default function FlowMenu({
   addElectroInterfaceNodeCallback,
   closeMenu,
 }: FlowMenuProps) {
-  const initialPosition: Position = { x: 100, y: 100 };
-
   function generateElectroInterface(
     type: ElectroType,
     name: string | undefined,
@@ -34,6 +32,11 @@ export default function FlowMenu({
     templateId: string | undefined,
     inputPlug: Plug | undefined
   ): ElectroInterface {
+    const initialPosition: Position = {
+      x: 100 + Math.random() * 50,
+      y: 100 + Math.random() * 50,
+    };
+
     switch (type) {
       case "Consumer":
         if (!consumerEnergyConsumption)
