@@ -5,6 +5,7 @@ import { Predefined } from "../lib/data/Predefined";
 import { generateId } from "../lib/utils";
 import FlowMenuItem from "./FlowMenuItem";
 import { Plug } from "../lib/data/Plug";
+import FlowMenuCreateForm from "./FlowMenuCreateForm";
 
 type FlowMenuCreateProps = {
   addNodeCallback: (
@@ -37,134 +38,21 @@ export default function FlowMenuCreate({
 
   return (
     <>
-      <FlowMenuItem>
-        <div className="text-xl font-bold">Erzeuger</div>
-        <label>Name:</label>
-        <input
-          className="bg-thw text-white px-2 rounded-md"
-          value={producerName}
-          onChange={(e) => setProducerName(e.target.value)}
-        />{" "}
-        <div className="flex flex-row gap-2">
-          <Button
-            type="primary"
-            onClick={() =>
-              addNodeCallback(
-                "Producer",
-                producerName,
-                undefined,
-                undefined,
-                undefined
-              )
-            }
-          >
-            Hinzufügen
-          </Button>
-          <Button
-            type="secondary"
-            onClick={() =>
-              saveNodeCallback({
-                id: generateId("producer"),
-                type: "Producer",
-                name: producerName,
-                defaultPlug: { current: 63, voltage: 400 },
-              })
-            }
-          >
-            Template speichern
-          </Button>
-        </div>
-      </FlowMenuItem>
-      <FlowMenuItem>
-        <div className="text-xl font-bold">Verteiler</div>
-        <label>Name:</label>
-        <input
-          className="bg-thw text-white px-2 rounded-md"
-          value={distributorName}
-          onChange={(e) => setDistributorName(e.target.value)}
-        />{" "}
-        <div className="flex flex-row gap-2">
-          <Button
-            type="primary"
-            onClick={() =>
-              addNodeCallback(
-                "Distributor",
-                distributorName,
-                undefined,
-                undefined,
-                undefined
-              )
-            }
-          >
-            Hinzufügen
-          </Button>
-          <Button
-            type="secondary"
-            onClick={() =>
-              saveNodeCallback({
-                id: generateId("distributor"),
-                type: "Distributor",
-                name: distributorName,
-                defaultPlug: { current: 63, voltage: 400 },
-              })
-            }
-          >
-            Template speichern
-          </Button>
-        </div>
-      </FlowMenuItem>
-      <FlowMenuItem>
-        <div className="text-xl font-bold">Verbraucher</div>
-        <label>Name:</label>
-        <input
-          className="bg-thw text-white px-2 rounded-md"
-          value={consumerName}
-          onChange={(e) => setConsumerName(e.target.value)}
-        />
-        <label>Energiebedarf in kW:</label>
-        <input
-          className="bg-thw text-white px-2 rounded-md"
-          value={consumerEnergyConsumption}
-          type="number"
-          min={0}
-          onChange={(e) => {
-            const value = e.target.value;
-            if (value.includes("-")) return;
-
-            setConsumerEnergyConsumption(value);
-          }}
-        />
-        <div className="flex flex-row gap-2">
-          <Button
-            type="primary"
-            onClick={() => {
-              addNodeCallback(
-                "Consumer",
-                consumerName,
-                getParsedEnergyConsumption() * 1000,
-                undefined,
-                undefined
-              );
-            }}
-          >
-            Hinzufügen
-          </Button>
-          <Button
-            type="secondary"
-            onClick={() => {
-              saveNodeCallback({
-                id: generateId("consumer"),
-                type: "Consumer",
-                name: consumerName,
-                defaultPlug: { current: 63, voltage: 400 },
-                energyConsumption: getParsedEnergyConsumption() * 1000,
-              });
-            }}
-          >
-            Template speichern
-          </Button>
-        </div>
-      </FlowMenuItem>
+      <FlowMenuCreateForm
+        electroType="Producer"
+        addNode={addNodeCallback}
+        saveNodeAsPredefined={saveNodeCallback}
+      />
+      <FlowMenuCreateForm
+        electroType="Distributor"
+        addNode={addNodeCallback}
+        saveNodeAsPredefined={saveNodeCallback}
+      />
+      <FlowMenuCreateForm
+        electroType="Consumer"
+        addNode={addNodeCallback}
+        saveNodeAsPredefined={saveNodeCallback}
+      />
     </>
   );
 }
