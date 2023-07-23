@@ -1,32 +1,30 @@
-"use client";
-
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import * as ReactFlow from "reactflow";
 
 import "reactflow/dist/style.css";
-import { Consumer } from "../lib/data/Consumer";
-import { Producer } from "../lib/data/Producer";
-import CableEdge from "./CableEdge";
-import { Cable } from "../lib/data/Cable";
+import { Consumer } from "./lib/data/Consumer";
+import { Producer } from "./lib/data/Producer";
+import CableEdge from "./components/flow/CableEdge";
+import { Cable } from "./lib/data/Cable";
 import {
   calculateTotalVoltageDropPercent,
   getRecursiveEnergyConsumption,
   getVoltageDropForCableData,
-} from "../lib/calculation/energy";
-import { Distributor } from "../lib/data/Distributor";
+} from "./lib/calculation/energy";
+import { Distributor } from "./lib/data/Distributor";
 
-import useStore, { RFState } from "./store";
+import useStore, { RFState } from "./components/flow/store";
 import { shallow } from "zustand/shallow";
-import FlowMenu from "./FlowMenu";
+import FlowMenu from "./components/flow/FlowMenu";
 import {
   ElectroInterface,
   ElectroInterfaceWithInputPlug,
-} from "../lib/data/Electro";
+} from "./lib/data/Electro";
 import {
   ElectroInterfaceNode,
   ElectroInterfaceNodeProps,
-} from "./ElectroInterfaceNode";
-import { Button } from "@/components/Button";
+} from "./components/flow/ElectroInterfaceNode";
+import { Button } from "./components/Button";
 
 const selector = (state: RFState) => ({
   nodes: state.nodes,

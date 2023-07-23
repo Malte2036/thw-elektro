@@ -1,5 +1,5 @@
 import { Position } from "../Position";
-import { ElectroInterface, ElectroInterfaceWithInputPlug } from "./Electro";
+import { ElectroInterfaceWithInputPlug } from "./Electro";
 import { Plug } from "./Plug";
 
 export class Distributor extends ElectroInterfaceWithInputPlug {

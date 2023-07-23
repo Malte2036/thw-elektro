@@ -4,9 +4,9 @@ import {
   EdgeProps,
   getBezierPath,
 } from "reactflow";
-import { Cable } from "../lib/data/Cable";
-import { isVoltageDropTooHigh } from "../lib/calculation/energy";
-import { Button } from "@/components/Button";
+import { Cable } from "../../lib/data/Cable";
+import { isVoltageDropTooHigh } from "../../lib/calculation/energy";
+import { Button } from "../../components/Button";
 
 export type CableEdgeData = {
   cable: Cable;

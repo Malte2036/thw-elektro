@@ -1,18 +1,18 @@
 import { ReactNode, useState } from "react";
-import { Position } from "../lib/Position";
-import { Consumer } from "../lib/data/Consumer";
-import { Distributor } from "../lib/data/Distributor";
-import { Producer } from "../lib/data/Producer";
-import { ElectroInterface, ElectroType } from "../lib/data/Electro";
+import { Position } from "../../lib/Position";
+import { Consumer } from "../../lib/data/Consumer";
+import { Distributor } from "../../lib/data/Distributor";
+import { Producer } from "../../lib/data/Producer";
+import { ElectroInterface, ElectroType } from "../../lib/data/Electro";
 import FlowMenuHeader, { FlowMenuHeaderOptions } from "./FlowMenuHeader";
 import FlowMenuCreate from "./FlowMenuCreate";
 import FlowMenuPredefined from "./FlowMenuPredefined";
-import { Predefined } from "../lib/data/Predefined";
-import { deletePredefined, savePredefined } from "../lib/db/save";
-import { generateId } from "../lib/utils";
-import { Button } from "@/components/Button";
+import { Predefined } from "../../lib/data/Predefined";
+import { deletePredefined, savePredefined } from "../../lib/db/save";
+import { generateId } from "../../lib/utils";
+import { Button } from "../../components/Button";
 import FlowMenuSettings from "./FlowMenuSettings";
-import { Plug } from "../lib/data/Plug";
+import { Plug } from "../../lib/data/Plug";
 
 type FlowMenuProps = {
   allPlacedNodeTemplateIds: string[];

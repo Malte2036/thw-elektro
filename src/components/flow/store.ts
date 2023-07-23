@@ -11,12 +11,12 @@ import {
   applyEdgeChanges,
   addEdge,
 } from "reactflow";
-import { isCircularConnection } from "../lib/calculation/energy";
-import { Cable } from "../lib/data/Cable";
+import { isCircularConnection } from "../../lib/calculation/energy";
+import { Cable } from "../../lib/data/Cable";
 import {
   ElectroInterface,
   ElectroInterfaceWithInputPlug,
-} from "../lib/data/Electro";
+} from "../../lib/data/Electro";
 
 export type RFState = {
   nodes: Node[];

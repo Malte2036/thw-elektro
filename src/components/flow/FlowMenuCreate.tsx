@@ -1,6 +1,6 @@
-import { ElectroType } from "../lib/data/Electro";
-import { Predefined } from "../lib/data/Predefined";
-import { Plug } from "../lib/data/Plug";
+import { ElectroType } from "../../lib/data/Electro";
+import { Predefined } from "../../lib/data/Predefined";
+import { Plug } from "../../lib/data/Plug";
 import FlowMenuCreateForm from "./FlowMenuCreateForm";
 
 type FlowMenuCreateProps = {

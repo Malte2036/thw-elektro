@@ -1,11 +1,11 @@
 import { Handle, NodeProps, NodeToolbar, Position } from "reactflow";
-import { ElectroInterface, translateElectroType } from "../lib/data/Electro";
+import { ElectroInterface, translateElectroType } from "../../lib/data/Electro";
 import { ReactNode } from "react";
-import { Consumer } from "../lib/data/Consumer";
-import { isVoltageDropTooHigh } from "../lib/calculation/energy";
-import { Distributor } from "../lib/data/Distributor";
-import { Button } from "@/components/Button";
-import { Producer } from "../lib/data/Producer";
+import { Consumer } from "../../lib/data/Consumer";
+import { isVoltageDropTooHigh } from "../../lib/calculation/energy";
+import { Distributor } from "../../lib/data/Distributor";
+import { Button } from "../../components/Button";
+import { Producer } from "../../lib/data/Producer";
 
 export type ElectroInterfaceNodeProps = {
   electroInterface: ElectroInterface;

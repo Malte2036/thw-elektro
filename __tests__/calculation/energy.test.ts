@@ -4,13 +4,13 @@ import {
   calculateTotalVoltageDropPercent,
   calculateVoltageDropPercent,
   getRecursiveEnergyConsumption,
-} from "@/app/lib/calculation/energy";
-import { Cable } from "@/app/lib/data/Cable";
-import { Consumer } from "@/app/lib/data/Consumer";
-import { Distributor } from "@/app/lib/data/Distributor";
-import { ElectroInterface } from "@/app/lib/data/Electro";
-import { Producer } from "@/app/lib/data/Producer";
-import { toTargetSourceString } from "@/app/lib/utils";
+} from "../../src/lib/calculation/energy";
+import { Cable } from "../../src/lib/data/Cable";
+import { Consumer } from "../../src/lib/data/Consumer";
+import { Distributor } from "../../src/lib/data/Distributor";
+import { ElectroInterface } from "../../src/lib/data/Electro";
+import { Producer } from "../../src/lib/data/Producer";
+import { toTargetSourceString } from "../../src/lib/utils";
 
 describe("calculatePowerInWatt", () => {
   it("", () => {

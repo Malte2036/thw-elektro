@@ -1,12 +1,11 @@
-import { Button } from "@/components/Button";
-import { ElectroType, translateElectroType } from "../lib/data/Electro";
-import { Consumer } from "../lib/data/Consumer";
+import { Button } from "../../components/Button";
+import { ElectroType, translateElectroType } from "../../lib/data/Electro";
 import { ReactNode, useEffect, useState } from "react";
-import { Predefined } from "../lib/data/Predefined";
-import { getPredefined } from "../lib/db/save";
+import { Predefined } from "../../lib/data/Predefined";
+import { getPredefined } from "../../lib/db/save";
 import { FlowMenuHeaderOptions } from "./FlowMenuHeader";
 import FlowMenuItem from "./FlowMenuItem";
-import { Plug } from "../lib/data/Plug";
+import { Plug } from "../../lib/data/Plug";
 
 type FlowMenuPredefinedProps = {
   allPlacedNodeTemplateIds: string[];
