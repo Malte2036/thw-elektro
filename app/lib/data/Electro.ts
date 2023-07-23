@@ -1,4 +1,5 @@
 import { Position } from "../Position";
+import { Plug } from "./Plug";
 
 export type ElectroType = "Consumer" | "Distributor" | "Producer";
 
@@ -21,6 +22,23 @@ export abstract class ElectroInterface {
     this.position = position;
     this.type = type;
     this.templateId = templateId;
+  }
+}
+
+export abstract class ElectroInterfaceWithInputPlug extends ElectroInterface {
+  public readonly inputPlug: Plug;
+
+  constructor(
+    id: string,
+    name: string | undefined,
+    position: Position,
+    type: ElectroType,
+    templateId: string | undefined,
+    inputPlug: Plug | undefined
+  ) {
+    super(id, name, position, type, templateId);
+
+    this.inputPlug = inputPlug ?? { current: 16, voltage: 230 };
   }
 }
 

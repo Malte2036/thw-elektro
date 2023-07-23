@@ -4,13 +4,15 @@ import { ElectroType } from "../lib/data/Electro";
 import { Predefined } from "../lib/data/Predefined";
 import { generateId } from "../lib/utils";
 import FlowMenuItem from "./FlowMenuItem";
+import { Plug } from "../lib/data/Plug";
 
 type FlowMenuCreateProps = {
   addNodeCallback: (
     type: ElectroType,
     name: string,
     consumerEnergyConsumption: number | undefined,
-    templateId: string | undefined
+    templateId: string | undefined,
+    inputPlug: Plug | undefined
   ) => void;
   saveNodeCallback: (predefined: Predefined) => void;
 };
@@ -47,7 +49,13 @@ export default function FlowMenuCreate({
           <Button
             type="primary"
             onClick={() =>
-              addNodeCallback("Producer", producerName, undefined, undefined)
+              addNodeCallback(
+                "Producer",
+                producerName,
+                undefined,
+                undefined,
+                undefined
+              )
             }
           >
             Hinzufügen
@@ -59,6 +67,7 @@ export default function FlowMenuCreate({
                 id: generateId("producer"),
                 type: "Producer",
                 name: producerName,
+                defaultPlug: { current: 63, voltage: 400 },
               })
             }
           >
@@ -82,6 +91,7 @@ export default function FlowMenuCreate({
                 "Distributor",
                 distributorName,
                 undefined,
+                undefined,
                 undefined
               )
             }
@@ -95,6 +105,7 @@ export default function FlowMenuCreate({
                 id: generateId("distributor"),
                 type: "Distributor",
                 name: distributorName,
+                defaultPlug: { current: 63, voltage: 400 },
               })
             }
           >
@@ -131,6 +142,7 @@ export default function FlowMenuCreate({
                 "Consumer",
                 consumerName,
                 getParsedEnergyConsumption() * 1000,
+                undefined,
                 undefined
               );
             }}
@@ -144,6 +156,7 @@ export default function FlowMenuCreate({
                 id: generateId("consumer"),
                 type: "Consumer",
                 name: consumerName,
+                defaultPlug: { current: 63, voltage: 400 },
                 energyConsumption: getParsedEnergyConsumption() * 1000,
               });
             }}

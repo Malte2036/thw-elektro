@@ -50,11 +50,44 @@ export default function FlowPage() {
   const edgeTypes = useMemo(() => ({ cableEdge: CableEdge }), []);
 
   const initialElectroInterfaceNodes = [
-    new Consumer("consumer-1", undefined, { x: 550, y: 100 }, 1500, undefined),
-    new Consumer("consumer-2", undefined, { x: 550, y: 300 }, 800, undefined),
-    new Consumer("consumer-3", undefined, { x: 550, y: 500 }, 1800, undefined),
-    new Distributor("distributor-1", undefined, { x: 300, y: 200 }, undefined),
-    new Distributor("distributor-2", undefined, { x: 300, y: 400 }, undefined),
+    new Consumer(
+      "consumer-1",
+      undefined,
+      { x: 550, y: 100 },
+      1500,
+      undefined,
+      undefined
+    ),
+    new Consumer(
+      "consumer-2",
+      undefined,
+      { x: 550, y: 300 },
+      800,
+      undefined,
+      undefined
+    ),
+    new Consumer(
+      "consumer-3",
+      undefined,
+      { x: 550, y: 500 },
+      1800,
+      undefined,
+      undefined
+    ),
+    new Distributor(
+      "distributor-1",
+      undefined,
+      { x: 300, y: 200 },
+      undefined,
+      undefined
+    ),
+    new Distributor(
+      "distributor-2",
+      undefined,
+      { x: 300, y: 400 },
+      undefined,
+      undefined
+    ),
     new Producer("producer-1", "SEA", { x: 50, y: 300 }, undefined),
   ];
 

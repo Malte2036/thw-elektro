@@ -13,7 +13,10 @@ import {
 } from "reactflow";
 import { isCircularConnection } from "../lib/calculation/energy";
 import { Cable } from "../lib/data/Cable";
-import { ElectroInterface } from "../lib/data/Electro";
+import {
+  ElectroInterface,
+  ElectroInterfaceWithInputPlug,
+} from "../lib/data/Electro";
 
 export type RFState = {
   nodes: Node[];
@@ -99,13 +102,15 @@ const useStore = create<RFState>((set, get) => ({
       return;
     }
 
+    var targetNode = get().nodes.find((node) => node.id === connection.target);
+    if (!targetNode) return;
+
     const cable = new Cable(
       "cable-" + Date.now(),
       50,
-      {
-        current: 16,
-        voltage: connection.source.includes("producer-") ? 400 : 230,
-      },
+      (
+        targetNode.data.electroInterface as ElectroInterfaceWithInputPlug
+      ).inputPlug,
       connection.source,
       connection.target,
       voltageDrop

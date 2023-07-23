@@ -6,6 +6,7 @@ import { Predefined } from "../lib/data/Predefined";
 import { getPredefined } from "../lib/db/save";
 import { FlowMenuHeaderOptions } from "./FlowMenuHeader";
 import FlowMenuItem from "./FlowMenuItem";
+import { Plug } from "../lib/data/Plug";
 
 type FlowMenuPredefinedProps = {
   allPlacedNodeTemplateIds: string[];
@@ -13,7 +14,8 @@ type FlowMenuPredefinedProps = {
     type: ElectroType,
     name: string,
     consumerEnergyConsumption: number | undefined,
-    templateId: string | undefined
+    templateId: string | undefined,
+    inputPlug: Plug | undefined
   ) => void;
   deleteNode: (id: string) => void;
   openAddPredefinedPage: () => void;
@@ -53,8 +55,38 @@ export default function FlowMenuPredefined({
     }
   });
 
-  function getConsumerData(consumer: Consumer): ReactNode {
-    return <div>Energiebedarf in kW: {consumer.energyConsumption / 1000}</div>;
+  function getBody(predefined: Predefined): ReactNode {
+    const plug = predefined.defaultPlug;
+
+    const defaultPlugText =
+      plug === undefined ? (
+        ""
+      ) : (
+        <div>
+          Stecker: {plug.voltage}V/{plug.current}A
+        </div>
+      );
+
+    switch (predefined.type) {
+      case "Consumer":
+        const energyConsumption = predefined.energyConsumption;
+        if (energyConsumption === undefined) {
+          throw new Error("Energy consumption is undefined");
+        }
+
+        return (
+          <>
+            <div>Energiebedarf in kW: {energyConsumption / 1000}</div>
+            {defaultPlugText}
+          </>
+        );
+      case "Distributor":
+        return <>{defaultPlugText}</>;
+      case "Producer":
+        return <></>;
+      default:
+        throw new Error("Invalid type " + predefined.type);
+    }
   }
 
   async function fetchPredefined() {
@@ -91,16 +123,20 @@ export default function FlowMenuPredefined({
           node.name != undefined && node.name.length > 0 ? ": " + node.name : ""
         }`}
       </div>
-      {node.type === "Consumer" && getConsumerData(node as Consumer)}
+      {getBody(node)}
       <div className="flex flex-row gap-2">
         <Button
           type="primary"
           onClick={() => {
             const energyConsumption =
-              node.type === "Consumer"
-                ? (node as Consumer).energyConsumption
-                : undefined;
-            addNode(node.type, node.name || "", energyConsumption, node.id);
+              node.type === "Consumer" ? node.energyConsumption : undefined;
+            addNode(
+              node.type,
+              node.name || "",
+              energyConsumption,
+              node.id,
+              node.defaultPlug
+            );
           }}
         >
           Hinzufügen

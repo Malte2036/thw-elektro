@@ -12,6 +12,7 @@ import { deletePredefined, savePredefined } from "../lib/db/save";
 import { generateId } from "../lib/utils";
 import { Button } from "@/components/Button";
 import FlowMenuSettings from "./FlowMenuSettings";
+import { Plug } from "../lib/data/Plug";
 
 type FlowMenuProps = {
   allPlacedNodeTemplateIds: string[];
@@ -30,7 +31,8 @@ export default function FlowMenu({
     type: ElectroType,
     name: string | undefined,
     consumerEnergyConsumption: number | undefined,
-    templateId: string | undefined
+    templateId: string | undefined,
+    inputPlug: Plug | undefined
   ): ElectroInterface {
     switch (type) {
       case "Consumer":
@@ -45,14 +47,16 @@ export default function FlowMenu({
           name,
           initialPosition,
           consumerEnergyConsumption,
-          templateId
+          templateId,
+          inputPlug
         );
       case "Distributor":
         return new Distributor(
           generateId("distributor"),
           name,
           initialPosition,
-          templateId
+          templateId,
+          inputPlug
         );
       case "Producer":
         return new Producer(
@@ -72,13 +76,15 @@ export default function FlowMenu({
     type: ElectroType,
     name: string,
     consumerEnergyConsumption: number | undefined,
-    templateId: string | undefined
+    templateId: string | undefined,
+    inputPlug: Plug | undefined
   ) {
     const electroInterface = generateElectroInterface(
       type,
       name.length > 0 ? name : undefined,
       consumerEnergyConsumption,
-      templateId
+      templateId,
+      inputPlug
     );
 
     addElectroInterfaceNodeCallback(electroInterface);

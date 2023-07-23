@@ -1,8 +1,10 @@
 import { ElectroType } from "./Electro";
+import { Plug } from "./Plug";
 
 export type Predefined = {
   id: string;
   type: ElectroType;
-  name?: string;
+  name: string | undefined;
+  defaultPlug: Plug | undefined;
   energyConsumption?: number;
 };
