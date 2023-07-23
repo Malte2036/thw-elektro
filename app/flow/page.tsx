@@ -19,7 +19,10 @@ import useStore, { RFState } from "./store";
 import { shallow } from "zustand/shallow";
 import FlowMenu from "./FlowMenu";
 import { ElectroInterface } from "../lib/data/Electro";
-import { ElectroInterfaceNode } from "./ElectroInterfaceNode";
+import {
+  ElectroInterfaceNode,
+  ElectroInterfaceNodeProps,
+} from "./ElectroInterfaceNode";
 import { Button } from "@/components/Button";
 
 const selector = (state: RFState) => ({
@@ -47,12 +50,12 @@ export default function FlowPage() {
   const edgeTypes = useMemo(() => ({ cableEdge: CableEdge }), []);
 
   const initialElectroInterfaceNodes = [
-    new Consumer("consumer-1", undefined, { x: 550, y: 100 }, 1500),
-    new Consumer("consumer-2", undefined, { x: 550, y: 300 }, 800),
-    new Consumer("consumer-3", undefined, { x: 550, y: 500 }, 1800),
-    new Distributor("distributor-1", undefined, { x: 300, y: 200 }),
-    new Distributor("distributor-2", undefined, { x: 300, y: 400 }),
-    new Producer("producer-1", "SEA", { x: 50, y: 300 }),
+    new Consumer("consumer-1", undefined, { x: 550, y: 100 }, 1500, undefined),
+    new Consumer("consumer-2", undefined, { x: 550, y: 300 }, 800, undefined),
+    new Consumer("consumer-3", undefined, { x: 550, y: 500 }, 1800, undefined),
+    new Distributor("distributor-1", undefined, { x: 300, y: 200 }, undefined),
+    new Distributor("distributor-2", undefined, { x: 300, y: 400 }, undefined),
+    new Producer("producer-1", "SEA", { x: 50, y: 300 }, undefined),
   ];
 
   const {
@@ -228,6 +231,15 @@ export default function FlowPage() {
         <div className="w-screen h-screen flowmenu-small-width absolute md:relative ">
           {
             <FlowMenu
+              allPlacedNodeTemplateIds={
+                nodes
+                  .map(
+                    (n) =>
+                      (n.data as ElectroInterfaceNodeProps).electroInterface
+                        .templateId
+                  )
+                  .filter((id) => id != undefined) as string[]
+              }
               addElectroInterfaceNodeCallback={(electro: ElectroInterface) => {
                 addElectroInterfaceNode(electro, () => {
                   removeNode(electro.id);

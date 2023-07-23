@@ -10,9 +10,10 @@ export class Consumer extends ElectroInterface {
     id: string,
     name: string | undefined,
     position: Position,
-    energyConsumption: number
+    energyConsumption: number,
+    templateId: string | undefined
   ) {
-    super(id, name, position, "Consumer");
+    super(id, name, position, "Consumer", templateId);
 
     this.energyConsumption = energyConsumption;
   }

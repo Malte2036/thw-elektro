@@ -13,19 +13,24 @@ import { generateId } from "../lib/utils";
 import { Button } from "@/components/Button";
 import FlowMenuSettings from "./FlowMenuSettings";
 
-export default function FlowMenu({
-  addElectroInterfaceNodeCallback,
-  closeMenu,
-}: {
+type FlowMenuProps = {
+  allPlacedNodeTemplateIds: string[];
   addElectroInterfaceNodeCallback: (electroInterface: ElectroInterface) => void;
   closeMenu: () => void;
-}) {
+};
+
+export default function FlowMenu({
+  allPlacedNodeTemplateIds,
+  addElectroInterfaceNodeCallback,
+  closeMenu,
+}: FlowMenuProps) {
   const initialPosition: Position = { x: 100, y: 100 };
 
   function generateElectroInterface(
     type: ElectroType,
     name: string | undefined,
-    consumerEnergyConsumption?: number
+    consumerEnergyConsumption: number | undefined,
+    templateId: string | undefined
   ): ElectroInterface {
     switch (type) {
       case "Consumer":
@@ -39,16 +44,23 @@ export default function FlowMenu({
           generateId("consumer"),
           name,
           initialPosition,
-          consumerEnergyConsumption
+          consumerEnergyConsumption,
+          templateId
         );
       case "Distributor":
         return new Distributor(
           generateId("distributor"),
           name,
-          initialPosition
+          initialPosition,
+          templateId
         );
       case "Producer":
-        return new Producer(generateId("producer"), name, initialPosition);
+        return new Producer(
+          generateId("producer"),
+          name,
+          initialPosition,
+          templateId
+        );
     }
   }
 
@@ -59,12 +71,14 @@ export default function FlowMenu({
   async function clickAddNode(
     type: ElectroType,
     name: string,
-    consumerEnergyConsumption?: number
+    consumerEnergyConsumption: number | undefined,
+    templateId: string | undefined
   ) {
     const electroInterface = generateElectroInterface(
       type,
       name.length > 0 ? name : undefined,
-      consumerEnergyConsumption
+      consumerEnergyConsumption,
+      templateId
     );
 
     addElectroInterfaceNodeCallback(electroInterface);
@@ -87,6 +101,7 @@ export default function FlowMenu({
       case FlowMenuHeaderOptions.Predefined:
         return (
           <FlowMenuPredefined
+            allPlacedNodeTemplateIds={allPlacedNodeTemplateIds}
             addNode={clickAddNode}
             deleteNode={(id: string) => deletePredefined(id)}
             openAddPredefinedPage={() =>

@@ -9,7 +9,8 @@ type FlowMenuCreateProps = {
   addNodeCallback: (
     type: ElectroType,
     name: string,
-    consumerEnergyConsumption?: number
+    consumerEnergyConsumption: number | undefined,
+    templateId: string | undefined
   ) => void;
   saveNodeCallback: (predefined: Predefined) => void;
 };
@@ -45,7 +46,9 @@ export default function FlowMenuCreate({
         <div className="flex flex-row gap-2">
           <Button
             type="primary"
-            onClick={() => addNodeCallback("Producer", producerName)}
+            onClick={() =>
+              addNodeCallback("Producer", producerName, undefined, undefined)
+            }
           >
             Hinzufügen
           </Button>
@@ -74,7 +77,14 @@ export default function FlowMenuCreate({
         <div className="flex flex-row gap-2">
           <Button
             type="primary"
-            onClick={() => addNodeCallback("Distributor", distributorName)}
+            onClick={() =>
+              addNodeCallback(
+                "Distributor",
+                distributorName,
+                undefined,
+                undefined
+              )
+            }
           >
             Hinzufügen
           </Button>
@@ -120,7 +130,8 @@ export default function FlowMenuCreate({
               addNodeCallback(
                 "Consumer",
                 consumerName,
-                getParsedEnergyConsumption() * 1000
+                getParsedEnergyConsumption() * 1000,
+                undefined
               );
             }}
           >

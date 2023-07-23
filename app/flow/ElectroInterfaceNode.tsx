@@ -6,7 +6,7 @@ import { isVoltageDropTooHigh } from "../lib/calculation/energy";
 import { Distributor } from "../lib/data/Distributor";
 import { Button } from "@/components/Button";
 
-type ElectroInterfaceNodeProps = {
+export type ElectroInterfaceNodeProps = {
   electroInterface: ElectroInterface;
   deleteNode: () => void;
 };

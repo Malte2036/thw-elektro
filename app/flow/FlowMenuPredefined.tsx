@@ -8,16 +8,19 @@ import { FlowMenuHeaderOptions } from "./FlowMenuHeader";
 import FlowMenuItem from "./FlowMenuItem";
 
 type FlowMenuPredefinedProps = {
+  allPlacedNodeTemplateIds: string[];
   addNode: (
     type: ElectroType,
     name: string,
-    consumerEnergyConsumption?: number
+    consumerEnergyConsumption: number | undefined,
+    templateId: string | undefined
   ) => void;
   deleteNode: (id: string) => void;
   openAddPredefinedPage: () => void;
 };
 
 export default function FlowMenuPredefined({
+  allPlacedNodeTemplateIds,
   addNode,
   deleteNode,
   openAddPredefinedPage,
@@ -27,6 +30,15 @@ export default function FlowMenuPredefined({
   );
 
   const sortedNodes = allPredefinedNodes.slice().sort((a, b) => {
+    const aIsAlreadyPlaced = allPlacedNodeTemplateIds.includes(a.id);
+    const bIsAlreadyPlaced = allPlacedNodeTemplateIds.includes(b.id);
+
+    if (aIsAlreadyPlaced && !bIsAlreadyPlaced) {
+      return 1; // 'b' comes before 'a'
+    } else if (!aIsAlreadyPlaced && bIsAlreadyPlaced) {
+      return -1; // 'a' comes before 'b'
+    }
+
     // Compare types first
     const typeComparison = a.type.localeCompare(b.type);
 
@@ -68,7 +80,12 @@ export default function FlowMenuPredefined({
   }
 
   return sortedNodes.map((node) => (
-    <FlowMenuItem key={node.id}>
+    <FlowMenuItem
+      className={
+        allPlacedNodeTemplateIds.includes(node.id) ? "opacity-50" : undefined
+      }
+      key={node.id}
+    >
       <div className="text-xl font-bold">
         {`${translateElectroType(node.type)}${
           node.name != undefined && node.name.length > 0 ? ": " + node.name : ""
@@ -83,7 +100,7 @@ export default function FlowMenuPredefined({
               node.type === "Consumer"
                 ? (node as Consumer).energyConsumption
                 : undefined;
-            addNode(node.type, node.name || "", energyConsumption);
+            addNode(node.type, node.name || "", energyConsumption, node.id);
           }}
         >
           Hinzufügen
