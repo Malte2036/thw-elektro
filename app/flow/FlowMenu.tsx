@@ -29,6 +29,7 @@ export default function FlowMenu({
     type: ElectroType,
     name: string | undefined,
     consumerEnergyConsumption: number | undefined,
+    producerEnergyProduction: number | undefined,
     templateId: string | undefined,
     inputPlug: Plug | undefined
   ): ElectroInterface {
@@ -62,11 +63,17 @@ export default function FlowMenu({
           inputPlug
         );
       case "Producer":
+        if (!producerEnergyProduction)
+          throw new Error(
+            "Producer energy production is undefined" + producerEnergyProduction
+          );
+
         return new Producer(
           generateId("producer"),
           name,
           initialPosition,
-          templateId
+          templateId,
+          producerEnergyProduction
         );
     }
   }
@@ -79,6 +86,7 @@ export default function FlowMenu({
     type: ElectroType,
     name: string,
     consumerEnergyConsumption: number | undefined,
+    producerEnergyProduction: number | undefined,
     templateId: string | undefined,
     inputPlug: Plug | undefined
   ) {
@@ -86,6 +94,7 @@ export default function FlowMenu({
       type,
       name.length > 0 ? name : undefined,
       consumerEnergyConsumption,
+      producerEnergyProduction,
       templateId,
       inputPlug
     );

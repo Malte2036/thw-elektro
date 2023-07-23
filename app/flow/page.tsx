@@ -91,7 +91,7 @@ export default function FlowPage() {
       undefined,
       undefined
     ),
-    new Producer("producer-1", "SEA", { x: 50, y: 300 }, undefined),
+    new Producer("producer-1", "SEA", { x: 50, y: 300 }, undefined, 50000),
   ];
 
   const {

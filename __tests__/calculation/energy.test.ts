@@ -117,12 +117,45 @@ describe("calculateTotalVoltageDropPercent", () => {
 
 describe("energy consumption", () => {
   const allElectroInterfaces: ElectroInterface[] = [
-    new Consumer("consumer-1", undefined, { x: 0, y: 0 }, 1005, undefined),
-    new Consumer("consumer-2", undefined, { x: 0, y: 0 }, 2020, undefined),
-    new Consumer("consumer-3", undefined, { x: 0, y: 0 }, 123, undefined),
-    new Distributor("distributor-1", undefined, { x: 0, y: 0 }, undefined),
-    new Distributor("distributor-2", undefined, { x: 0, y: 0 }, undefined),
-    new Producer("producer-1", undefined, { x: 0, y: 0 }, undefined),
+    new Consumer(
+      "consumer-1",
+      undefined,
+      { x: 0, y: 0 },
+      1005,
+      undefined,
+      undefined
+    ),
+    new Consumer(
+      "consumer-2",
+      undefined,
+      { x: 0, y: 0 },
+      2020,
+      undefined,
+      undefined
+    ),
+    new Consumer(
+      "consumer-3",
+      undefined,
+      { x: 0, y: 0 },
+      123,
+      undefined,
+      undefined
+    ),
+    new Distributor(
+      "distributor-1",
+      undefined,
+      { x: 0, y: 0 },
+      undefined,
+      undefined
+    ),
+    new Distributor(
+      "distributor-2",
+      undefined,
+      { x: 0, y: 0 },
+      undefined,
+      undefined
+    ),
+    new Producer("producer-1", undefined, { x: 0, y: 0 }, undefined, 12000),
   ];
   const outputEdges: Cable[] = [
     new Cable(

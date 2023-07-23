@@ -5,6 +5,7 @@ import { Consumer } from "../lib/data/Consumer";
 import { isVoltageDropTooHigh } from "../lib/calculation/energy";
 import { Distributor } from "../lib/data/Distributor";
 import { Button } from "@/components/Button";
+import { Producer } from "../lib/data/Producer";
 
 export type ElectroInterfaceNodeProps = {
   electroInterface: ElectroInterface;
@@ -52,15 +53,27 @@ export function ElectroInterfaceNode({
                   : "opacity-75"
               }`}
             >
-              max: {distributor.allowedEnergyFlow / 1000}kW
+              max Last: {distributor.allowedEnergyFlow / 1000}kW
             </div>
           </>
         );
       case "Producer":
-        const producer = data.electroInterface as Distributor;
+        const producer = data.electroInterface as Producer;
         return (
           <>
             <div>{producer.energyFlow / 1000}kW</div>
+            <div
+              className={`text-xs ${
+                producer.energyFlow > producer.allowedEnergyFlow
+                  ? "text-red-600 font-bold"
+                  : "opacity-75"
+              }`}
+            >
+              max Last: {producer.allowedEnergyFlow / 1000}kW
+            </div>
+            <div className="text-xs opacity-75">
+              Produktion: {producer.energyProduction / 1000}kw
+            </div>
           </>
         );
     }

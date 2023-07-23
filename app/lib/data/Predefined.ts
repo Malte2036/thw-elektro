@@ -7,4 +7,5 @@ export type Predefined = {
   name: string | undefined;
   defaultPlug: Plug | undefined;
   energyConsumption?: number;
+  energyProduction?: number;
 };

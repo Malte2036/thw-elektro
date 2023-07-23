@@ -12,6 +12,7 @@ type FlowMenuCreateFormProps = {
     type: ElectroType,
     name: string,
     consumerEnergyConsumption: number | undefined,
+    producerEnergyProduction: number | undefined,
     templateId: string | undefined,
     inputPlug: Plug | undefined
   ) => void;
@@ -27,6 +28,9 @@ export default function FlowMenuCreateForm({
   const [energyConsumption, setEnergyConsumption] = useState<
     string | undefined
   >(electroType == "Consumer" ? "5.2" : undefined);
+  const [energyProduction, setEnergyProduction] = useState<string | undefined>(
+    electroType == "Producer" ? "12" : undefined
+  );
 
   function getParsedEnergyConsumption(): number | undefined {
     if (!energyConsumption) return undefined;
@@ -36,6 +40,16 @@ export default function FlowMenuCreateForm({
       throw new Error("Invalid energy consumption");
     }
     return parsedEnergyConsumption * 1000;
+  }
+
+  function getParsedEnergyProduction(): number | undefined {
+    if (!energyProduction) return undefined;
+
+    const parsedEnergyProduction = parseFloat(energyProduction);
+    if (isNaN(parsedEnergyProduction)) {
+      throw new Error("Invalid energy production");
+    }
+    return parsedEnergyProduction * 1000;
   }
 
   const [defaultInputPlug, setDefaultInputPlug] = useState<number | undefined>(
@@ -88,6 +102,23 @@ export default function FlowMenuCreateForm({
           </select>
         </>
       )}
+      {electroType == "Producer" && (
+        <>
+          <label>Produktion in kW:</label>
+          <input
+            className="bg-thw text-white px-2 rounded-md"
+            value={energyProduction}
+            type="number"
+            min={0}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value.includes("-")) return;
+
+              setEnergyProduction(value);
+            }}
+          />
+        </>
+      )}
       <div className="flex flex-row gap-2">
         <Button
           type="primary"
@@ -96,6 +127,7 @@ export default function FlowMenuCreateForm({
               electroType,
               name,
               getParsedEnergyConsumption(),
+              getParsedEnergyProduction(),
               undefined,
               undefined
             )
@@ -114,6 +146,7 @@ export default function FlowMenuCreateForm({
                 ? allPossiblePlugs[defaultInputPlug]
                 : undefined,
               energyConsumption: getParsedEnergyConsumption(),
+              energyProduction: getParsedEnergyProduction(),
             })
           }
         >

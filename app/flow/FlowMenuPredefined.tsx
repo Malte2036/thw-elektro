@@ -14,6 +14,7 @@ type FlowMenuPredefinedProps = {
     type: ElectroType,
     name: string,
     consumerEnergyConsumption: number | undefined,
+    producerEnergyProduction: number | undefined,
     templateId: string | undefined,
     inputPlug: Plug | undefined
   ) => void;
@@ -85,7 +86,16 @@ export default function FlowMenuPredefined({
       case "Distributor":
         return <>{defaultPlugText}</>;
       case "Producer":
-        return <></>;
+        const energyProduction = predefined.energyProduction;
+        if (energyProduction === undefined) {
+          throw new Error("Energy production is undefined");
+        }
+
+        return (
+          <>
+            <div>Produktion: {energyProduction / 1000}kW</div>
+          </>
+        );
       default:
         throw new Error("Invalid type " + predefined.type);
     }
@@ -134,10 +144,14 @@ export default function FlowMenuPredefined({
           onClick={() => {
             const energyConsumption =
               node.type === "Consumer" ? node.energyConsumption : undefined;
+            const energyProduction =
+              node.type === "Producer" ? node.energyProduction : undefined;
+
             addNode(
               node.type,
               node.name || "",
               energyConsumption,
+              energyProduction,
               node.id,
               node.defaultPlug
             );

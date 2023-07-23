@@ -8,6 +8,7 @@ type FlowMenuCreateProps = {
     type: ElectroType,
     name: string,
     consumerEnergyConsumption: number | undefined,
+    producerEnergyProduction: number | undefined,
     templateId: string | undefined,
     inputPlug: Plug | undefined
   ) => void;
