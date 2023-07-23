@@ -72,7 +72,7 @@ export default function FlowMenuCreateForm({
       )}
       {electroType !== "Producer" && (
         <>
-          <label>Stecker:</label>
+          <label>Input Stecker:</label>
           <select
             className="bg-thw text-white p-1 rounded-md"
             value={defaultInputPlug}

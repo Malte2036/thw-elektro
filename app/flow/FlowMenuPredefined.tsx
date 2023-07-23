@@ -63,7 +63,7 @@ export default function FlowMenuPredefined({
         ""
       ) : (
         <div>
-          Stecker: {plug.voltage}V/{plug.current}A
+          Input Stecker: {plug.voltage}V/{plug.current}A
         </div>
       );
 
@@ -76,7 +76,7 @@ export default function FlowMenuPredefined({
 
         return (
           <>
-            <div>Energiebedarf in kW: {energyConsumption / 1000}</div>
+            <div>Energiebedarf: {energyConsumption / 1000}kW</div>
             {defaultPlugText}
           </>
         );
