@@ -61,14 +61,16 @@ export default function FlowMenuCreateForm({
       <div className="text-xl font-bold">
         {translateElectroType(electroType)}
       </div>
-      <label>Name:</label>
-      <input
-        className="bg-thw text-white px-2 rounded-md"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
+      <div className="flex flex-col gap-1">
+        <label>Name:</label>
+        <input
+          className="bg-thw text-white px-2 rounded-md"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+      </div>
       {electroType === "Consumer" && (
-        <>
+        <div className="flex flex-col gap-1">
           <label>Energiebedarf in kW:</label>
           <input
             className="bg-thw text-white px-2 rounded-md"
@@ -82,10 +84,10 @@ export default function FlowMenuCreateForm({
               setEnergyConsumption(value);
             }}
           />
-        </>
+        </div>
       )}
       {electroType !== "Producer" && (
-        <>
+        <div className="flex flex-col gap-1">
           <label>Input Stecker:</label>
           <select
             className="bg-thw text-white p-1 rounded-md"
@@ -100,13 +102,13 @@ export default function FlowMenuCreateForm({
               </option>
             ))}
           </select>
-        </>
+        </div>
       )}
       {electroType == "Producer" && (
-        <>
+        <div className="flex flex-col gap-1">
           <label>Produktion in kW:</label>
           <input
-            className="bg-thw text-white px-2 rounded-md"
+            className="bg-thw text-white px-2 py-0 rounded-md"
             value={energyProduction}
             type="number"
             min={0}
@@ -117,9 +119,9 @@ export default function FlowMenuCreateForm({
               setEnergyProduction(value);
             }}
           />
-        </>
+        </div>
       )}
-      <div className="flex flex-row gap-2">
+      <div className="flex flex-row gap-2 mt-1">
         <Button
           type="primary"
           onClick={() =>
