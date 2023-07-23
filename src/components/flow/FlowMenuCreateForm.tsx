@@ -53,7 +53,7 @@ export default function FlowMenuCreateForm({
   }
 
   const [defaultInputPlug, setDefaultInputPlug] = useState<number | undefined>(
-    undefined
+    electroType != "Producer" ? 0 : undefined
   );
 
   return (
@@ -144,9 +144,10 @@ export default function FlowMenuCreateForm({
               id: generateId(electroType),
               type: electroType,
               name: name,
-              defaultPlug: defaultInputPlug
-                ? allPossiblePlugs[defaultInputPlug]
-                : undefined,
+              defaultPlug:
+                defaultInputPlug !== undefined
+                  ? allPossiblePlugs[defaultInputPlug]
+                  : undefined,
               energyConsumption: getParsedEnergyConsumption(),
               energyProduction: getParsedEnergyProduction(),
             })
