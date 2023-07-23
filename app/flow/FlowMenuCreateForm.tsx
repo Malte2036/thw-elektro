@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FlowMenuItem from "./FlowMenuItem";
 import { Button } from "@/components/Button";
 import { ElectroType, translateElectroType } from "../lib/data/Electro";
-import { Plug } from "../lib/data/Plug";
+import { Plug, allPossiblePlugs } from "../lib/data/Plug";
 import { Predefined } from "../lib/data/Predefined";
 import { generateId } from "../lib/utils";
 
@@ -38,6 +38,10 @@ export default function FlowMenuCreateForm({
     return parsedEnergyConsumption * 1000;
   }
 
+  const [defaultInputPlug, setDefaultInputPlug] = useState<number | undefined>(
+    undefined
+  );
+
   return (
     <FlowMenuItem>
       <div className="text-xl font-bold">
@@ -66,6 +70,24 @@ export default function FlowMenuCreateForm({
           />
         </>
       )}
+      {electroType !== "Producer" && (
+        <>
+          <label>Stecker:</label>
+          <select
+            className="bg-thw text-white p-1 rounded-md"
+            value={defaultInputPlug}
+            onChange={(event) =>
+              setDefaultInputPlug(parseInt(event.target.value))
+            }
+          >
+            {allPossiblePlugs.map((plug, index) => (
+              <option key={index} value={index}>
+                {`${plug.voltage}V/${plug.current}A`}
+              </option>
+            ))}
+          </select>
+        </>
+      )}
       <div className="flex flex-row gap-2">
         <Button
           type="primary"
@@ -88,7 +110,9 @@ export default function FlowMenuCreateForm({
               id: generateId(electroType),
               type: electroType,
               name: name,
-              defaultPlug: { current: 63, voltage: 400 },
+              defaultPlug: defaultInputPlug
+                ? allPossiblePlugs[defaultInputPlug]
+                : undefined,
               energyConsumption: getParsedEnergyConsumption(),
             })
           }

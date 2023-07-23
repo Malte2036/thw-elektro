@@ -6,6 +6,15 @@ export type Plug = {
   current: Current;
 };
 
+export const allPossiblePlugs: Plug[] = [
+  { voltage: 230, current: 16 },
+  { voltage: 230, current: 32 },
+  { voltage: 230, current: 63 },
+  { voltage: 400, current: 16 },
+  { voltage: 400, current: 32 },
+  { voltage: 400, current: 63 },
+];
+
 export function getNextCablePlug(plug: Plug): Plug {
   switch (plug.current) {
     case 16:
