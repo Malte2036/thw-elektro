@@ -6,6 +6,10 @@ export class Distributor extends ElectroInterfaceWithInputPlug {
   public energyFlow: number = 0;
   public hasEnergy: boolean = false;
 
+  public get allowedEnergyFlow(): number {
+    return this.inputPlug.current * this.inputPlug.voltage;
+  }
+
   constructor(
     id: string,
     name: string | undefined,

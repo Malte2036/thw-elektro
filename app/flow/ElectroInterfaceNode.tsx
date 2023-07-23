@@ -28,7 +28,7 @@ export function ElectroInterfaceNode({
         const totalVoltageDrop = consumer.totalVoltageDrop ?? 0;
         return (
           <>
-            {consumer.energyConsumption / 1000}kW
+            <div>{consumer.energyConsumption / 1000}kW</div>
             <div
               className={
                 isVoltageDropTooHigh(totalVoltageDrop)
@@ -42,10 +42,27 @@ export function ElectroInterfaceNode({
         );
       case "Distributor":
         const distributor = data.electroInterface as Distributor;
-        return <>{distributor.energyFlow / 1000}kW</>;
+        return (
+          <>
+            <div>{distributor.energyFlow / 1000}kW</div>
+            <div
+              className={`text-xs ${
+                distributor.energyFlow > distributor.allowedEnergyFlow
+                  ? "text-red-600 font-bold"
+                  : "opacity-75"
+              }`}
+            >
+              max: {distributor.allowedEnergyFlow / 1000}kW
+            </div>
+          </>
+        );
       case "Producer":
         const producer = data.electroInterface as Distributor;
-        return <>{producer.energyFlow / 1000}kW</>;
+        return (
+          <>
+            <div>{producer.energyFlow / 1000}kW</div>
+          </>
+        );
     }
   }
 

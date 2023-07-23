@@ -26,7 +26,7 @@ export abstract class ElectroInterface {
 }
 
 export abstract class ElectroInterfaceWithInputPlug extends ElectroInterface {
-  public readonly inputPlug: Plug;
+  public inputPlug: Plug;
 
   constructor(
     id: string,

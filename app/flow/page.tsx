@@ -18,7 +18,10 @@ import { Distributor } from "../lib/data/Distributor";
 import useStore, { RFState } from "./store";
 import { shallow } from "zustand/shallow";
 import FlowMenu from "./FlowMenu";
-import { ElectroInterface } from "../lib/data/Electro";
+import {
+  ElectroInterface,
+  ElectroInterfaceWithInputPlug,
+} from "../lib/data/Electro";
 import {
   ElectroInterfaceNode,
   ElectroInterfaceNodeProps,
@@ -240,6 +243,20 @@ export default function FlowPage() {
               cable.nextPlug();
 
               updateCableEdge(cable);
+
+              const targetNode = nodes.find((n) => n.id == cable.target);
+              if (targetNode) {
+                const electroInterface = (
+                  targetNode.data as ElectroInterfaceNodeProps
+                ).electroInterface;
+                if (electroInterface.type != "Producer") {
+                  const electroInterfaceWithPlug =
+                    electroInterface as ElectroInterfaceWithInputPlug;
+                  electroInterfaceWithPlug.inputPlug = cable.plug;
+                  updateElectroInterfaceNode(electroInterfaceWithPlug);
+                }
+              }
+
               setRecalculateFlip((state) => !state);
             },
             (cable: Cable) => {
