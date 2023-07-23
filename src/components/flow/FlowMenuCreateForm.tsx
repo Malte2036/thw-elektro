@@ -106,7 +106,7 @@ export default function FlowMenuCreateForm({
       )}
       {electroType == "Producer" && (
         <div className="flex flex-col gap-1">
-          <label>Produktion in kW:</label>
+          <label>Produktion in kVA:</label>
           <input
             className="bg-thw text-white px-2 py-0 rounded-md"
             value={energyProduction}

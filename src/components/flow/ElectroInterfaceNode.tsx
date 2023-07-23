@@ -53,7 +53,7 @@ export function ElectroInterfaceNode({
                   : "opacity-75"
               }`}
             >
-              max Last: {distributor.allowedEnergyFlow / 1000}kW
+              max Leistung: {distributor.allowedEnergyFlow / 1000}kW
             </div>
           </>
         );
@@ -69,10 +69,10 @@ export function ElectroInterfaceNode({
                   : "opacity-75"
               }`}
             >
-              max Last: {producer.allowedEnergyFlow / 1000}kW
+              max Leistung: {producer.allowedEnergyFlow / 1000}kW
             </div>
             <div className="text-xs opacity-75">
-              Produktion: {producer.energyProduction / 1000}kw
+              Produktion: {producer.energyProduction / 1000}kVA
             </div>
           </>
         );

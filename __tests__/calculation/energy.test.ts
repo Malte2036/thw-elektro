@@ -9,19 +9,15 @@ import { Cable } from "../../src/lib/data/Cable";
 import { Consumer } from "../../src/lib/data/Consumer";
 import { Distributor } from "../../src/lib/data/Distributor";
 import { ElectroInterface } from "../../src/lib/data/Electro";
+import { Plug } from "../../src/lib/data/Plug";
 import { Producer } from "../../src/lib/data/Producer";
 import { toTargetSourceString } from "../../src/lib/utils";
 
 describe("calculatePowerInWatt", () => {
   it("", () => {
-    const cable = new Cable(
-      "cable-test",
-      25,
-      { current: 16, voltage: 230 },
-      "",
-      ""
-    );
-    expect(calculatePowerInWatt(cable)).toEqual(3680);
+    const plug: Plug = { current: 16, voltage: 230 };
+
+    expect(calculatePowerInWatt(plug)).toEqual(3680);
   });
 });
 

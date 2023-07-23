@@ -92,7 +92,7 @@ export default function FlowMenuPredefined({
 
         return (
           <>
-            <div>Produktion: {energyProduction / 1000}kW</div>
+            <div>Produktion: {energyProduction / 1000}kVA</div>
           </>
         );
       default:

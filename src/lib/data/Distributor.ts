@@ -1,4 +1,5 @@
 import { Position } from "../Position";
+import { calculatePowerInWatt } from "../calculation/energy";
 import { ElectroInterfaceWithInputPlug } from "./Electro";
 import { Plug } from "./Plug";
 
@@ -7,7 +8,7 @@ export class Distributor extends ElectroInterfaceWithInputPlug {
   public hasEnergy: boolean = false;
 
   public get allowedEnergyFlow(): number {
-    return this.inputPlug.current * this.inputPlug.voltage;
+    return calculatePowerInWatt(this.inputPlug);
   }
 
   constructor(
