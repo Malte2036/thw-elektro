@@ -38,6 +38,7 @@ export type RFState = {
     deleteNode: () => void
   ) => void;
   updateElectroInterfaceNode: (electroInterface: ElectroInterface) => void;
+  deleteAll: () => void;
 };
 
 // this is our useStore hook that we can use in our components to get parts of the store and call actions
@@ -177,6 +178,12 @@ const useStore = create<RFState>((set, get) => ({
         }
         return node;
       }),
+    });
+  },
+  deleteAll: () => {
+    set({
+      nodes: [],
+      edges: [],
     });
   },
 }));

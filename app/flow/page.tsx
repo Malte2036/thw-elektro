@@ -39,6 +39,7 @@ const selector = (state: RFState) => ({
   updateCableEdge: state.updateCableEdge,
   addElectroInterfaceNode: state.addElectroInterfaceNode,
   updateElectroInterfaceNode: state.updateElectroInterfaceNode,
+  deleteAll: state.deleteAll,
 });
 
 export default function FlowPage() {
@@ -105,6 +106,7 @@ export default function FlowPage() {
     updateCableEdge,
     addElectroInterfaceNode,
     updateElectroInterfaceNode,
+    deleteAll,
   } = useStore(selector, shallow);
 
   function getAllElectro(): ElectroInterface[] {
@@ -272,9 +274,29 @@ export default function FlowPage() {
         <ReactFlow.Background />
         <ReactFlow.Controls />
         <ReactFlow.Panel position="top-right">
-          <Button type="primary" onClick={() => setShowMenu((state) => !state)}>
-            {showMenu ? "Close" : "Open"} Menu
-          </Button>
+          <div className="flex flex-col gap-2">
+            <Button
+              type="primary"
+              onClick={() => setShowMenu((state) => !state)}
+            >
+              {showMenu ? "Close" : "Open"} Menu
+            </Button>
+            {nodes.length > 0 && (
+              <Button
+                type="secondary"
+                onClick={() => {
+                  const confirmed = confirm(
+                    "Bist du sicher, dass du alle Nodes löschen möchtest?"
+                  );
+                  if (!confirmed) return;
+
+                  deleteAll();
+                }}
+              >
+                Clear
+              </Button>
+            )}
+          </div>
         </ReactFlow.Panel>
       </ReactFlow.ReactFlow>
       {showMenu ? (
