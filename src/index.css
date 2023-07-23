@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.h-screen {
+  height: 100vh;
+  height: 100dvh;
+}
+
+@screen xl {
+  .flowmenu-small-width {
+    width: 32rem;
+  }
+}
