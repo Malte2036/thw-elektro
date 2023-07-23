@@ -27,33 +27,35 @@ export default function FlowMenuPredefined({
   deleteNode,
   openAddPredefinedPage,
 }: FlowMenuPredefinedProps) {
-  const [allPredefinedNodes, setAllPredefinedNodes] = useState<Predefined[]>(
-    []
-  );
+  const [allPredefinedNodes, setAllPredefinedNodes] = useState<
+    Predefined[] | undefined
+  >(undefined);
 
-  const sortedNodes = allPredefinedNodes.slice().sort((a, b) => {
-    const aIsAlreadyPlaced = allPlacedNodeTemplateIds.includes(a.id);
-    const bIsAlreadyPlaced = allPlacedNodeTemplateIds.includes(b.id);
+  const sortedNodes: Predefined[] | undefined = allPredefinedNodes
+    ?.slice()
+    .sort((a, b) => {
+      const aIsAlreadyPlaced = allPlacedNodeTemplateIds.includes(a.id);
+      const bIsAlreadyPlaced = allPlacedNodeTemplateIds.includes(b.id);
 
-    if (aIsAlreadyPlaced && !bIsAlreadyPlaced) {
-      return 1; // 'b' comes before 'a'
-    } else if (!aIsAlreadyPlaced && bIsAlreadyPlaced) {
-      return -1; // 'a' comes before 'b'
-    }
+      if (aIsAlreadyPlaced && !bIsAlreadyPlaced) {
+        return 1; // 'b' comes before 'a'
+      } else if (!aIsAlreadyPlaced && bIsAlreadyPlaced) {
+        return -1; // 'a' comes before 'b'
+      }
 
-    // Compare types first
-    const typeComparison = a.type.localeCompare(b.type);
+      // Compare types first
+      const typeComparison = a.type.localeCompare(b.type);
 
-    if (typeComparison !== 0) {
-      // If types are different, sort by type
-      return typeComparison;
-    } else {
-      // If types are the same, handle the possibility of undefined names
-      const nameA = a.name || ""; // Use an empty string if name is undefined
-      const nameB = b.name || ""; // Use an empty string if name is undefined
-      return nameA.localeCompare(nameB);
-    }
-  });
+      if (typeComparison !== 0) {
+        // If types are different, sort by type
+        return typeComparison;
+      } else {
+        // If types are the same, handle the possibility of undefined names
+        const nameA = a.name || ""; // Use an empty string if name is undefined
+        const nameB = b.name || ""; // Use an empty string if name is undefined
+        return nameA.localeCompare(nameB);
+      }
+    });
 
   function getBody(predefined: Predefined): ReactNode {
     const plug = predefined.defaultPlug;
@@ -97,6 +99,8 @@ export default function FlowMenuPredefined({
   useEffect(() => {
     fetchPredefined();
   }, []);
+
+  if (sortedNodes === undefined) return <></>;
 
   if (sortedNodes.length === 0) {
     return (
