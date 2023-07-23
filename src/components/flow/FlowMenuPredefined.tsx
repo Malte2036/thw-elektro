@@ -148,6 +148,13 @@ export default function FlowMenuPredefined({
         <Button
           type="primary"
           onClick={() => {
+            if (allPlacedNodeTemplateIds.includes(node.id)) {
+              const confirmed = window.confirm(
+                "Dieses Template wurde bereits platziert. Es wird eine Kopie des Templates platziert."
+              );
+              if (!confirmed) return;
+            }
+
             const energyConsumption =
               node.type === "Consumer" ? node.energyConsumption : undefined;
             const energyProduction =
@@ -167,6 +174,11 @@ export default function FlowMenuPredefined({
         </Button>
         <Button
           onClick={() => {
+            const confirmed = window.confirm(
+              "Willst du wirklich das Template unwiderruflich löschen?"
+            );
+            if (!confirmed) return;
+
             deleteNode(node.id);
             fetchPredefined();
           }}
