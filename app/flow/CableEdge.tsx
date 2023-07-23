@@ -75,7 +75,8 @@ export default function CableEdge(edgeProps: EdgeProps<CableEdgeData>) {
           >
             <div>{edgeProps.data?.cable.length}m</div>
             <div>
-              {edgeProps.data?.cable.voltage}V/{edgeProps.data?.cable.current}A
+              {edgeProps.data?.cable.plug.voltage}V/
+              {edgeProps.data?.cable.plug.current}A
             </div>
             <div>{edgeProps.data?.cable.voltageDrop.toFixed(2)}%</div>
           </div>

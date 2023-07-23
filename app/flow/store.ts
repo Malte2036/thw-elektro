@@ -102,8 +102,10 @@ const useStore = create<RFState>((set, get) => ({
     const cable = new Cable(
       "cable-" + Date.now(),
       50,
-      connection.source.includes("producer-") ? 400 : 230,
-      16,
+      {
+        current: 16,
+        voltage: connection.source.includes("producer-") ? 400 : 230,
+      },
       connection.source,
       connection.target,
       voltageDrop

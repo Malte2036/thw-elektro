@@ -204,7 +204,7 @@ export default function FlowPage() {
               setRecalculateFlip((state) => !state);
             },
             (cable: Cable) => {
-              cable.nextType();
+              cable.nextPlug();
 
               updateCableEdge(cable);
               setRecalculateFlip((state) => !state);

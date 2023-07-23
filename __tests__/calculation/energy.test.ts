@@ -14,14 +14,26 @@ import { toTargetSourceString } from "@/app/lib/utils";
 
 describe("calculatePowerInWatt", () => {
   it("", () => {
-    const cable = new Cable("cable-test", 25, 230, 16, "", "");
+    const cable = new Cable(
+      "cable-test",
+      25,
+      { current: 16, voltage: 230 },
+      "",
+      ""
+    );
     expect(calculatePowerInWatt(cable)).toEqual(3680);
   });
 });
 
 describe("calculateVoltageDrop", () => {
   it("", () => {
-    const cable = new Cable("cable-test", 75, 400, 16, "", "");
+    const cable = new Cable(
+      "cable-test",
+      75,
+      { current: 16, voltage: 400 },
+      "",
+      ""
+    );
     const energyConsumption = 5000;
     expect(calculateVoltageDropPercent(cable, energyConsumption)).toBeCloseTo(
       1.67
@@ -34,26 +46,61 @@ describe("calculateTotalVoltageDropPercent", () => {
     expect(
       calculateTotalVoltageDropPercent(
         [
-          new Cable("cable-fake-0", 25, 400, 16, "producer", "consumer-fake-1"),
+          new Cable(
+            "cable-fake-0",
+            25,
+            { current: 16, voltage: 400 },
+            "producer",
+            "consumer-fake-1"
+          ),
 
           new Cable(
             "cable-fake-1",
             25,
-            400,
-            16,
+            { current: 16, voltage: 400 },
             "distributor-2",
             "consumer-fake-2"
           ),
 
-          new Cable("cable-1", 25, 400, 16, "producer", "distributor-1"),
+          new Cable(
+            "cable-1",
+            25,
+            { current: 16, voltage: 400 },
+            "producer",
+            "distributor-1"
+          ),
 
-          new Cable("cable-2", 25, 400, 16, "distributor-1", "distributor-2"),
+          new Cable(
+            "cable-2",
+            25,
+            { current: 16, voltage: 400 },
+            "distributor-1",
+            "distributor-2"
+          ),
 
-          new Cable("cable-3", 25, 400, 16, "distributor-2", "distributor-3"),
+          new Cable(
+            "cable-3",
+            25,
+            { current: 16, voltage: 400 },
+            "distributor-2",
+            "distributor-3"
+          ),
 
-          new Cable("cable-4", 25, 400, 16, "distributor-3", "distributor-4"),
+          new Cable(
+            "cable-4",
+            25,
+            { current: 16, voltage: 400 },
+            "distributor-3",
+            "distributor-4"
+          ),
 
-          new Cable("cable-5", 25, 400, 16, "distributor-4", "consumer-1"),
+          new Cable(
+            "cable-5",
+            25,
+            { current: 16, voltage: 400 },
+            "distributor-4",
+            "consumer-1"
+          ),
         ],
         new Map([
           [toTargetSourceString("distributor-1", "producer"), 1.4],
@@ -70,19 +117,37 @@ describe("calculateTotalVoltageDropPercent", () => {
 
 describe("energy consumption", () => {
   const allElectroInterfaces: ElectroInterface[] = [
-    new Consumer("consumer-1", undefined, { x: 0, y: 0 }, 1005),
-    new Consumer("consumer-2", undefined, { x: 0, y: 0 }, 2020),
-    new Consumer("consumer-3", undefined, { x: 0, y: 0 }, 123),
-    new Distributor("distributor-1", undefined, { x: 0, y: 0 }),
-    new Distributor("distributor-2", undefined, { x: 0, y: 0 }),
-    new Producer("producer-1", undefined, { x: 0, y: 0 }),
+    new Consumer("consumer-1", undefined, { x: 0, y: 0 }, 1005, undefined),
+    new Consumer("consumer-2", undefined, { x: 0, y: 0 }, 2020, undefined),
+    new Consumer("consumer-3", undefined, { x: 0, y: 0 }, 123, undefined),
+    new Distributor("distributor-1", undefined, { x: 0, y: 0 }, undefined),
+    new Distributor("distributor-2", undefined, { x: 0, y: 0 }, undefined),
+    new Producer("producer-1", undefined, { x: 0, y: 0 }, undefined),
   ];
   const outputEdges: Cable[] = [
-    new Cable("cable-0", 25, 400, 16, "producer-1", "distributor-1"),
+    new Cable(
+      "cable-0",
+      25,
+      { current: 16, voltage: 400 },
+      "producer-1",
+      "distributor-1"
+    ),
 
-    new Cable("cable-1", 25, 400, 16, "distributor-1", "consumer-1"),
+    new Cable(
+      "cable-1",
+      25,
+      { current: 16, voltage: 400 },
+      "distributor-1",
+      "consumer-1"
+    ),
 
-    new Cable("cable-2", 25, 400, 16, "distributor-1", "consumer-2"),
+    new Cable(
+      "cable-2",
+      25,
+      { current: 16, voltage: 400 },
+      "distributor-1",
+      "consumer-2"
+    ),
   ];
 
   it("_getDependingConsumersEnergyConsumption", () => {

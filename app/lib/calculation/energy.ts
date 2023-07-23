@@ -4,16 +4,17 @@ import * as ReactFlow from "reactflow";
 import { ElectroInterface } from "../data/Electro";
 import { Consumer } from "../data/Consumer";
 import { Distributor } from "../data/Distributor";
+import { getPlugDiameter } from "../data/Plug";
 
 export function calculateVoltageDropPercent(
   cable: Cable,
   energyConsumption: number
 ): number {
-  const voltage = cable.voltage;
+  const voltage = cable.plug.voltage;
   const length = cable.length;
   const powerInWatt = energyConsumption;
   const resistance = 56;
-  const diameter = cable.getDiameter();
+  const diameter = getPlugDiameter(cable.plug);
 
   if (voltage === 230) {
     return (
@@ -64,14 +65,11 @@ export function isVoltageDropTooHigh(voltageDropPercent: number): boolean {
 }
 
 export function calculatePowerInWatt(cable: Cable): number {
-  const voltage = cable.voltage;
-  const current = cable.current;
-
-  if (voltage === 230) {
-    return voltage * current;
+  if (cable.plug.voltage === 230) {
+    return cable.plug.voltage * cable.plug.current;
   }
-  if (voltage === 400) {
-    return voltage * current * Math.sqrt(3);
+  if (cable.plug.voltage === 400) {
+    return cable.plug.voltage * cable.plug.current * Math.sqrt(3);
   }
 
   throw new Error("Invalid voltage. Only 230V and 400V are supported.");
