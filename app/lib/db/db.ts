@@ -6,8 +6,9 @@ export class MySubClassedDexie extends Dexie {
 
   constructor() {
     super("elektroDatabase");
-    this.version(2).stores({
-      predefined: "id, type, name, energyConsumption",
+    this.version(3).stores({
+      predefined:
+        "id, type, name, defaultPlug, energyConsumption, energyProduction",
     });
   }
 }
