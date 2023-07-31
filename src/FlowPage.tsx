@@ -27,6 +27,8 @@ import {
 import { Button } from "./components/Button";
 
 import { inject } from "@vercel/analytics";
+import Dialog from "./components/Dialog";
+import useDialog from "./hooks/useDialog";
 
 const selector = (state: RFState) => ({
   nodes: state.nodes,
@@ -46,6 +48,11 @@ export default function FlowPage() {
   inject();
 
   const [showMenu, setShowMenu] = useState<boolean>(false);
+  const {
+    isDialogOpen: isInfoDialogOpen,
+    openDialog: openInfoDialog,
+    closeDialog: closeInfoDialog,
+  } = useDialog({ initialIsOpen: true });
 
   const nodeTypes = useMemo(
     () => ({
@@ -283,6 +290,9 @@ export default function FlowPage() {
             >
               {showMenu ? "Close" : "Open"} Menu
             </Button>
+            <Button type="secondary" onClick={() => openInfoDialog()}>
+              Info
+            </Button>
             {nodes.length > 0 && (
               <Button
                 type="secondary"
@@ -301,6 +311,9 @@ export default function FlowPage() {
           </div>
         </ReactFlow.Panel>
       </ReactFlow.ReactFlow>
+
+      {isInfoDialogOpen && <Dialog closeDialog={closeInfoDialog} />}
+
       {showMenu ? (
         <div className="w-screen h-screen flowmenu-small-width absolute md:relative ">
           {
