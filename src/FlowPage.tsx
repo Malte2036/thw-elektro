@@ -284,12 +284,16 @@ export default function FlowPage() {
         <ReactFlow.Controls />
         <ReactFlow.Panel position="top-right">
           <div className="flex flex-col gap-2">
+            <Button type="primary" onClick={() => window.open("https://thw-tools.de?ref=elektro", '_blank')}>
+              Mehr THW Tools
+            </Button>
             <Button
               type="primary"
               onClick={() => setShowMenu((state) => !state)}
             >
               {showMenu ? "Close" : "Open"} Menu
             </Button>
+
             <Button type="secondary" onClick={() => openInfoDialog()}>
               Info
             </Button>
