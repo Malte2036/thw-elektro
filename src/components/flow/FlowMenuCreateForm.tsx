@@ -131,7 +131,9 @@ export default function FlowMenuCreateForm({
               getParsedEnergyConsumption(),
               getParsedEnergyProduction(),
               undefined,
-              undefined
+              defaultInputPlug !== undefined
+                ? allPossiblePlugs[defaultInputPlug]
+                : undefined,
             )
           }
         >
@@ -156,6 +158,6 @@ export default function FlowMenuCreateForm({
           Template speichern
         </Button>
       </div>
-    </FlowMenuItem>
+    </FlowMenuItem >
   );
 }

@@ -43,7 +43,7 @@ export default function FlowMenu({
         if (!consumerEnergyConsumption)
           throw new Error(
             "Consumer energy consumption is undefined" +
-              consumerEnergyConsumption
+            consumerEnergyConsumption
           );
 
         return new Consumer(
