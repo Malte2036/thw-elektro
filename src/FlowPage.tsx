@@ -30,6 +30,7 @@ import { inject } from "@vercel/analytics";
 import Dialog from "./components/Dialog";
 import useDialog from "./hooks/useDialog";
 import InfoDialog from "./components/InfoDIalog";
+import Footer from "./components/Footer";
 
 const selector = (state: RFState) => ({
   nodes: state.nodes,
@@ -314,6 +315,9 @@ export default function FlowPage() {
               </Button>
             )}
           </div>
+        </ReactFlow.Panel>
+        <ReactFlow.Panel position="bottom-center">
+          <Footer />
         </ReactFlow.Panel>
       </ReactFlow.ReactFlow>
 
