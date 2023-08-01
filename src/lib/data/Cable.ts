@@ -1,7 +1,7 @@
 import { toTargetSourceString } from "../utils";
 import { Plug, getNextCablePlug } from "./Plug";
 
-export type CableLength = 25 | 50 | 75 | 100;
+export type CableLength = 1 | 2 | 25 | 50 | 75 | 100;
 
 export class Cable {
   public readonly id: string;
@@ -55,6 +55,10 @@ export class Cable {
 
 function getNextCableLength(length: CableLength): CableLength {
   switch (length) {
+    case 1:
+      return 2;
+    case 2:
+      return 25;
     case 25:
       return 50;
     case 50:
@@ -62,6 +66,6 @@ function getNextCableLength(length: CableLength): CableLength {
     case 75:
       return 100;
     case 100:
-      return 25;
+      return 1;
   }
 }
