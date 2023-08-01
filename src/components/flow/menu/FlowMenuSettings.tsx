@@ -1,16 +1,16 @@
-import { Button } from "../../components/Button";
+import Button from "../../../components/Button";
 import FlowMenuItem from "./FlowMenuItem";
 import {
   exportPredefinedData,
   importPredefinedData,
-} from "../../lib/db/export";
+} from "../../../lib/db/export";
 import {
   bulkSavePredefined,
   deleteAllPredefined,
   getPredefined,
-} from "../../lib/db/save";
+} from "../../../lib/db/save";
 import { ChangeEvent, useState } from "react";
-import { Predefined } from "../../lib/data/Predefined";
+import { Predefined } from "../../../lib/data/Predefined";
 
 type FlowMenuSettingsProps = {
   openPredefinedPage: () => void;

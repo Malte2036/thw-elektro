@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 import { Consumer } from "../../lib/data/Consumer";
 import { isVoltageDropTooHigh } from "../../lib/calculation/energy";
 import { Distributor } from "../../lib/data/Distributor";
-import { Button } from "../../components/Button";
+import Button from "../../components/Button";
 import { Producer } from "../../lib/data/Producer";
 import { formatNumberWithMaxTwoDecimals } from "../../lib/utils";
 
@@ -55,11 +55,10 @@ export function ElectroInterfaceNode({
               {formatNumberWithMaxTwoDecimals(distributor.energyFlow / 1000)}kW
             </div>
             <div
-              className={`text-xs ${
-                distributor.energyFlow > distributor.allowedEnergyFlow
+              className={`text-xs ${distributor.energyFlow > distributor.allowedEnergyFlow
                   ? "text-red-600 font-bold"
                   : "opacity-75"
-              }`}
+                }`}
             >
               max Leistung:{" "}
               {formatNumberWithMaxTwoDecimals(
@@ -77,11 +76,10 @@ export function ElectroInterfaceNode({
               {formatNumberWithMaxTwoDecimals(producer.energyFlow / 1000)}kW
             </div>
             <div
-              className={`text-xs ${
-                producer.energyFlow > producer.allowedEnergyFlow
+              className={`text-xs ${producer.energyFlow > producer.allowedEnergyFlow
                   ? "text-red-600 font-bold"
                   : "opacity-75"
-              }`}
+                }`}
             >
               max Leistung:{" "}
               {formatNumberWithMaxTwoDecimals(
@@ -170,9 +168,8 @@ export function ElectroInterfaceNode({
     <div>
       {getNodeToolbar()}
       <div
-        className={`${
-          hasEnergy() ? "bg-thw" : "bg-thw-400"
-        } transition-colors text-white px-6 py-2 rounded-sm`}
+        className={`${hasEnergy() ? "bg-thw" : "bg-thw-400"
+          } transition-colors text-white px-6 py-2 rounded-sm`}
       >
         <div className="text-xs">{getTitle()}</div>
         {getMainLine()}

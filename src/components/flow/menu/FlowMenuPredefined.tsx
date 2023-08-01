@@ -1,12 +1,12 @@
-import { Button } from "../../components/Button";
-import { ElectroType, translateElectroType } from "../../lib/data/Electro";
+import Button from "../../../components/Button";
+import { ElectroType, translateElectroType } from "../../../lib/data/Electro";
 import { ReactNode, useEffect, useState } from "react";
-import { Predefined } from "../../lib/data/Predefined";
-import { getPredefined } from "../../lib/db/save";
+import { Predefined } from "../../../lib/data/Predefined";
+import { getPredefined } from "../../../lib/db/save";
 import { FlowMenuHeaderOptions } from "./FlowMenuHeader";
 import FlowMenuItem from "./FlowMenuItem";
-import { Plug } from "../../lib/data/Plug";
-import { formatNumberWithMaxTwoDecimals } from "../../lib/utils";
+import { Plug } from "../../../lib/data/Plug";
+import { formatNumberWithMaxTwoDecimals } from "../../../lib/utils";
 
 type FlowMenuPredefinedProps = {
   allPlacedNodeTemplateIds: string[];
@@ -139,9 +139,8 @@ export default function FlowMenuPredefined({
       key={node.id}
     >
       <div className="text-xl font-bold">
-        {`${translateElectroType(node.type)}${
-          node.name != undefined && node.name.length > 0 ? ": " + node.name : ""
-        }`}
+        {`${translateElectroType(node.type)}${node.name != undefined && node.name.length > 0 ? ": " + node.name : ""
+          }`}
       </div>
       {getBody(node)}
       <div className="flex flex-row gap-2">

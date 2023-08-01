@@ -15,7 +15,7 @@ import { Distributor } from "./lib/data/Distributor";
 
 import useStore, { RFState } from "./components/flow/store";
 import { shallow } from "zustand/shallow";
-import FlowMenu from "./components/flow/FlowMenu";
+import FlowMenu from "./components/flow/menu/FlowMenu";
 import {
   ElectroInterface,
   ElectroInterfaceWithInputPlug,
@@ -24,11 +24,12 @@ import {
   ElectroInterfaceNode,
   ElectroInterfaceNodeProps,
 } from "./components/flow/ElectroInterfaceNode";
-import { Button } from "./components/Button";
+import Button from "./components/Button";
 
 import { inject } from "@vercel/analytics";
 import Dialog from "./components/Dialog";
 import useDialog from "./hooks/useDialog";
+import InfoDialog from "./components/InfoDIalog";
 
 const selector = (state: RFState) => ({
   nodes: state.nodes,
@@ -316,7 +317,7 @@ export default function FlowPage() {
         </ReactFlow.Panel>
       </ReactFlow.ReactFlow>
 
-      {isInfoDialogOpen && <Dialog closeDialog={closeInfoDialog} />}
+      {isInfoDialogOpen && <InfoDialog closeDialog={closeInfoDialog} />}
 
       {showMenu ? (
         <div className="w-screen h-screen flowmenu-small-width absolute md:relative ">
