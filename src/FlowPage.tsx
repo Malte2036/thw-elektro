@@ -27,7 +27,6 @@ import {
 import Button from "./components/Button";
 
 import { inject } from "@vercel/analytics";
-import Dialog from "./components/Dialog";
 import useDialog from "./hooks/useDialog";
 import InfoDialog from "./components/InfoDIalog";
 import Footer from "./components/Footer";

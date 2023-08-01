@@ -1,5 +1,4 @@
 import { ReactNode, useRef } from "react";
-import Button from "./Button";
 
 type DialogProps = {
   header: string;
