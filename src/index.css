@@ -7,6 +7,10 @@
   height: 100dvh;
 }
 
+.min-width-3 {
+  min-width: 3rem;
+}
+
 @screen xl {
   .flowmenu-small-width {
     width: 32rem;

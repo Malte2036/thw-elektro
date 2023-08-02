@@ -6,6 +6,8 @@ import { getPredefined } from "../../../lib/db/save";
 import { FlowMenuHeaderOptions } from "./FlowMenuHeader";
 import FlowMenuItem from "./FlowMenuItem";
 import { Plug } from "../../../lib/data/Plug";
+import { useDialogContext } from "../../../hooks/useDialog";
+import ConfirmDialog from "../../ConfirmDialog";
 
 type FlowMenuPredefinedProps = {
   allPlacedNodeTemplateIds: string[];
@@ -27,6 +29,8 @@ export default function FlowMenuPredefined({
   deleteNode,
   openAddPredefinedPage,
 }: FlowMenuPredefinedProps) {
+  const dialogContext = useDialogContext();
+
   const [allPredefinedNodes, setAllPredefinedNodes] = useState<
     Predefined[] | undefined
   >(undefined);
@@ -82,6 +86,22 @@ export default function FlowMenuPredefined({
     );
   }
 
+  function addNodeFromPredefined(node: Predefined) {
+    const energyConsumption =
+      node.type === "Consumer" ? node.energyConsumption : undefined;
+    const energyProduction =
+      node.type === "Producer" ? node.energyProduction : undefined;
+
+    addNode(
+      node.type,
+      node.name || "",
+      energyConsumption,
+      energyProduction,
+      node.id,
+      node.defaultPlug
+    );
+  }
+
   return sortedNodes.map((node) => (
     <FlowMenuItem
       className={
@@ -99,44 +119,29 @@ export default function FlowMenuPredefined({
           type="primary"
           onClick={() => {
             if (allPlacedNodeTemplateIds.includes(node.id)) {
-              const confirmed = window.confirm(
-                "Dieses Template wurde bereits platziert. Es wird eine Kopie des Templates platziert."
+              dialogContext?.setDialog(
+                <ConfirmDialog title="Duplikat" question="Dieses Template wurde bereits platziert. Es wird eine Kopie des Templates platziert." onConfirm={() => addNodeFromPredefined(node)} />
               );
-              if (!confirmed) return;
+              return;
             }
-
-            const energyConsumption =
-              node.type === "Consumer" ? node.energyConsumption : undefined;
-            const energyProduction =
-              node.type === "Producer" ? node.energyProduction : undefined;
-
-            addNode(
-              node.type,
-              node.name || "",
-              energyConsumption,
-              energyProduction,
-              node.id,
-              node.defaultPlug
-            );
+            addNodeFromPredefined(node);
           }}
         >
           Hinzufügen
         </Button>
         <Button
-          onClick={() => {
-            const confirmed = window.confirm(
-              "Willst du wirklich das Template unwiderruflich löschen?"
-            );
-            if (!confirmed) return;
-
-            deleteNode(node.id);
-            fetchPredefined();
-          }}
+          onClick={() =>
+            dialogContext?.setDialog(
+              <ConfirmDialog title="Template löschen" question="Willst du wirklich dieses Template unwiderruflich löschen?" onConfirm={() => {
+                deleteNode(node.id);
+                fetchPredefined();
+              }} />
+            )}
           type="secondary"
         >
           Löschen
         </Button>
       </div>
-    </FlowMenuItem>
+    </FlowMenuItem >
   ));
 }

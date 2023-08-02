@@ -11,6 +11,8 @@ import {
 } from "../../../lib/db/save";
 import { ChangeEvent, useState } from "react";
 import { Predefined } from "../../../lib/data/Predefined";
+import { useDialogContext } from "../../../hooks/useDialog";
+import ConfirmDialog from "../../ConfirmDialog";
 
 type FlowMenuSettingsProps = {
   openPredefinedPage: () => void;
@@ -50,17 +52,19 @@ export default function FlowMenuSettings({
     }
   }
 
+  const dialogContext = useDialogContext();
+
   async function startDelete() {
-    const confirmed = window.confirm(
-      "Bist du dir sicher, dass du alle Templates unwiderruflich löschen möchtest?"
-    );
+    dialogContext?.setDialog(
+      <ConfirmDialog title="Löschen" question="Bist du dir sicher, dass du alle Templates unwiderruflich löschen möchtest?" onConfirm={
+        async () => {
+          await deleteAllPredefined();
+          console.log("Deleted all predefined data");
 
-    if (confirmed) {
-      await deleteAllPredefined();
-      console.log("Deleted all predefined data");
-
-      openPredefinedPage();
-    }
+          openPredefinedPage();
+        }
+      } />
+    )
   }
 
   return (

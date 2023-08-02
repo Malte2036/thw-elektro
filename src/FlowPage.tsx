@@ -30,6 +30,7 @@ import { inject } from "@vercel/analytics";
 import { useDialogContext } from "./hooks/useDialog";
 import InfoDialog from "./components/InfoDIalog";
 import Footer from "./components/Footer";
+import ConfirmDialog from "./components/ConfirmDialog";
 
 const selector = (state: RFState) => ({
   nodes: state.nodes,
@@ -298,14 +299,9 @@ export default function FlowPage() {
             {nodes.length > 0 && (
               <Button
                 type="secondary"
-                onClick={() => {
-                  const confirmed = confirm(
-                    "Bist du sicher, dass du alle Nodes löschen möchtest?"
-                  );
-                  if (!confirmed) return;
-
-                  deleteAll();
-                }}
+                onClick={
+                  () => dialogContext?.setDialog(<ConfirmDialog title="Löschen" question="Bist du dir sicher, dass du alle sichtbaren Nodes löschen möchtest?" onConfirm={deleteAll} />)
+                }
               >
                 Clear
               </Button>
