@@ -119,6 +119,7 @@ describe("energy consumption", () => {
       { x: 0, y: 0 },
       1005,
       undefined,
+      undefined,
       undefined
     ),
     new Consumer(
@@ -127,6 +128,7 @@ describe("energy consumption", () => {
       { x: 0, y: 0 },
       2020,
       undefined,
+      undefined,
       undefined
     ),
     new Consumer(
@@ -134,6 +136,7 @@ describe("energy consumption", () => {
       undefined,
       { x: 0, y: 0 },
       123,
+      undefined,
       undefined,
       undefined
     ),

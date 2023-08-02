@@ -42,6 +42,8 @@ export function ElectroInterfaceNode({
             >
               {formatNumberWithMaxTwoDecimals(totalVoltageDrop)}%
             </div>
+            <div>Scheinleistung: {formatNumberWithMaxTwoDecimals(consumer.getApparentPower() / 1000)}kVA</div>
+            <div>Wirkleistung: {formatNumberWithMaxTwoDecimals(consumer.getActivePower() / 1000)}kVA</div>
           </>
         );
       case "Distributor":

@@ -13,6 +13,7 @@ type FlowMenuCreateFormProps = {
     name: string,
     consumerEnergyConsumption: number | undefined,
     producerEnergyProduction: number | undefined,
+    ratedPower: number | undefined,
     templateId: string | undefined,
     inputPlug: Plug | undefined
   ) => void;
@@ -30,6 +31,9 @@ export default function FlowMenuCreateForm({
   >(electroType == "Consumer" ? "5.2" : undefined);
   const [energyProduction, setEnergyProduction] = useState<string | undefined>(
     electroType == "Producer" ? "12" : undefined
+  );
+  const [ratedPower, setRatedPower] = useState<string | undefined>(
+    electroType == "Consumer" ? "7" : undefined
   );
 
   function getParsedEnergyConsumption(): number | undefined {
@@ -52,6 +56,16 @@ export default function FlowMenuCreateForm({
     return parsedEnergyProduction * 1000;
   }
 
+  function getParsedRatedPower(): number | undefined {
+    if (!ratedPower) return undefined;
+
+    const parsedRatedPower = parseFloat(ratedPower);
+    if (isNaN(parsedRatedPower)) {
+      throw new Error("Invalid rated power");
+    }
+    return parsedRatedPower * 1000;
+  }
+
   const [defaultInputPlug, setDefaultInputPlug] = useState<number | undefined>(
     electroType != "Producer" ? 0 : undefined
   );
@@ -70,21 +84,40 @@ export default function FlowMenuCreateForm({
         />
       </div>
       {electroType === "Consumer" && (
-        <div className="flex flex-col gap-1">
-          <label>Energiebedarf in kW:</label>
-          <input
-            className="bg-thw text-white px-2 rounded-md"
-            value={energyConsumption}
-            type="number"
-            min={0}
-            onChange={(e) => {
-              const value = e.target.value;
-              if (value.includes("-")) return;
+        <>
+          <div className="flex flex-col gap-1">
+            <label>Energiebedarf in kW:</label>
+            <input
+              className="bg-thw text-white px-2 rounded-md"
+              value={energyConsumption}
+              type="number"
+              min={0}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value.includes("-")) return;
 
-              setEnergyConsumption(value);
-            }}
-          />
-        </div>
+                setEnergyConsumption(value);
+              }}
+            />
+          </div>
+
+
+          <div className="flex flex-col gap-1">
+            <label>Nennstrom in A:</label>
+            <input
+              className="bg-thw text-white px-2 rounded-md"
+              value={ratedPower}
+              type="number"
+              min={0}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value.includes("-")) return;
+
+                setRatedPower(value);
+              }}
+            />
+          </div>
+        </>
       )}
       {electroType !== "Producer" && (
         <div className="flex flex-col gap-1">
@@ -130,6 +163,7 @@ export default function FlowMenuCreateForm({
               name,
               getParsedEnergyConsumption(),
               getParsedEnergyProduction(),
+              getParsedRatedPower(),
               undefined,
               defaultInputPlug !== undefined
                 ? allPossiblePlugs[defaultInputPlug]
@@ -151,6 +185,7 @@ export default function FlowMenuCreateForm({
                   ? allPossiblePlugs[defaultInputPlug]
                   : undefined,
               energyConsumption: getParsedEnergyConsumption(),
+              ratedPower: getParsedRatedPower(),
               energyProduction: getParsedEnergyProduction(),
             })
           }

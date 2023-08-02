@@ -66,6 +66,7 @@ export default function FlowPage() {
       { x: 550, y: 100 },
       1500,
       undefined,
+      undefined,
       undefined
     ),
     new Consumer(
@@ -74,6 +75,7 @@ export default function FlowPage() {
       { x: 550, y: 300 },
       800,
       undefined,
+      undefined,
       undefined
     ),
     new Consumer(
@@ -81,6 +83,7 @@ export default function FlowPage() {
       undefined,
       { x: 550, y: 500 },
       1800,
+      undefined,
       undefined,
       undefined
     ),

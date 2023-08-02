@@ -13,6 +13,7 @@ export type Predefined = {
   defaultPlug: Plug | undefined;
   energyConsumption?: number;
   energyProduction?: number;
+  ratedPower?: number
 };
 
 export function electroInterfaceToPredefined(
