@@ -52,3 +52,9 @@ export function translateElectroType(type: ElectroType) {
       return "Erzeuger";
   }
 }
+
+export function getTitleForElectro(electro: ElectroInterface) {
+  const translatedType = translateElectroType(electro.type);
+  const name = electro.name;
+  return `${translatedType}${name != undefined ? ` (${name})` : ""}:`;
+}

@@ -1,12 +1,11 @@
 import Button from "../../../components/Button";
 import { ElectroType, translateElectroType } from "../../../lib/data/Electro";
-import { ReactNode, useEffect, useState } from "react";
-import { Predefined } from "../../../lib/data/Predefined";
+import { useEffect, useState } from "react";
+import { Predefined, getBodyFromPredefined } from "../../../lib/data/Predefined";
 import { getPredefined } from "../../../lib/db/save";
 import { FlowMenuHeaderOptions } from "./FlowMenuHeader";
 import FlowMenuItem from "./FlowMenuItem";
 import { Plug } from "../../../lib/data/Plug";
-import { formatNumberWithMaxTwoDecimals } from "../../../lib/utils";
 
 type FlowMenuPredefinedProps = {
   allPlacedNodeTemplateIds: string[];
@@ -58,54 +57,6 @@ export default function FlowMenuPredefined({
       }
     });
 
-  function getBody(predefined: Predefined): ReactNode {
-    const plug = predefined.defaultPlug;
-
-    const defaultPlugText =
-      plug === undefined ? (
-        ""
-      ) : (
-        <div>
-          Input Stecker: {plug.voltage}V/{plug.current}A
-        </div>
-      );
-
-    switch (predefined.type) {
-      case "Consumer":
-        const energyConsumption = predefined.energyConsumption;
-        if (energyConsumption === undefined) {
-          throw new Error("Energy consumption is undefined");
-        }
-
-        return (
-          <>
-            <div>
-              Energiebedarf:{" "}
-              {formatNumberWithMaxTwoDecimals(energyConsumption / 1000)}kW
-            </div>
-            {defaultPlugText}
-          </>
-        );
-      case "Distributor":
-        return <>{defaultPlugText}</>;
-      case "Producer":
-        const energyProduction = predefined.energyProduction;
-        if (energyProduction === undefined) {
-          throw new Error("Energy production is undefined");
-        }
-
-        return (
-          <>
-            <div>
-              Produktion:{" "}
-              {formatNumberWithMaxTwoDecimals(energyProduction / 1000)}kVA
-            </div>
-          </>
-        );
-      default:
-        throw new Error("Invalid type " + predefined.type);
-    }
-  }
 
   async function fetchPredefined() {
     const data = await getPredefined();
@@ -142,7 +93,7 @@ export default function FlowMenuPredefined({
         {`${translateElectroType(node.type)}${node.name != undefined && node.name.length > 0 ? ": " + node.name : ""
           }`}
       </div>
-      {getBody(node)}
+      {getBodyFromPredefined(node)}
       <div className="flex flex-row gap-2">
         <Button
           type="primary"

@@ -1,19 +1,14 @@
-import { useState } from "react";
+import { ReactNode, createContext, useContext } from "react";
 
-type DialogProps = {
-  initialIsOpen: boolean;
+type DialogContextType = {
+  setDialog: React.Dispatch<React.SetStateAction<ReactNode>>;
+  closeDialog: () => void;
 };
 
-export default function useDialog({ initialIsOpen }: DialogProps) {
-  const [isDialogOpen, setIsDialogOpen] = useState(initialIsOpen);
+export const DialogContext = createContext<DialogContextType | undefined>(
+  undefined
+);
 
-  const openDialog = () => {
-    setIsDialogOpen(true);
-  };
-
-  const closeDialog = () => {
-    setIsDialogOpen(false);
-  };
-
-  return { isDialogOpen, openDialog, closeDialog };
+export function useDialogContext() {
+  return useContext(DialogContext);
 }

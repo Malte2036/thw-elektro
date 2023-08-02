@@ -1,12 +1,14 @@
 import { ReactNode, useRef } from "react";
+import { useDialogContext } from "../hooks/useDialog";
 
 type DialogProps = {
   header: string;
   children: ReactNode,
-  closeDialog: () => void;
 };
 
-export default function Dialog({ header, children, closeDialog }: DialogProps) {
+export default function Dialog({ header, children }: DialogProps) {
+  const dialogContext = useDialogContext();
+
   const outerDivRef = useRef<HTMLDivElement>(null);
 
   const handleOuterDivClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -16,7 +18,7 @@ export default function Dialog({ header, children, closeDialog }: DialogProps) {
       !isDescendant(outerDivRef.current, event.target as HTMLElement)
     ) {
       // Handle click on the outerDiv here
-      closeDialog();
+      dialogContext?.closeDialog();
     }
   };
 

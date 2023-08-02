@@ -1,11 +1,21 @@
 import { inject } from "@vercel/analytics";
 import FlowPage from "./FlowPage";
-import { useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
+import { DialogContext } from "./hooks/useDialog";
 
 export default function App() {
+
   useEffect(() => {
     inject();
   }, []);
 
-  return <FlowPage />;
-}
+  const [dialog, setDialog] = useState<ReactNode | undefined>();
+
+  return <DialogContext.Provider value={{
+    setDialog,
+    closeDialog: () => setDialog(undefined)
+  }}>
+    <FlowPage />
+    {dialog}
+  </DialogContext.Provider>
+};

@@ -27,7 +27,7 @@ import {
 import Button from "./components/Button";
 
 import { inject } from "@vercel/analytics";
-import useDialog from "./hooks/useDialog";
+import { useDialogContext } from "./hooks/useDialog";
 import InfoDialog from "./components/InfoDIalog";
 import Footer from "./components/Footer";
 
@@ -49,11 +49,6 @@ export default function FlowPage() {
   inject();
 
   const [showMenu, setShowMenu] = useState<boolean>(false);
-  const {
-    isDialogOpen: isInfoDialogOpen,
-    openDialog: openInfoDialog,
-    closeDialog: closeInfoDialog,
-  } = useDialog({ initialIsOpen: true });
 
   const nodeTypes = useMemo(
     () => ({
@@ -233,6 +228,8 @@ export default function FlowPage() {
     recalculate();
   }, [recalculateFlip]);
 
+  const dialogContext = useDialogContext();
+
   return (
     <div className="w-screen h-screen flex flex-row">
       <ReactFlow.ReactFlow
@@ -295,7 +292,7 @@ export default function FlowPage() {
               {showMenu ? "Close" : "Open"} Menu
             </Button>
 
-            <Button type="secondary" onClick={() => openInfoDialog()}>
+            <Button type="secondary" onClick={() => dialogContext?.setDialog(<InfoDialog />)}>
               Info
             </Button>
             {nodes.length > 0 && (
@@ -320,7 +317,6 @@ export default function FlowPage() {
         </ReactFlow.Panel>
       </ReactFlow.ReactFlow>
 
-      {isInfoDialogOpen && <InfoDialog closeDialog={closeInfoDialog} />}
 
       {showMenu ? (
         <div className="w-screen h-screen flowmenu-small-width absolute md:relative ">

@@ -1,13 +1,14 @@
+import { useDialogContext } from "../hooks/useDialog";
 import Button from "./Button";
 import Dialog from "./Dialog";
 
-type InfoDialogProps = {
-    closeDialog: () => void;
-};
+type InfoDialogProps = {};
 
 
-export default function InfoDialog({ closeDialog }: InfoDialogProps) {
-    return <Dialog header="Spannungsfall" closeDialog={closeDialog}>
+export default function InfoDialog({ }: InfoDialogProps) {
+    const dialogContext = useDialogContext();
+
+    return <Dialog header="Spannungsfall">
         <div className="flex flex-col gap-0">
             <div className="text-lg font-bold">
                 Berechne den Spannungsfall und die maximale Leistung:
@@ -43,8 +44,8 @@ export default function InfoDialog({ closeDialog }: InfoDialogProps) {
             Keinerlei Gewähr für die Richtigkeit der Berechnungen.
         </div>
 
-        <Button type="primary" onClick={() => closeDialog()}>
+        <Button type="primary" onClick={() => dialogContext?.closeDialog()}>
             Okay
         </Button>
-    </Dialog>
+    </Dialog >
 }

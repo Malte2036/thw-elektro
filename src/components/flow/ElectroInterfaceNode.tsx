@@ -1,5 +1,5 @@
 import { Handle, NodeProps, NodeToolbar, Position } from "reactflow";
-import { ElectroInterface, translateElectroType } from "../../lib/data/Electro";
+import { ElectroInterface, getTitleForElectro } from "../../lib/data/Electro";
 import { ReactNode } from "react";
 import { Consumer } from "../../lib/data/Consumer";
 import { isVoltageDropTooHigh } from "../../lib/calculation/energy";
@@ -7,6 +7,8 @@ import { Distributor } from "../../lib/data/Distributor";
 import Button from "../../components/Button";
 import { Producer } from "../../lib/data/Producer";
 import { formatNumberWithMaxTwoDecimals } from "../../lib/utils";
+import { useDialogContext } from "../../hooks/useDialog";
+import NodeInfoDialog from "../NodeInfoDialog";
 
 export type ElectroInterfaceNodeProps = {
   electroInterface: ElectroInterface;
@@ -17,11 +19,6 @@ export function ElectroInterfaceNode({
   data,
   selected,
 }: NodeProps<ElectroInterfaceNodeProps>) {
-  function getTitle(): string {
-    const translatedType = translateElectroType(data.electroInterface.type);
-    const name = data.electroInterface.name;
-    return `${translatedType}${name != undefined ? ` (${name})` : ""}:`;
-  }
 
   function getMainLine(): ReactNode {
     switch (data.electroInterface.type) {
@@ -56,8 +53,8 @@ export function ElectroInterfaceNode({
             </div>
             <div
               className={`text-xs ${distributor.energyFlow > distributor.allowedEnergyFlow
-                  ? "text-red-600 font-bold"
-                  : "opacity-75"
+                ? "text-red-600 font-bold"
+                : "opacity-75"
                 }`}
             >
               max Leistung:{" "}
@@ -77,8 +74,8 @@ export function ElectroInterfaceNode({
             </div>
             <div
               className={`text-xs ${producer.energyFlow > producer.allowedEnergyFlow
-                  ? "text-red-600 font-bold"
-                  : "opacity-75"
+                ? "text-red-600 font-bold"
+                : "opacity-75"
                 }`}
             >
               max Leistung:{" "}
@@ -137,8 +134,17 @@ export function ElectroInterfaceNode({
     }
   }
 
+  const dialogContext = useDialogContext();
+
+  function openNodeInfoDialog() {
+    dialogContext?.setDialog(<NodeInfoDialog electroInterface={data.electroInterface}></NodeInfoDialog>)
+  }
+
   function getNodeToolbar(): ReactNode {
     const buttons = [
+      <Button key={"info"} type="secondary" onClick={openNodeInfoDialog}>
+        Info
+      </Button>,
       <Button key={"delete"} type="secondary" onClick={data.deleteNode}>
         Delete
       </Button>,
@@ -171,7 +177,7 @@ export function ElectroInterfaceNode({
         className={`${hasEnergy() ? "bg-thw" : "bg-thw-400"
           } transition-colors text-white px-6 py-2 rounded-sm`}
       >
-        <div className="text-xs">{getTitle()}</div>
+        <div className="text-xs">{getTitleForElectro(data.electroInterface)}</div>
         {getMainLine()}
       </div>
       {getHandles()}
