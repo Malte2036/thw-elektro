@@ -5,7 +5,7 @@ import { Plug } from "./Plug";
 export class Consumer extends ElectroInterfaceWithInputPlug {
   public readonly energyConsumption: number;
   /**
-   * @returns Nennleistung in A
+   * @returns Nennstrom in A
    */
   public readonly ratedPower: number | undefined = undefined;
 
@@ -28,32 +28,35 @@ export class Consumer extends ElectroInterfaceWithInputPlug {
   }
 
   /**
-   * S = U * I * Wurzel(3) * cos(phi)
+   * S = U * I * Wurzel(3)
    * @returns Scheinleistung in VA
    */
   public getApparentPower(): number {
     if (!this.ratedPower) return 0.0001; // change, it is 0.0001 do not destroy with old stored data
 
-    return ((this.inputPlug.voltage * this.ratedPower) / 1000) * Math.sqrt(3);
+    return this.inputPlug.voltage * this.ratedPower * Math.sqrt(3);
   }
 
   /**
    * P = U * I * Wurzel(3) * cos(phi)
-   * @returns Wirkleistung in VA
+   * @returns Wirkleistung in W
    */
   public getActivePower(): number {
-    if (!this.ratedPower) return 0.0001; // change, it is 0.0001 do not destroy with old stored data
-
-    return this.getApparentPower() * COS_PHY;
+    return this.energyConsumption;
   }
 
   /**
-   * B = U * I * Wurzel(3)
+   * B = U * I * Wurzel(3) * sin(phi)
    * @returns Blindleistung in VA
    */
-  // public getReactivePower(): number {
-  //   if (!this.ratedPower) return 0.0001; // change, it is 0.0001 do not destroy with old stored data
-  //
-  //   return this.getApparentPower() * SIN_PHY;
-  // }
+  public getReactivePower(): number {
+    if (!this.ratedPower) return 0.0001; // change, it is 0.0001 do not destroy with old stored data
+
+    return this.getApparentPower() * this.getSinPhi();
+  }
+
+  getSinPhi(): number {
+    const cosPhi = Math.acos(this.getActivePower() / this.getApparentPower());
+    return Math.sin(cosPhi);
+  }
 }

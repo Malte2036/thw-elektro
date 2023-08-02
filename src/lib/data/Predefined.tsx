@@ -80,6 +80,10 @@ export function getBodyFromPredefined(predefined: Predefined): ReactNode {
             Energiebedarf:{" "}
             {formatNumberWithMaxTwoDecimals(energyConsumption / 1000)}kW
           </div>
+          <div>
+            Nennstrom:{" "}
+            {formatNumberWithMaxTwoDecimals(predefined.ratedPower ?? 0)}A
+          </div>
           {defaultPlugText}
         </>
       );

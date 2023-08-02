@@ -13,11 +13,12 @@ import NodeInfoDialog from "../NodeInfoDialog";
 export type ElectroInterfaceNodeProps = {
   electroInterface: ElectroInterface;
   deleteNode: () => void;
+  childrenElectroInterfaces: ElectroInterface[];
 };
 
 export function ElectroInterfaceNode({
   data,
-  selected,
+  selected
 }: NodeProps<ElectroInterfaceNodeProps>) {
 
   function getMainLine(): ReactNode {
@@ -42,12 +43,15 @@ export function ElectroInterfaceNode({
             >
               {formatNumberWithMaxTwoDecimals(totalVoltageDrop)}%
             </div>
+            <div>Nennstrom: {formatNumberWithMaxTwoDecimals(consumer.ratedPower ?? 0)}A</div>
             <div>Scheinleistung: {formatNumberWithMaxTwoDecimals(consumer.getApparentPower() / 1000)}kVA</div>
-            <div>Wirkleistung: {formatNumberWithMaxTwoDecimals(consumer.getActivePower() / 1000)}kVA</div>
+            <div>Wirkleistung: {formatNumberWithMaxTwoDecimals(consumer.getActivePower() / 1000)}kW</div>
+            <div>Blindleistung: {formatNumberWithMaxTwoDecimals(consumer.getReactivePower() / 1000)}kVA</div>
           </>
         );
       case "Distributor":
         const distributor = data.electroInterface as Distributor;
+        const childrenConsumers = data.childrenElectroInterfaces.filter(c => c.type == "Consumer") as Consumer[];
         return (
           <>
             <div>
@@ -65,6 +69,7 @@ export function ElectroInterfaceNode({
               )}
               kW
             </div>
+            <div>Scheinleistung: {formatNumberWithMaxTwoDecimals(distributor.getApparentPower(childrenConsumers) / 1000)}kVA</div>
           </>
         );
       case "Producer":

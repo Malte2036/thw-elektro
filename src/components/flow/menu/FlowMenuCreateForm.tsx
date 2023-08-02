@@ -63,7 +63,7 @@ export default function FlowMenuCreateForm({
     if (isNaN(parsedRatedPower)) {
       throw new Error("Invalid rated power");
     }
-    return parsedRatedPower * 1000;
+    return parsedRatedPower;
   }
 
   const [defaultInputPlug, setDefaultInputPlug] = useState<number | undefined>(
