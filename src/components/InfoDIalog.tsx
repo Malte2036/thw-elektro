@@ -39,6 +39,9 @@ export default function InfoDialog({ closeDialog }: InfoDialogProps) {
         <div>
             Die App berechnet automatisch den Spannungsfall und die maximale Leistung anhand der eingegebenen Daten.
         </div>
+        <div className="italic">
+            Keinerlei Gewähr für die Richtigkeit der Berechnungen.
+        </div>
 
         <Button type="primary" onClick={() => closeDialog()}>
             Okay
