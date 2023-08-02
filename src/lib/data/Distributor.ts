@@ -1,7 +1,7 @@
 import { Position } from "../Position";
 import { calculatePowerInWatt } from "../calculation/energy";
 import { Consumer } from "./Consumer";
-import { ElectroInterfaceWithInputPlug } from "./Electro";
+import { ElectroInterface, ElectroInterfaceWithInputPlug } from "./Electro";
 import { Plug } from "./Plug";
 
 export class Distributor extends ElectroInterfaceWithInputPlug {
@@ -26,13 +26,17 @@ export class Distributor extends ElectroInterfaceWithInputPlug {
    * S = Wurzel ( (Summe Pi)² + (Summe Qi)² )
    * @returns Scheinleistung in VA
    */
-  public getApparentPower(children: Consumer[]): number {
-    const sumActivePower = children.reduce(
+  public getApparentPower(children: ElectroInterface[]): number {
+    const consumerChildren = children.filter(
+      (child) => child instanceof Consumer
+    ) as Consumer[];
+
+    const sumActivePower = consumerChildren.reduce(
       (accumulator, currentValue) =>
         accumulator + currentValue.getActivePower(),
       0
     );
-    const sumReactivePower = children.reduce(
+    const sumReactivePower = consumerChildren.reduce(
       (accumulator, currentValue) =>
         accumulator + currentValue.getReactivePower(),
       0

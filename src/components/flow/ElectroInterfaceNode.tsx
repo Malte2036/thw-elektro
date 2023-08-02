@@ -51,7 +51,6 @@ export function ElectroInterfaceNode({
         );
       case "Distributor":
         const distributor = data.electroInterface as Distributor;
-        const childrenConsumers = data.childrenElectroInterfaces.filter(c => c.type == "Consumer") as Consumer[];
         return (
           <>
             <div>
@@ -69,7 +68,7 @@ export function ElectroInterfaceNode({
               )}
               kW
             </div>
-            <div>Scheinleistung: {formatNumberWithMaxTwoDecimals(distributor.getApparentPower(childrenConsumers) / 1000)}kVA</div>
+            <div>Scheinleistung: {formatNumberWithMaxTwoDecimals(distributor.getApparentPower(data.childrenElectroInterfaces) / 1000)}kVA</div>
           </>
         );
       case "Producer":

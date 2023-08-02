@@ -1,5 +1,5 @@
 import { Position } from "../Position";
-import { COS_PHY, ElectroInterfaceWithInputPlug } from "./Electro";
+import { ElectroInterfaceWithInputPlug } from "./Electro";
 import { Plug } from "./Plug";
 
 export class Consumer extends ElectroInterfaceWithInputPlug {

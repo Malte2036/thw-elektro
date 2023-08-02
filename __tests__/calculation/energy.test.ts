@@ -210,4 +210,52 @@ describe("energy consumption", () => {
       ])
     );
   });
+
+  describe("getReactivePower consumer", () => {
+    const consumer = new Consumer(
+      "consumer-1",
+      undefined,
+      { x: 0, y: 0 },
+      3200,
+      7.3,
+      undefined,
+      { current: 16, voltage: 400 }
+    );
+
+    expect(consumer.getActivePower() / 1000).toEqual(3.2);
+    expect(consumer.getApparentPower() / 1000).toBeCloseTo(5.06, 2);
+    expect(consumer.getReactivePower() / 1000).toBeCloseTo(3.916, 2);
+  });
+
+  describe("getReactivePower distributor", () => {
+    const consumer = new Consumer(
+      "consumer-1",
+      undefined,
+      { x: 0, y: 0 },
+      3200,
+      7.3,
+      undefined,
+      { current: 16, voltage: 400 }
+    );
+    const consumer2 = new Consumer(
+      "consumer-2",
+      undefined,
+      { x: 0, y: 0 },
+      5300,
+      9.3,
+      undefined,
+      { current: 16, voltage: 400 }
+    );
+    const distributor = new Distributor(
+      "distributor-1",
+      undefined,
+      { x: 0, y: 0 },
+      undefined,
+      { current: 32, voltage: 400 }
+    );
+
+    expect(
+      distributor.getApparentPower([consumer, consumer2]) / 1000
+    ).toBeCloseTo(11.39, 2);
+  });
 });
