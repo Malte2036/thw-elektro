@@ -181,6 +181,8 @@ export default function FlowPage() {
 
   useEffect(() => {
     createInitialNodes();
+
+    dialogContext?.setDialog(<InfoDialog />);
   }, []);
 
   function recalculate() {
