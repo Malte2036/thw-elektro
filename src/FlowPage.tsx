@@ -62,42 +62,42 @@ export default function FlowPage() {
   const initialElectroInterfaceNodes = [
     new Consumer(
       "consumer-1",
+      "Chiemsee A",
+      { x: 700, y: 100 },
+      3200,
+      7.3,
       undefined,
-      { x: 550, y: 100 },
-      1500,
-      undefined,
-      undefined,
-      undefined
+      { current: 16, voltage: 400 }
     ),
     new Consumer(
       "consumer-2",
+      "Mast TP15-1",
+      { x: 700, y: 300 },
+      5300,
+      9.3,
       undefined,
-      { x: 550, y: 300 },
-      800,
-      undefined,
-      undefined,
-      undefined
+      { current: 16, voltage: 400 }
     ),
     new Consumer(
       "consumer-3",
+      "Chiemsee A",
+      { x: 700, y: 500 },
+      3200,
+      7.3,
       undefined,
-      { x: 550, y: 500 },
-      1800,
-      undefined,
-      undefined,
-      undefined
+      { current: 16, voltage: 400 }
     ),
     new Distributor(
       "distributor-1",
       undefined,
-      { x: 300, y: 200 },
+      { x: 350, y: 200 },
       undefined,
       undefined
     ),
     new Distributor(
       "distributor-2",
       undefined,
-      { x: 300, y: 400 },
+      { x: 350, y: 400 },
       undefined,
       undefined
     ),
