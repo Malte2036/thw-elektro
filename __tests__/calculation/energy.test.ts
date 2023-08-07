@@ -1,5 +1,5 @@
 import {
-  _getDependingConsumersEnergyConsumption,
+  _getDependingConsumersValues,
   calculatePowerInWatt,
   calculateTotalVoltageDropPercent,
   calculateVoltageDropPercent,
@@ -182,8 +182,9 @@ describe("energy consumption", () => {
     ),
   ];
 
-  it("_getDependingConsumersEnergyConsumption", () => {
-    const res = _getDependingConsumersEnergyConsumption(
+  it("_getDependingConsumersValues", () => {
+    const res = _getDependingConsumersValues(
+      "energyConsumption",
       allElectroInterfaces,
       outputEdges
     );

@@ -102,70 +102,88 @@ export function getVoltageDropForCableData(
   return calculateVoltageDropPercent(headCable, energyConsumption);
 }
 
-export function getRecursiveEnergyConsumption(
+function getRecursiveValues(
+  key: "energyConsumption",
   allElectroInterfaces: ElectroInterface[],
   allCables: Cable[],
   headCableTargets: string[]
 ): Map<string, number> {
-  const energyConsumptionMap = new Map<string, number>();
+  const resultMap = new Map<string, number>();
 
   for (const headCableTarget of headCableTargets) {
-    const localEnergyConsumptionMap = new Map<string, number>();
+    const localResultMap = new Map<string, number>();
 
     const outputEdges = allCables.filter((c) => c.source === headCableTarget);
 
-    const dependingConsumers = _getDependingConsumersEnergyConsumption(
+    const dependingConsumers = _getDependingConsumersValues(
+      key,
       allElectroInterfaces,
       outputEdges
     );
-    dependingConsumers.forEach((value, key) =>
-      localEnergyConsumptionMap.set(key, value)
-    );
+    dependingConsumers.forEach((value, key) => localResultMap.set(key, value));
 
-    const dependingDistributors = getDependingDistributorsEnergyConsumption(
+    const dependingDistributors = getDependingDistributorValues(
+      key,
       allElectroInterfaces,
       allCables,
       outputEdges
     );
     dependingDistributors.forEach((value, key) =>
-      localEnergyConsumptionMap.set(key, value)
+      localResultMap.set(key, value)
     );
 
-    const energyConsumption = sumArray(
-      Array.from(localEnergyConsumptionMap.entries())
+    const valueSum = sumArray(
+      Array.from(localResultMap.entries())
         .filter((v) => !v[0].includes("distributor"))
         .map((v) => v[1])
     );
-    energyConsumptionMap.set(headCableTarget, energyConsumption);
+    resultMap.set(headCableTarget, valueSum);
 
-    localEnergyConsumptionMap.forEach((value, key) =>
-      energyConsumptionMap.set(key, value)
-    );
+    localResultMap.forEach((value, key) => resultMap.set(key, value));
   }
 
-  return energyConsumptionMap;
+  return resultMap;
 }
 
-export function _getDependingConsumersEnergyConsumption(
+export function getRecursiveEnergyConsumption(
+  allElectroInterfaces: ElectroInterface[],
+  allCables: Cable[],
+  headCableTargets: string[]
+): Map<string, number> {
+  return getRecursiveValues(
+    "energyConsumption",
+    allElectroInterfaces,
+    allCables,
+    headCableTargets
+  );
+}
+
+export function _getDependingConsumersValues(
+  key: "energyConsumption",
   allElectroInterfaces: ElectroInterface[],
   outputEdges: Cable[]
 ): Map<string, number> {
-  const energyConsumptionMap = new Map<string, number>();
+  const resultMap = new Map<string, number>();
 
   for (const edge of outputEdges) {
-    const consumption = allElectroInterfaces
+    const found = allElectroInterfaces
       .filter((e) => e.type == "Consumer")
       .map((e) => e as Consumer)
-      .find((c) => c.id === edge.target)?.energyConsumption;
+      .find((c) => c.id === edge.target);
 
-    if (consumption !== undefined) {
-      energyConsumptionMap.set(edge.target, consumption);
+    if (!found) continue;
+
+    const value = (found as any)[key];
+
+    if (value !== undefined) {
+      resultMap.set(edge.target, value);
     }
   }
-  return energyConsumptionMap;
+  return resultMap;
 }
 
-function getDependingDistributorsEnergyConsumption(
+function getDependingDistributorValues(
+  key: "energyConsumption",
   allElectroInterfaces: ElectroInterface[],
   allCables: Cable[],
   outputEdges: Cable[]
@@ -180,7 +198,7 @@ function getDependingDistributorsEnergyConsumption(
     allDistributor.find((d) => d.id === e.target)
   );
   for (const edge of dependingEdges) {
-    const res = getRecursiveEnergyConsumption(allElectroInterfaces, allCables, [
+    const res = getRecursiveValues(key, allElectroInterfaces, allCables, [
       edge.target,
     ]);
     res.forEach((value, key) => energyConsumptionMap.set(key, value));
