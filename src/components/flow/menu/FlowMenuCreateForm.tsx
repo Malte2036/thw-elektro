@@ -28,12 +28,17 @@ export default function FlowMenuCreateForm({
   const [name, setName] = useState<string>("");
   const [energyConsumption, setEnergyConsumption] = useState<
     string | undefined
-  >(electroType == "Consumer" ? "5.2" : undefined);
+  >(electroType == "Consumer" ? "3.2" : undefined);
   const [energyProduction, setEnergyProduction] = useState<string | undefined>(
     electroType == "Producer" ? "12" : undefined
   );
   const [ratedPower, setRatedPower] = useState<string | undefined>(
-    electroType == "Consumer" ? "7" : undefined
+    electroType == "Consumer" ? "7.3" : undefined
+  );
+
+  const [defaultInputPlug, setDefaultInputPlug] = useState<number | undefined>(
+    electroType != "Producer" ? allPossiblePlugs.findIndex((plug) => plug.voltage === 400 && plug.current === 16)
+      : undefined
   );
 
   function getParsedEnergyConsumption(): number | undefined {
@@ -65,10 +70,6 @@ export default function FlowMenuCreateForm({
     }
     return parsedRatedPower;
   }
-
-  const [defaultInputPlug, setDefaultInputPlug] = useState<number | undefined>(
-    electroType != "Producer" ? 0 : undefined
-  );
 
   return (
     <FlowMenuItem>

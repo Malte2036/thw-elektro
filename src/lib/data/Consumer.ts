@@ -57,6 +57,7 @@ export class Consumer extends ElectroInterfaceWithInputPlug {
 
   getSinPhi(): number {
     const cosPhi = Math.acos(this.getActivePower() / this.getApparentPower());
+
     return Math.sin(cosPhi);
   }
 }
