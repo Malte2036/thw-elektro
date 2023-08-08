@@ -8,6 +8,7 @@ import CableEdge from "./components/flow/CableEdge";
 import { Cable } from "./lib/data/Cable";
 import {
   calculateTotalVoltageDropPercent,
+  getRecursiveApparentPower,
   getRecursiveEnergyConsumption,
   getVoltageDropForCableData,
 } from "./lib/calculation/energy";
@@ -162,6 +163,20 @@ export default function FlowPage() {
     return allEnergyConsumptions;
   }
 
+  function getApparentPowers(): Map<string, number> {
+    const allElectro = getAllElectro();
+    const allCables = getAllCables();
+
+    const allApparentPowers = getRecursiveApparentPower(
+      allElectro,
+      allCables,
+      allElectro.filter((e) => e.type == "Producer").map((p) => p.id) ?? []
+    );
+
+    return allApparentPowers;
+  }
+
+
   function getVoltageDrops(
     currentAllEnergyConsumptions: Map<string, number>
   ): Map<string, number> {
@@ -188,6 +203,7 @@ export default function FlowPage() {
 
   function recalculate() {
     const allEnergyConsumptions = getEnergyConsumptions();
+    const allApparentPowers = getApparentPowers();
     const voltageDrops = getVoltageDrops(allEnergyConsumptions);
 
     const allElectro = getAllElectro();
@@ -208,10 +224,12 @@ export default function FlowPage() {
           const distributor = electro as Distributor;
           distributor.energyFlow = allEnergyConsumptions.get(electro.id) ?? 0;
           distributor.hasEnergy = allEnergyConsumptions.has(distributor.id);
+          distributor.apparentPower = allApparentPowers.get(distributor.id) ?? 0;
           break;
         case "Producer":
           const producer = electro as Producer;
           producer.energyFlow = allEnergyConsumptions.get(producer.id) ?? 0;
+          producer.apparentPower = allApparentPowers.get(producer.id) ?? 0;
           break;
       }
 

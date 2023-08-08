@@ -68,7 +68,7 @@ export function ElectroInterfaceNode({
               )}
               kW
             </div>
-            <div>Scheinleistung: {formatNumberWithMaxTwoDecimals(distributor.getApparentPower(data.childrenElectroInterfaces) / 1000)}kVA</div>
+            <div>Scheinleistung: {distributor.apparentPower ? formatNumberWithMaxTwoDecimals(distributor.apparentPower / 1000) : ""}kVA</div>
           </>
         );
       case "Producer":
@@ -95,6 +95,7 @@ export function ElectroInterfaceNode({
               {formatNumberWithMaxTwoDecimals(producer.energyProduction / 1000)}
               kVA
             </div>
+            <div>Scheinleistung: {producer.apparentPower ? formatNumberWithMaxTwoDecimals(producer.apparentPower / 1000) : ""}kVA</div>
           </>
         );
     }

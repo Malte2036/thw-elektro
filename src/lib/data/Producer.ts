@@ -4,6 +4,7 @@ import { COS_PHY, ElectroInterface } from "./Electro";
 export class Producer extends ElectroInterface {
   public energyFlow: number = 0;
   public readonly energyProduction: number;
+  public apparentPower: number | undefined = undefined;
 
   public get allowedEnergyFlow(): number {
     return this.energyProduction * COS_PHY;

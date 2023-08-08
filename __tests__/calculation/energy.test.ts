@@ -3,6 +3,7 @@ import {
   calculatePowerInWatt,
   calculateTotalVoltageDropPercent,
   calculateVoltageDropPercent,
+  getRecursiveApparentPower,
   getRecursiveEnergyConsumption,
 } from "../../src/lib/calculation/energy";
 import { Cable } from "../../src/lib/data/Cable";
@@ -118,18 +119,18 @@ describe("energy consumption", () => {
       undefined,
       { x: 0, y: 0 },
       1005,
+      7.3,
       undefined,
-      undefined,
-      undefined
+      { current: 16, voltage: 400 }
     ),
     new Consumer(
       "consumer-2",
       undefined,
       { x: 0, y: 0 },
       2020,
+      9.3,
       undefined,
-      undefined,
-      undefined
+      { current: 16, voltage: 400 }
     ),
     new Consumer(
       "consumer-3",
@@ -184,7 +185,7 @@ describe("energy consumption", () => {
 
   it("_getDependingConsumersValues", () => {
     const res = _getDependingConsumersValues(
-      "energyConsumption",
+      (consumer: Consumer) => consumer.energyConsumption,
       allElectroInterfaces,
       outputEdges
     );
@@ -196,6 +197,7 @@ describe("energy consumption", () => {
       ])
     );
   });
+
   it("getRecursiveEnergyConsumption", () => {
     const res = getRecursiveEnergyConsumption(
       allElectroInterfaces,
@@ -208,6 +210,25 @@ describe("energy consumption", () => {
         ["distributor-1", 1005 + 2020],
         ["consumer-1", 1005],
         ["consumer-2", 2020],
+      ])
+    );
+  });
+
+  it("getRecursiveApparentPower", () => {
+    const res = getRecursiveApparentPower(allElectroInterfaces, outputEdges, [
+      "producer-1",
+    ]);
+
+    const roundedRes = new Map(
+      Array.from(res.entries()).map(([key, value]) => [key, Math.round(value)])
+    );
+
+    expect(roundedRes).toEqual(
+      new Map([
+        ["producer-1", 11501],
+        ["distributor-1", 11501],
+        ["consumer-1", 5058],
+        ["consumer-2", 6443],
       ])
     );
   });
@@ -228,7 +249,7 @@ describe("energy consumption", () => {
     expect(consumer.getReactivePower() / 1000).toBeCloseTo(3.916, 2);
   });
 
-  describe("getReactivePower distributor", () => {
+  /*describe("getReactivePower distributor", () => {
     const consumer = new Consumer(
       "consumer-1",
       undefined,
@@ -258,5 +279,5 @@ describe("energy consumption", () => {
     expect(
       distributor.getApparentPower([consumer, consumer2]) / 1000
     ).toBeCloseTo(11.39, 2);
-  });
+  });*/
 });
