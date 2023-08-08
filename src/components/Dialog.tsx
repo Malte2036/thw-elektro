@@ -42,7 +42,7 @@ export default function Dialog({ header, children }: DialogProps) {
       ref={outerDivRef}
       onClick={handleOuterDivClick}
     >
-      <div className="relative p-4 bg-white rounded-md shadow-md flex flex-col gap-2 max-w-md m-4">
+      <div className="relative p-4 bg-white rounded-md shadow-md flex flex-col gap-2 max-w-md m-4 max-h-screen overflow-scroll">
         <div className="text-2xl text-thw font-bold">{header}</div>
 
         {children}
