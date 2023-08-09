@@ -53,12 +53,12 @@ export default function CableEdge(edgeProps: EdgeProps<CableEdgeData>) {
               >
                 Länge
               </Button>
-              <Button
+              {/*<Button
                 type="secondary"
                 onClick={() => edgeProps.data?.nextType(edgeProps.data.cable)}
               >
                 Type
-              </Button>
+          </Button>*/}
               <Button
                 type="secondary"
                 onClick={() => edgeProps.data?.deleteEdge(edgeProps.data.cable)}
