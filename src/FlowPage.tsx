@@ -7,10 +7,8 @@ import { Producer } from "./lib/data/Producer";
 import CableEdge from "./components/flow/CableEdge";
 import { Cable } from "./lib/data/Cable";
 import {
-  calculateTotalVoltageDropPercent,
   getRecursiveApparentPower,
   getRecursiveEnergyConsumption,
-  getVoltageDropForCableData,
 } from "./lib/calculation/energy";
 import { Distributor } from "./lib/data/Distributor";
 
@@ -32,6 +30,7 @@ import { useDialogContext } from "./hooks/useDialog";
 import InfoDialog from "./components/InfoDIalog";
 import Footer from "./components/Footer";
 import ConfirmDialog from "./components/ConfirmDialog";
+import { calculateTotalVoltageDropPercent, getVoltageDropForCableData } from "./lib/calculation/voltageDrop";
 
 const selector = (state: RFState) => ({
   nodes: state.nodes,

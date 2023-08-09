@@ -2,7 +2,7 @@ import { Handle, NodeProps, NodeToolbar, Position } from "reactflow";
 import { ElectroInterface, getTitleForElectro } from "../../lib/data/Electro";
 import { ReactNode } from "react";
 import { Consumer } from "../../lib/data/Consumer";
-import { isVoltageDropTooHigh } from "../../lib/calculation/energy";
+import { isVoltageDropTooHigh } from "../../lib/calculation/voltageDrop";
 import { Distributor } from "../../lib/data/Distributor";
 import Button from "../../components/Button";
 import { Producer } from "../../lib/data/Producer";

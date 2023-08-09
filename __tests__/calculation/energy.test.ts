@@ -1,11 +1,13 @@
 import {
   _getDependingConsumersValues,
   calculatePowerInWatt,
-  calculateTotalVoltageDropPercent,
-  calculateVoltageDropPercent,
   getRecursiveApparentPower,
   getRecursiveEnergyConsumption,
 } from "../../src/lib/calculation/energy";
+import {
+  calculateVoltageDropPercent,
+  calculateTotalVoltageDropPercent,
+} from "../../src/lib/calculation/voltageDrop";
 import { Cable } from "../../src/lib/data/Cable";
 import { Consumer } from "../../src/lib/data/Consumer";
 import { Distributor } from "../../src/lib/data/Distributor";
@@ -225,8 +227,8 @@ describe("energy consumption", () => {
 
     expect(roundedRes).toEqual(
       new Map([
-        ["producer-1", 11501],
-        ["distributor-1", 11501],
+        ["producer-1", 11481],
+        ["distributor-1", 11481],
         ["consumer-1", 5058],
         ["consumer-2", 6443],
       ])

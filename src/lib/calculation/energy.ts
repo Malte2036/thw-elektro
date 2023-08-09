@@ -1,112 +1,51 @@
 import { Cable } from "../data/Cable";
-import { sumArray, toTargetSourceString } from "../utils";
+import { sumArray } from "../utils";
 import * as ReactFlow from "reactflow";
 import { ElectroInterface } from "../data/Electro";
 import { Consumer } from "../data/Consumer";
 import { Distributor } from "../data/Distributor";
-import { Plug, getPlugDiameter } from "../data/Plug";
+import { Plug } from "../data/Plug";
 
-export function calculateVoltageDropPercent(
-  cable: Cable,
-  energyConsumption: number
-): number {
-  const voltage = cable.plug.voltage;
-  const length = cable.length;
-  const powerInWatt = energyConsumption;
-  const resistance = 56;
-  const diameter = getPlugDiameter(cable.plug);
-
-  if (voltage === 230) {
-    return (
-      ((2 * length * powerInWatt) /
-        (resistance * diameter * Math.pow(voltage, 2))) *
-      100
-    );
-  }
-  if (voltage === 400) {
-    return (
-      ((length * powerInWatt) /
-        (resistance * diameter * Math.pow(voltage, 2))) *
-      100
-    );
-  }
-
-  throw new Error("Invalid voltage. Only 230V and 400V are supported.");
-}
-
-export function calculateTotalVoltageDropPercent(
-  allCable: Cable[],
-  allVoltageDrops: Map<string, number>,
-  leafCableSource: string
-): number {
-  const inputEdge = allCable.find((c) => c.target === leafCableSource);
-  if (inputEdge === undefined) {
-    // is (maybe) producer leaf
-    return 0;
-  }
-
-  const drop =
-    allVoltageDrops.get(
-      toTargetSourceString(inputEdge.target, inputEdge.source)
-    ) ?? 0;
-
-  return (
-    drop +
-    calculateTotalVoltageDropPercent(
-      allCable,
-      allVoltageDrops,
-      inputEdge.source
-    )
-  );
-}
-
-export function isVoltageDropTooHigh(voltageDropPercent: number): boolean {
-  return voltageDropPercent > 3;
-}
-
-export function calculatePowerInWatt(plug: Plug): number {
-  if (plug.voltage === 230) {
-    return plug.voltage * plug.current;
-  }
-  if (plug.voltage === 400) {
-    return plug.voltage * plug.current * Math.sqrt(3);
-  }
-
-  throw new Error("Invalid voltage. Only 230V and 400V are supported.");
-}
-
-export function getVoltageDropForCableData(
+export function getRecursiveEnergyConsumption(
   allElectroInterfaces: ElectroInterface[],
-  allEnergyConsumptions: Map<string, number>,
-  headCable: Cable
-): number {
-  const allConsumers = allElectroInterfaces.filter(
-    (e) => e.type === "Consumer"
-  ) as Consumer[];
-  const allDistributors = allElectroInterfaces.filter(
-    (e) => e.type === "Distributor"
-  ) as Distributor[];
-  const consumerData = allConsumers.find((c) => c.id === headCable.target);
-  const distributorData = allDistributors.find(
-    (d) => d.id === headCable.target
+  allCables: Cable[],
+  headCableTargets: string[]
+): Map<string, number> {
+  return getRecursiveValues(
+    (consumer) => consumer.energyConsumption,
+    (localResultMap) =>
+      sumArray(
+        Array.from(localResultMap.entries())
+          .filter((v) => !v[0].includes("distributor"))
+          .map((v) => v[1])
+      ),
+    allElectroInterfaces,
+    allCables,
+    headCableTargets
   );
+}
 
-  let energyConsumption = 0;
-
-  if (consumerData !== undefined) {
-    energyConsumption = consumerData.energyConsumption;
-  } else if (distributorData !== undefined) {
-    energyConsumption = allEnergyConsumptions.get(distributorData.id) ?? 0;
-  }
-
-  return calculateVoltageDropPercent(headCable, energyConsumption);
+export function getRecursiveApparentPower(
+  allElectroInterfaces: ElectroInterface[],
+  allCables: Cable[],
+  headCableTargets: string[]
+): Map<string, number> {
+  return getRecursiveValues(
+    (consumer) => consumer.getApparentPower(),
+    (localResultMap, childrenElectorInterfaces) =>
+      getApparentPowerFromChildren(localResultMap, childrenElectorInterfaces) ??
+      0,
+    allElectroInterfaces,
+    allCables,
+    headCableTargets
+  );
 }
 
 function getRecursiveValues(
   getValueByConsumer: (consumer: Consumer) => number,
   combineChildrenValues: (
     localResultMap: Map<string, number>,
-    allElectroInterfaces: ElectroInterface[]
+    childrenElectroInterfaces: ElectroInterface[]
   ) => number,
   allElectroInterfaces: ElectroInterface[],
   allCables: Cable[],
@@ -139,7 +78,9 @@ function getRecursiveValues(
 
     const combinedSum = combineChildrenValues(
       localResultMap,
-      allElectroInterfaces
+      allElectroInterfaces.filter((electro) =>
+        outputEdges.some((edge) => edge.target === electro.id)
+      )
     );
 
     resultMap.set(headCableTarget, combinedSum);
@@ -148,44 +89,6 @@ function getRecursiveValues(
   }
 
   return resultMap;
-}
-
-export function getRecursiveEnergyConsumption(
-  allElectroInterfaces: ElectroInterface[],
-  allCables: Cable[],
-  headCableTargets: string[]
-): Map<string, number> {
-  return getRecursiveValues(
-    (consumer) => consumer.energyConsumption,
-    (localResultMap) =>
-      sumArray(
-        Array.from(localResultMap.entries())
-          .filter((v) => !v[0].includes("distributor"))
-          .map((v) => v[1])
-      ),
-    allElectroInterfaces,
-    allCables,
-    headCableTargets
-  );
-}
-
-export function getRecursiveApparentPower(
-  allElectroInterfaces: ElectroInterface[],
-  allCables: Cable[],
-  headCableTargets: string[]
-): Map<string, number> {
-  return getRecursiveValues(
-    (consumer) => consumer.getApparentPower(),
-    (localResultMap, allElectorInterfaces) => {
-      const found = allElectorInterfaces.find(
-        (e) => e.id === localResultMap.keys().next().value
-      );
-      return 123;
-    },
-    allElectroInterfaces,
-    allCables,
-    headCableTargets
-  );
 }
 
 export function _getDependingConsumersValues(
@@ -216,7 +119,7 @@ function getDependingDistributorValues(
   getValueByConsumer: (consumer: Consumer) => number,
   combineChildrenValues: (
     localResultMap: Map<string, number>,
-    allElectroInterfaces: ElectroInterface[]
+    childrenElectroInterfaces: ElectroInterface[]
   ) => number,
   allElectroInterfaces: ElectroInterface[],
   allCables: Cable[],
@@ -248,7 +151,10 @@ function getDependingDistributorValues(
  * S = Wurzel ( (Summe Pi)² + (Summe Qi)² )
  * @returns Scheinleistung in VA
  */
-function getApparentPower(children: ElectroInterface[]): number | undefined {
+function getApparentPowerFromChildren(
+  localResultMap: Map<string, number>,
+  children: ElectroInterface[]
+): number | undefined {
   const consumerChildren = children.filter(
     (child) => child instanceof Consumer
   ) as Consumer[];
@@ -261,8 +167,23 @@ function getApparentPower(children: ElectroInterface[]): number | undefined {
     consumerChildren.map((c) => c.getReactivePower())
   );
 
-  return Math.sqrt(Math.pow(sumActivePower, 2) + Math.pow(sumReactivePower, 2));
+  const distributorChildren = children.filter(
+    (child) => child instanceof Distributor
+  ) as Distributor[];
+
+  const sumDistributorsApparentPower = sumArray(
+    distributorChildren
+      .filter((d) => localResultMap.has(d.id))
+      .map((d) => localResultMap.get(d.id)!)
+  );
+
+  return (
+    Math.sqrt(Math.pow(sumActivePower, 2) + Math.pow(sumReactivePower, 2)) +
+    sumDistributorsApparentPower
+  );
 }
+
+// utils
 
 export function isCircularConnection(
   connection: ReactFlow.Connection,
@@ -290,4 +211,15 @@ export function isCircularConnection(
   }
 
   return false;
+}
+
+export function calculatePowerInWatt(plug: Plug): number {
+  if (plug.voltage === 230) {
+    return plug.voltage * plug.current;
+  }
+  if (plug.voltage === 400) {
+    return plug.voltage * plug.current * Math.sqrt(3);
+  }
+
+  throw new Error("Invalid voltage. Only 230V and 400V are supported.");
 }
