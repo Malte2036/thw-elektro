@@ -46,7 +46,7 @@ export function ElectroInterfaceNode({
             <div>Nennstrom: {formatNumberWithMaxTwoDecimals(consumer.ratedPower ?? 0)}A</div>
             <div>Scheinleistung: {formatNumberWithMaxTwoDecimals(consumer.getApparentPower() / 1000)}kVA</div>
             <div>Wirkleistung: {formatNumberWithMaxTwoDecimals(consumer.getActivePower() / 1000)}kW</div>
-            <div>Blindleistung: {formatNumberWithMaxTwoDecimals(consumer.getReactivePower() / 1000)}kVA</div>
+            <div>Blindleistung: {formatNumberWithMaxTwoDecimals(consumer.getReactivePower() / 1000)}kVAR</div>
           </>
         );
       case "Distributor":

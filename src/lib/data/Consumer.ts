@@ -47,7 +47,7 @@ export class Consumer extends ElectroInterfaceWithInputPlug {
 
   /**
    * B = U * I * Wurzel(3) * sin(phi)
-   * @returns Blindleistung in VA
+   * @returns Blindleistung in VAR
    */
   public getReactivePower(): number {
     if (!this.ratedPower) return 0.0001; // change, it is 0.0001 do not destroy with old stored data
