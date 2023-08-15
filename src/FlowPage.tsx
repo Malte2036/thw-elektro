@@ -26,7 +26,7 @@ import {
 } from "./components/flow/ElectroInterfaceNode";
 import Button from "./components/Button";
 
-import { inject } from "@vercel/analytics";
+
 import { useDialogContext } from "./hooks/useDialog";
 import InfoDialog from "./components/InfoDIalog";
 import Footer from "./components/Footer";
@@ -47,7 +47,7 @@ const selector = (state: RFState) => ({
 });
 
 export default function FlowPage() {
-  inject();
+
 
   const [showMenu, setShowMenu] = useState<boolean>(false);
 
