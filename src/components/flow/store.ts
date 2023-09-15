@@ -21,6 +21,8 @@ import {
 export type RFState = {
   nodes: Node[];
   edges: Edge[];
+  setNodes: (nodes: Node[]) => void;
+  setEdges: (edges: Edge[]) => void;
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
   removeNode: (id: string) => void;
@@ -45,6 +47,16 @@ export type RFState = {
 const useStore = create<RFState>((set, get) => ({
   nodes: [],
   edges: [],
+  setNodes: (nodes: Node[]) => {
+    set({
+      nodes,
+    });
+  },
+  setEdges: (edges: Edge[]) => {
+    set({
+      edges,
+    });
+  },
   onNodesChange: (changes: NodeChange[]) => {
     set({
       nodes: applyNodeChanges(changes, get().nodes),

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import * as ReactFlow from "reactflow";
 
 import "reactflow/dist/style.css";
@@ -24,17 +24,18 @@ import {
   ElectroInterfaceNodeProps,
 } from "./components/flow/ElectroInterfaceNode";
 import Button from "./components/Button";
-
-
 import { useDialogContext } from "./hooks/useDialog";
 import InfoDialog from "./components/InfoDIalog";
 import Footer from "./components/Footer";
 import ConfirmDialog from "./components/ConfirmDialog";
+import Dialog from "./components/Dialog";
 import { calculateTotalVoltageDropPercent, getVoltageDropForCableData } from "./lib/calculation/voltageDrop";
 
 const selector = (state: RFState) => ({
   nodes: state.nodes,
   edges: state.edges,
+  setNodes: state.setNodes,
+  setEdges: state.setEdges,
   onNodesChange: state.onNodesChange,
   onEdgesChange: state.onEdgesChange,
   removeNode: state.removeNode,
@@ -107,6 +108,8 @@ export default function FlowPage() {
   const {
     nodes,
     edges,
+    setNodes,
+    setEdges,
     onNodesChange,
     onEdgesChange,
     removeNode,
@@ -117,6 +120,41 @@ export default function FlowPage() {
     updateElectroInterfaceNode,
     deleteAll,
   } = useStore(selector, shallow);
+  //const { setViewport } = ReactFlow.useReactFlow();
+
+
+  const [rfInstance, setRfInstance] = useState<
+    ReactFlow.ReactFlowInstance | null
+  >(null);
+
+  const FLOW_KEY = "currentFlow"
+
+  const onSave = useCallback(() => {
+    if (rfInstance) {
+      const flow = rfInstance.toObject();
+      localStorage.setItem(FLOW_KEY, JSON.stringify(flow));
+
+    }
+  }, [rfInstance]);
+
+  function restoreFlow(): boolean {
+    const item = localStorage.getItem(FLOW_KEY)
+    if (!item) return false;
+
+    const flow = JSON.parse(item);
+    if (!flow) return false;
+
+
+    console.log("restore Flow");
+
+    setNodes(flow.nodes || []);
+    setEdges(flow.edges || []);
+
+    //const { x = 0, y = 0, zoom = 1 } = flow.viewport;
+    //setViewport({ x, y, zoom });
+
+    return true;
+  }
 
   function getAllElectro(): ElectroInterface[] {
     return (nodes as ReactFlow.Node[])
@@ -185,7 +223,7 @@ export default function FlowPage() {
     const voltageDrops = new Map();
 
     allCable.forEach((c) => {
-      let voltageDrop = getVoltageDropForCableData(
+      const voltageDrop = getVoltageDropForCableData(
         allElectro,
         currentAllEnergyConsumptions,
         c
@@ -197,7 +235,11 @@ export default function FlowPage() {
   }
 
   useEffect(() => {
-    createInitialNodes();
+
+    const success = restoreFlow();
+    if (success === false) {
+      createInitialNodes();
+    }
 
     dialogContext?.setDialog(<InfoDialog />);
   }, []);
@@ -255,111 +297,127 @@ export default function FlowPage() {
 
   return (
     <div className="w-screen h-screen flex flex-row">
-      <ReactFlow.ReactFlow
-        nodeTypes={nodeTypes}
-        nodes={nodes}
-        edgeTypes={edgeTypes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={(connection) => {
-          addCableEdge(
-            connection,
-            (cable: Cable) => {
-              cable.nextLength();
+      <ReactFlow.ReactFlowProvider>
+        <ReactFlow.ReactFlow
+          nodeTypes={nodeTypes}
+          onInit={setRfInstance}
+          nodes={nodes}
+          edgeTypes={edgeTypes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={(connection) => {
+            addCableEdge(
+              connection,
+              (cable: Cable) => {
+                cable.nextLength();
 
-              updateCableEdge(cable);
-              setRecalculateFlip((state) => !state);
-            },
-            (cable: Cable) => {
-              cable.nextPlug();
+                updateCableEdge(cable);
+                setRecalculateFlip((state) => !state);
+              },
+              (cable: Cable) => {
+                cable.nextPlug();
 
-              updateCableEdge(cable);
+                updateCableEdge(cable);
 
-              const targetNode = nodes.find((n) => n.id == cable.target);
-              if (targetNode) {
-                const electroInterface = (
-                  targetNode.data as ElectroInterfaceNodeProps
-                ).electroInterface;
-                if (electroInterface.type != "Producer") {
-                  const electroInterfaceWithPlug =
-                    electroInterface as ElectroInterfaceWithInputPlug;
-                  electroInterfaceWithPlug.inputPlug = cable.plug;
-                  updateElectroInterfaceNode(electroInterfaceWithPlug);
+                const targetNode = nodes.find((n) => n.id == cable.target);
+                if (targetNode) {
+                  const electroInterface = (
+                    targetNode.data as ElectroInterfaceNodeProps
+                  ).electroInterface;
+                  if (electroInterface.type != "Producer") {
+                    const electroInterfaceWithPlug =
+                      electroInterface as ElectroInterfaceWithInputPlug;
+                    electroInterfaceWithPlug.inputPlug = cable.plug;
+                    updateElectroInterfaceNode(electroInterfaceWithPlug);
+                  }
                 }
-              }
 
-              setRecalculateFlip((state) => !state);
-            },
-            (cable: Cable) => {
-              removeEdge(cable.id);
-              setRecalculateFlip((state) => !state);
-            },
-            0
-          );
-          setRecalculateFlip((state) => !state);
-        }}
-        fitView
-      >
-        <ReactFlow.Background />
-        <ReactFlow.Controls />
-        <ReactFlow.Panel position="top-right">
-          <div className="flex flex-col gap-2">
-            <Button type="primary" onClick={() => window.open("https://thw-tools.de?ref=elektro", '_blank')}>
-              Mehr THW Tools
-            </Button>
-            <Button
-              type="primary"
-              onClick={() => setShowMenu((state) => !state)}
-            >
-              {showMenu ? "Close" : "Open"} Menu
-            </Button>
-
-            <Button type="secondary" onClick={() => dialogContext?.setDialog(<InfoDialog />)}>
-              Info
-            </Button>
-            {nodes.length > 0 && (
-              <Button
-                type="secondary"
-                onClick={
-                  () => dialogContext?.setDialog(<ConfirmDialog title="Löschen" question="Bist du dir sicher, dass du alle sichtbaren Nodes löschen möchtest?" onConfirm={deleteAll} />)
-                }
-              >
-                Clear
+                setRecalculateFlip((state) => !state);
+              },
+              (cable: Cable) => {
+                removeEdge(cable.id);
+                setRecalculateFlip((state) => !state);
+              },
+              0
+            );
+            setRecalculateFlip((state) => !state);
+          }}
+          fitView
+        >
+          <ReactFlow.Background />
+          <ReactFlow.Controls />
+          <ReactFlow.Panel position="top-right">
+            <div className="flex flex-col gap-2">
+              <Button type="primary" onClick={() => window.open("https://thw-tools.de?ref=elektro", '_blank')}>
+                Mehr THW Tools
               </Button>
-            )}
+              <Button
+                type="primary"
+                onClick={() => setShowMenu((state) => !state)}
+              >
+                {showMenu ? "Close" : "Open"} Menu
+              </Button>
+
+              <Button type="secondary" onClick={() => dialogContext?.setDialog(<InfoDialog />)}>
+                Info
+              </Button>
+              {nodes.length > 0 && (
+                <Button
+                  type="secondary"
+                  onClick={
+                    () => dialogContext?.setDialog(<ConfirmDialog title="Löschen" question="Bist du dir sicher, dass du alle sichtbaren Nodes löschen möchtest?" onConfirm={deleteAll} />)
+                  }
+                >
+                  Clear
+                </Button>
+              )}
+              <Button type="secondary" onClick={() => {
+                onSave();
+                dialogContext?.setDialog(<Dialog header="Flow gespeichert">
+                  <div>
+                    Der Flow wurde erfolgreich gespeichert.
+                    Sobald die Seite neugeladen wird,
+                    wird der Flow wieder hergestellt.
+                  </div>
+                  <Button type="primary" onClick={() => dialogContext?.closeDialog()}>
+                    Okay
+                  </Button>
+                </Dialog>)
+              }}>Speichern</Button>
+            </div>
+          </ReactFlow.Panel>
+          <ReactFlow.Panel position="bottom-center">
+            <Footer />
+          </ReactFlow.Panel>
+        </ReactFlow.ReactFlow>
+
+
+        {showMenu ? (
+          <div className="w-screen h-screen flowmenu-small-width absolute md:relative ">
+            {
+              <FlowMenu
+                allPlacedNodeTemplateIds={
+                  nodes
+                    .map(
+                      (n) =>
+                        (n.data as ElectroInterfaceNodeProps).electroInterface
+                          .templateId
+                    )
+                    .filter((id) => id != undefined) as string[]
+                }
+                addElectroInterfaceNodeCallback={(electro: ElectroInterface) => {
+                  addElectroInterfaceNode(electro, () => {
+                    removeNode(electro.id);
+                    setRecalculateFlip((state) => !state);
+                  });
+                }}
+                closeMenu={() => setShowMenu(false)}
+              />
+            }
           </div>
-        </ReactFlow.Panel>
-        <ReactFlow.Panel position="bottom-center">
-          <Footer />
-        </ReactFlow.Panel>
-      </ReactFlow.ReactFlow>
-
-
-      {showMenu ? (
-        <div className="w-screen h-screen flowmenu-small-width absolute md:relative ">
-          {
-            <FlowMenu
-              allPlacedNodeTemplateIds={
-                nodes
-                  .map(
-                    (n) =>
-                      (n.data as ElectroInterfaceNodeProps).electroInterface
-                        .templateId
-                  )
-                  .filter((id) => id != undefined) as string[]
-              }
-              addElectroInterfaceNodeCallback={(electro: ElectroInterface) => {
-                addElectroInterfaceNode(electro, () => {
-                  removeNode(electro.id);
-                  setRecalculateFlip((state) => !state);
-                });
-              }}
-              closeMenu={() => setShowMenu(false)}
-            />
-          }
-        </div>
-      ) : undefined}
+        ) : undefined}
+      </ReactFlow.ReactFlowProvider>
     </div>
   );
 }

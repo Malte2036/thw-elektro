@@ -137,6 +137,7 @@ export default function FlowMenu({
             openPredefinedPage={() =>
               setSelectedOption(FlowMenuHeaderOptions.Predefined)
             }
+            closeMenu={closeMenu}
           />
         );
       default:
