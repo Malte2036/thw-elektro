@@ -23,7 +23,7 @@ export function ElectroInterfaceNode({
 
   function getMainLine(): ReactNode {
     switch (data.electroInterface.type) {
-      case "Consumer":
+      case "Consumer": {
         const consumer = data.electroInterface as Consumer;
         const totalVoltageDrop = consumer.totalVoltageDrop ?? 0;
         return (
@@ -43,13 +43,10 @@ export function ElectroInterfaceNode({
             >
               {formatNumberWithMaxTwoDecimals(totalVoltageDrop)}%
             </div>
-            <div>Nennstrom: {formatNumberWithMaxTwoDecimals(consumer.ratedPower ?? 0)}A</div>
-            <div>Scheinleistung: {formatNumberWithMaxTwoDecimals(consumer.getApparentPower() / 1000)}kVA</div>
-            <div>Wirkleistung: {formatNumberWithMaxTwoDecimals(consumer.getActivePower() / 1000)}kW</div>
-            <div>Blindleistung: {formatNumberWithMaxTwoDecimals(consumer.getReactivePower() / 1000)}kVAR</div>
           </>
         );
-      case "Distributor":
+      }
+      case "Distributor": {
         const distributor = data.electroInterface as Distributor;
         return (
           <>
@@ -68,10 +65,10 @@ export function ElectroInterfaceNode({
               )}
               kW
             </div>
-            <div>Scheinleistung: {distributor.apparentPower ? formatNumberWithMaxTwoDecimals(distributor.apparentPower / 1000) : ""}kVA</div>
           </>
         );
-      case "Producer":
+      }
+      case "Producer": {
         const producer = data.electroInterface as Producer;
         return (
           <>
@@ -95,9 +92,9 @@ export function ElectroInterfaceNode({
               {formatNumberWithMaxTwoDecimals(producer.energyProduction / 1000)}
               kVA
             </div>
-            <div>Scheinleistung: {producer.apparentPower ? formatNumberWithMaxTwoDecimals(producer.apparentPower / 1000) : ""}kVA</div>
           </>
         );
+      }
     }
   }
 
@@ -144,7 +141,7 @@ export function ElectroInterfaceNode({
   const dialogContext = useDialogContext();
 
   function openNodeInfoDialog() {
-    dialogContext?.setDialog(<NodeInfoDialog electroInterface={data.electroInterface}></NodeInfoDialog>)
+    dialogContext?.setDialog(<NodeInfoDialog electroInterface={data.electroInterface} />)
   }
 
   function getNodeToolbar(): ReactNode {
