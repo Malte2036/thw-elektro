@@ -2,10 +2,8 @@ import { useDialogContext } from "../hooks/useDialog";
 import Button from "./Button";
 import Dialog from "./Dialog";
 
-type InfoDialogProps = {};
 
-
-export default function InfoDialog({ }: InfoDialogProps) {
+export default function InfoDialog() {
     const dialogContext = useDialogContext();
 
     return <Dialog header="Spannungsfall">

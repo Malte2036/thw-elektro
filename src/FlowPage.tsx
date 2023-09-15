@@ -355,9 +355,14 @@ export default function FlowPage() {
               <Button type="secondary" onClick={() => {
                 onSave();
                 dialogContext?.setDialog(<Dialog header="Flow gespeichert">
-                  Der Flow wurde erfolgreich gespeichert.
-                  Sobald die Seite neugeladen wird,
-                  wird der Flow wieder hergestellt.
+                  <div>
+                    Der Flow wurde erfolgreich gespeichert.
+                    Sobald die Seite neugeladen wird,
+                    wird der Flow wieder hergestellt.
+                  </div>
+                  <Button type="primary" onClick={() => dialogContext?.closeDialog()}>
+                    Okay
+                  </Button>
                 </Dialog>)
               }}>Speichern</Button>
             </div>
