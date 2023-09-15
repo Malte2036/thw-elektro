@@ -12,7 +12,7 @@ export function exportDataAsJson(fileName: string, data: unknown) {
   document.body.removeChild(link);
 }
 
-export function importPredefinedData(file: unknown): Promise<Predefined[]> {
+export function importJsonData<DataType>(file: File): Promise<DataType> {
   console.log("Start importPredefinedData");
 
   return new Promise((resolve, reject) => {
@@ -25,7 +25,7 @@ export function importPredefinedData(file: unknown): Promise<Predefined[]> {
 
       try {
         const jsonData = JSON.parse(event.target.result?.toString() || "");
-        resolve(Array.isArray(jsonData) ? jsonData : []);
+        resolve(jsonData);
       } catch (error) {
         console.error("Error parsing JSON data:", error);
         reject([]);

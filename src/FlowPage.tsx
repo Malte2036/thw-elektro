@@ -25,12 +25,11 @@ import {
   ElectroInterfaceNodeProps,
 } from "./components/flow/ElectroInterfaceNode";
 import Button from "./components/Button";
-
-
 import { useDialogContext } from "./hooks/useDialog";
 import InfoDialog from "./components/InfoDIalog";
 import Footer from "./components/Footer";
 import ConfirmDialog from "./components/ConfirmDialog";
+import Dialog from "./components/Dialog";
 
 const selector = (state: RFState) => ({
   nodes: state.nodes,
@@ -207,7 +206,7 @@ export default function FlowPage() {
     const voltageDrops = new Map();
 
     allCable.forEach((c) => {
-      let voltageDrop = getVoltageDropForCableData(
+      const voltageDrop = getVoltageDropForCableData(
         allElectro,
         currentAllEnergyConsumptions,
         c
@@ -353,7 +352,14 @@ export default function FlowPage() {
                   Clear
                 </Button>
               )}
-              <Button type="secondary" onClick={onSave}>Speichern</Button>
+              <Button type="secondary" onClick={() => {
+                onSave();
+                dialogContext?.setDialog(<Dialog header="Flow gespeichert">
+                  Der Flow wurde erfolgreich gespeichert.
+                  Sobald die Seite neugeladen wird,
+                  wird der Flow wieder hergestellt.
+                </Dialog>)
+              }}>Speichern</Button>
             </div>
           </ReactFlow.Panel>
           <ReactFlow.Panel position="bottom-center">

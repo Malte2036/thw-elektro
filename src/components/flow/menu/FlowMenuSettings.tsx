@@ -2,7 +2,7 @@ import Button from "../../../components/Button";
 import FlowMenuItem from "./FlowMenuItem";
 import {
   exportDataAsJson,
-  importPredefinedData,
+  importJsonData,
 } from "../../../lib/db/export";
 import {
   bulkSavePredefined,
@@ -17,12 +17,14 @@ import * as ReactFlow from "reactflow";
 
 type FlowMenuSettingsProps = {
   openPredefinedPage: () => void;
+  closeMenu: () => void;
 };
 
 export default function FlowMenuSettings({
   openPredefinedPage,
 }: FlowMenuSettingsProps) {
-  const [file, setFile] = useState<File>();
+  const [templateFile, setTemplateFile] = useState<File>();
+  const [flowFile, setFlowFile] = useState<File>();
 
 
   const flow = ReactFlow.useReactFlow();
@@ -32,23 +34,19 @@ export default function FlowMenuSettings({
     exportDataAsJson("exported_templates.json", data);
   }
 
-  async function startFlowExport() {
-    exportDataAsJson("exported_flow.json", flow.toObject());
-  }
-
-  async function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
+  async function handleTemplateFileChange(e: ChangeEvent<HTMLInputElement>) {
     if (e.target.files) {
-      setFile(e.target.files[0]);
+      setTemplateFile(e.target.files[0]);
     }
   }
 
   async function startTemplateImport() {
-    if (!file) {
+    if (!templateFile) {
       return;
     }
 
     try {
-      const data: Predefined[] = await importPredefinedData(file);
+      const data: Predefined[] = await importJsonData(templateFile);
       if (data.length > 0) {
         await bulkSavePredefined(data);
         console.log("Imported predefined data");
@@ -59,6 +57,38 @@ export default function FlowMenuSettings({
       alert("Fehler beim Importieren der Templates.");
     }
   }
+
+  async function startFlowExport() {
+    exportDataAsJson("exported_flow.json", flow.toObject());
+  }
+
+  async function handleFlowFileChange(e: ChangeEvent<HTMLInputElement>) {
+    if (e.target.files) {
+      setFlowFile(e.target.files[0]);
+    }
+  }
+
+  async function startFlowImport() {
+    if (!flowFile) {
+      return;
+    }
+
+    try {
+      type ImportedFlowData = {
+        nodes: ReactFlow.Node[],
+        edges: ReactFlow.Edge[]
+      }
+      const data = await importJsonData<ImportedFlowData>(flowFile);
+      if (data) {
+        flow.setNodes(data.nodes);
+        flow.setEdges(data.edges);
+      }
+
+    } catch (error) {
+      alert("Fehler beim Importieren der Templates.");
+    }
+  }
+
 
   const dialogContext = useDialogContext();
 
@@ -82,6 +112,18 @@ export default function FlowMenuSettings({
         <Button onClick={startFlowExport} type="secondary">
           Exportieren
         </Button>
+      </FlowMenuItem> <FlowMenuItem>
+        <div>
+          Hiermit kann ein Flow eines anderen Nutzers importiert werden.
+        </div>
+        <input type="file" accept=".json" onChange={handleFlowFileChange} />
+        <Button
+          onClick={startFlowImport}
+          type="secondary"
+          disabled={flowFile == undefined}
+        >
+          Importieren
+        </Button>
       </FlowMenuItem>
       <FlowMenuItem>
         <div>Hiermit können alle aktuellen Templates exportiert werden.</div>
@@ -93,11 +135,11 @@ export default function FlowMenuSettings({
         <div>
           Hiermit können alle Templates eines anderen Nutzers importiert werden.
         </div>
-        <input type="file" accept=".json" onChange={handleFileChange} />
+        <input type="file" accept=".json" onChange={handleTemplateFileChange} />
         <Button
           onClick={startTemplateImport}
           type="secondary"
-          disabled={file == undefined}
+          disabled={templateFile == undefined}
         >
           Importieren
         </Button>
