@@ -1,5 +1,3 @@
-import { Predefined } from "../data/Predefined";
-
 export function exportDataAsJson(fileName: string, data: unknown) {
   const jsonData = JSON.stringify(data, null, 2);
   const blob = new Blob([jsonData], { type: "application/json" });
