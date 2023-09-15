@@ -30,6 +30,7 @@ export default function FlowMenu({
     name: string | undefined,
     consumerEnergyConsumption: number | undefined,
     producerEnergyProduction: number | undefined,
+    ratedPower: number | undefined,
     templateId: string | undefined,
     inputPlug: Plug | undefined
   ): ElectroInterface {
@@ -51,6 +52,7 @@ export default function FlowMenu({
           name,
           initialPosition,
           consumerEnergyConsumption,
+          ratedPower,
           templateId,
           inputPlug
         );
@@ -87,6 +89,7 @@ export default function FlowMenu({
     name: string,
     consumerEnergyConsumption: number | undefined,
     producerEnergyProduction: number | undefined,
+    ratedPower: number | undefined,
     templateId: string | undefined,
     inputPlug: Plug | undefined
   ) {
@@ -95,6 +98,7 @@ export default function FlowMenu({
       name.length > 0 ? name : undefined,
       consumerEnergyConsumption,
       producerEnergyProduction,
+      ratedPower,
       templateId,
       inputPlug
     );

@@ -165,6 +165,9 @@ const useStore = create<RFState>((set, get) => ({
     electroInterface: ElectroInterface,
     deleteNode: () => void
   ) => {
+    const allChildrenEdges = get().edges.filter(
+      (edge) => edge.source === electroInterface.id
+    );
     const electroInterfaceNode = {
       id: electroInterface.id,
       type: "electroInterfaceNode",
@@ -172,6 +175,11 @@ const useStore = create<RFState>((set, get) => ({
       data: {
         electroInterface,
         deleteNode,
+        childrenElectroInterfaces: get()
+          .nodes.filter((node) =>
+            allChildrenEdges.find((edge) => edge.target === node.id)
+          )
+          .map((node) => node.data.electroInterface as ElectroInterface),
       },
       draggable: true,
     };
@@ -180,12 +188,20 @@ const useStore = create<RFState>((set, get) => ({
     });
   },
   updateElectroInterfaceNode: (electroInterface: ElectroInterface) => {
+    const allChildrenEdges = get().edges.filter(
+      (edge) => edge.source === electroInterface.id
+    );
     set({
       nodes: get().nodes.map((node) => {
         if (node.id === electroInterface.id) {
           node.data = {
             ...node.data,
             electroInterface,
+            childrenElectroInterfaces: get()
+              .nodes.filter((node) =>
+                allChildrenEdges.find((edge) => edge.target === node.id)
+              )
+              .map((node) => node.data.electroInterface as ElectroInterface),
           };
         }
         return node;

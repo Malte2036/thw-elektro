@@ -9,6 +9,7 @@ type FlowMenuCreateProps = {
     name: string,
     consumerEnergyConsumption: number | undefined,
     producerEnergyProduction: number | undefined,
+    ratedPower: number | undefined,
     templateId: string | undefined,
     inputPlug: Plug | undefined
   ) => void;

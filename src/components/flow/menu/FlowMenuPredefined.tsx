@@ -16,6 +16,7 @@ type FlowMenuPredefinedProps = {
     name: string,
     consumerEnergyConsumption: number | undefined,
     producerEnergyProduction: number | undefined,
+    ratedPower: number | undefined,
     templateId: string | undefined,
     inputPlug: Plug | undefined
   ) => void;
@@ -97,6 +98,7 @@ export default function FlowMenuPredefined({
       node.name || "",
       energyConsumption,
       energyProduction,
+      node.ratedPower,
       node.id,
       node.defaultPlug
     );

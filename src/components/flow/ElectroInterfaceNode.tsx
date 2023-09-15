@@ -2,7 +2,7 @@ import { Handle, NodeProps, NodeToolbar, Position } from "reactflow";
 import { ElectroInterface, getTitleForElectro } from "../../lib/data/Electro";
 import { ReactNode } from "react";
 import { Consumer } from "../../lib/data/Consumer";
-import { isVoltageDropTooHigh } from "../../lib/calculation/energy";
+import { isVoltageDropTooHigh } from "../../lib/calculation/voltageDrop";
 import { Distributor } from "../../lib/data/Distributor";
 import Button from "../../components/Button";
 import { Producer } from "../../lib/data/Producer";
@@ -13,16 +13,17 @@ import NodeInfoDialog from "../NodeInfoDialog";
 export type ElectroInterfaceNodeProps = {
   electroInterface: ElectroInterface;
   deleteNode: () => void;
+  childrenElectroInterfaces: ElectroInterface[];
 };
 
 export function ElectroInterfaceNode({
   data,
-  selected,
+  selected
 }: NodeProps<ElectroInterfaceNodeProps>) {
 
   function getMainLine(): ReactNode {
     switch (data.electroInterface.type) {
-      case "Consumer":
+      case "Consumer": {
         const consumer = data.electroInterface as Consumer;
         const totalVoltageDrop = consumer.totalVoltageDrop ?? 0;
         return (
@@ -44,7 +45,8 @@ export function ElectroInterfaceNode({
             </div>
           </>
         );
-      case "Distributor":
+      }
+      case "Distributor": {
         const distributor = data.electroInterface as Distributor;
         return (
           <>
@@ -65,7 +67,8 @@ export function ElectroInterfaceNode({
             </div>
           </>
         );
-      case "Producer":
+      }
+      case "Producer": {
         const producer = data.electroInterface as Producer;
         return (
           <>
@@ -91,6 +94,7 @@ export function ElectroInterfaceNode({
             </div>
           </>
         );
+      }
     }
   }
 
@@ -137,7 +141,7 @@ export function ElectroInterfaceNode({
   const dialogContext = useDialogContext();
 
   function openNodeInfoDialog() {
-    dialogContext?.setDialog(<NodeInfoDialog electroInterface={data.electroInterface}></NodeInfoDialog>)
+    dialogContext?.setDialog(<NodeInfoDialog electroInterface={data.electroInterface} />)
   }
 
   function getNodeToolbar(): ReactNode {
