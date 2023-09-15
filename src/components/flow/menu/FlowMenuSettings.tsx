@@ -1,7 +1,7 @@
 import Button from "../../../components/Button";
 import FlowMenuItem from "./FlowMenuItem";
 import {
-  exportPredefinedData,
+  exportDataAsJson,
   importPredefinedData,
 } from "../../../lib/db/export";
 import {
@@ -13,6 +13,7 @@ import { ChangeEvent, useState } from "react";
 import { Predefined } from "../../../lib/data/Predefined";
 import { useDialogContext } from "../../../hooks/useDialog";
 import ConfirmDialog from "../../ConfirmDialog";
+import * as ReactFlow from "reactflow";
 
 type FlowMenuSettingsProps = {
   openPredefinedPage: () => void;
@@ -23,9 +24,16 @@ export default function FlowMenuSettings({
 }: FlowMenuSettingsProps) {
   const [file, setFile] = useState<File>();
 
-  async function startExport() {
+
+  const flow = ReactFlow.useReactFlow();
+
+  async function startTemplateExport() {
     const data = await getPredefined();
-    exportPredefinedData(data);
+    exportDataAsJson("exported_templates.json", data);
+  }
+
+  async function startFlowExport() {
+    exportDataAsJson("exported_flow.json", flow.toObject());
   }
 
   async function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
@@ -34,7 +42,7 @@ export default function FlowMenuSettings({
     }
   }
 
-  async function startImport() {
+  async function startTemplateImport() {
     if (!file) {
       return;
     }
@@ -54,7 +62,7 @@ export default function FlowMenuSettings({
 
   const dialogContext = useDialogContext();
 
-  async function startDelete() {
+  async function startTemplateDelete() {
     dialogContext?.setDialog(
       <ConfirmDialog title="Löschen" question="Bist du dir sicher, dass du alle Templates unwiderruflich löschen möchtest?" onConfirm={
         async () => {
@@ -70,8 +78,14 @@ export default function FlowMenuSettings({
   return (
     <>
       <FlowMenuItem>
+        <div>Hiermit kann der derzeitige Flow exportiert werden.</div>
+        <Button onClick={startFlowExport} type="secondary">
+          Exportieren
+        </Button>
+      </FlowMenuItem>
+      <FlowMenuItem>
         <div>Hiermit können alle aktuellen Templates exportiert werden.</div>
-        <Button onClick={startExport} type="secondary">
+        <Button onClick={startTemplateExport} type="secondary">
           Exportieren
         </Button>
       </FlowMenuItem>
@@ -81,7 +95,7 @@ export default function FlowMenuSettings({
         </div>
         <input type="file" accept=".json" onChange={handleFileChange} />
         <Button
-          onClick={startImport}
+          onClick={startTemplateImport}
           type="secondary"
           disabled={file == undefined}
         >
@@ -93,7 +107,7 @@ export default function FlowMenuSettings({
           Hiermit können alle aktuellen Templates unwiderruflich gelöscht
           werden.
         </div>
-        <Button onClick={startDelete} type="secondary">
+        <Button onClick={startTemplateDelete} type="secondary">
           Templates löschen
         </Button>
       </FlowMenuItem>

@@ -121,7 +121,9 @@ export default function FlowPage() {
   //const { setViewport } = ReactFlow.useReactFlow();
 
 
-  const [rfInstance, setRfInstance] = useState(null);
+  const [rfInstance, setRfInstance] = useState<
+    ReactFlow.ReactFlowInstance | null
+  >(null);
 
   const FLOW_KEY = "currentFlow"
 
@@ -276,113 +278,115 @@ export default function FlowPage() {
 
   return (
     <div className="w-screen h-screen flex flex-row">
-      <ReactFlow.ReactFlow
-        nodeTypes={nodeTypes}
-        onInit={setRfInstance}
-        nodes={nodes}
-        edgeTypes={edgeTypes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={(connection) => {
-          addCableEdge(
-            connection,
-            (cable: Cable) => {
-              cable.nextLength();
+      <ReactFlow.ReactFlowProvider>
+        <ReactFlow.ReactFlow
+          nodeTypes={nodeTypes}
+          onInit={setRfInstance}
+          nodes={nodes}
+          edgeTypes={edgeTypes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={(connection) => {
+            addCableEdge(
+              connection,
+              (cable: Cable) => {
+                cable.nextLength();
 
-              updateCableEdge(cable);
-              setRecalculateFlip((state) => !state);
-            },
-            (cable: Cable) => {
-              cable.nextPlug();
+                updateCableEdge(cable);
+                setRecalculateFlip((state) => !state);
+              },
+              (cable: Cable) => {
+                cable.nextPlug();
 
-              updateCableEdge(cable);
+                updateCableEdge(cable);
 
-              const targetNode = nodes.find((n) => n.id == cable.target);
-              if (targetNode) {
-                const electroInterface = (
-                  targetNode.data as ElectroInterfaceNodeProps
-                ).electroInterface;
-                if (electroInterface.type != "Producer") {
-                  const electroInterfaceWithPlug =
-                    electroInterface as ElectroInterfaceWithInputPlug;
-                  electroInterfaceWithPlug.inputPlug = cable.plug;
-                  updateElectroInterfaceNode(electroInterfaceWithPlug);
+                const targetNode = nodes.find((n) => n.id == cable.target);
+                if (targetNode) {
+                  const electroInterface = (
+                    targetNode.data as ElectroInterfaceNodeProps
+                  ).electroInterface;
+                  if (electroInterface.type != "Producer") {
+                    const electroInterfaceWithPlug =
+                      electroInterface as ElectroInterfaceWithInputPlug;
+                    electroInterfaceWithPlug.inputPlug = cable.plug;
+                    updateElectroInterfaceNode(electroInterfaceWithPlug);
+                  }
                 }
-              }
 
-              setRecalculateFlip((state) => !state);
-            },
-            (cable: Cable) => {
-              removeEdge(cable.id);
-              setRecalculateFlip((state) => !state);
-            },
-            0
-          );
-          setRecalculateFlip((state) => !state);
-        }}
-        fitView
-      >
-        <ReactFlow.Background />
-        <ReactFlow.Controls />
-        <ReactFlow.Panel position="top-right">
-          <div className="flex flex-col gap-2">
-            <Button type="primary" onClick={() => window.open("https://thw-tools.de?ref=elektro", '_blank')}>
-              Mehr THW Tools
-            </Button>
-            <Button
-              type="primary"
-              onClick={() => setShowMenu((state) => !state)}
-            >
-              {showMenu ? "Close" : "Open"} Menu
-            </Button>
-
-            <Button type="secondary" onClick={() => dialogContext?.setDialog(<InfoDialog />)}>
-              Info
-            </Button>
-            {nodes.length > 0 && (
-              <Button
-                type="secondary"
-                onClick={
-                  () => dialogContext?.setDialog(<ConfirmDialog title="Löschen" question="Bist du dir sicher, dass du alle sichtbaren Nodes löschen möchtest?" onConfirm={deleteAll} />)
-                }
-              >
-                Clear
+                setRecalculateFlip((state) => !state);
+              },
+              (cable: Cable) => {
+                removeEdge(cable.id);
+                setRecalculateFlip((state) => !state);
+              },
+              0
+            );
+            setRecalculateFlip((state) => !state);
+          }}
+          fitView
+        >
+          <ReactFlow.Background />
+          <ReactFlow.Controls />
+          <ReactFlow.Panel position="top-right">
+            <div className="flex flex-col gap-2">
+              <Button type="primary" onClick={() => window.open("https://thw-tools.de?ref=elektro", '_blank')}>
+                Mehr THW Tools
               </Button>
-            )}
-            <Button type="secondary" onClick={onSave}>Speichern</Button>
+              <Button
+                type="primary"
+                onClick={() => setShowMenu((state) => !state)}
+              >
+                {showMenu ? "Close" : "Open"} Menu
+              </Button>
+
+              <Button type="secondary" onClick={() => dialogContext?.setDialog(<InfoDialog />)}>
+                Info
+              </Button>
+              {nodes.length > 0 && (
+                <Button
+                  type="secondary"
+                  onClick={
+                    () => dialogContext?.setDialog(<ConfirmDialog title="Löschen" question="Bist du dir sicher, dass du alle sichtbaren Nodes löschen möchtest?" onConfirm={deleteAll} />)
+                  }
+                >
+                  Clear
+                </Button>
+              )}
+              <Button type="secondary" onClick={onSave}>Speichern</Button>
+            </div>
+          </ReactFlow.Panel>
+          <ReactFlow.Panel position="bottom-center">
+            <Footer />
+          </ReactFlow.Panel>
+        </ReactFlow.ReactFlow>
+
+
+        {showMenu ? (
+          <div className="w-screen h-screen flowmenu-small-width absolute md:relative ">
+            {
+              <FlowMenu
+                allPlacedNodeTemplateIds={
+                  nodes
+                    .map(
+                      (n) =>
+                        (n.data as ElectroInterfaceNodeProps).electroInterface
+                          .templateId
+                    )
+                    .filter((id) => id != undefined) as string[]
+                }
+                addElectroInterfaceNodeCallback={(electro: ElectroInterface) => {
+                  addElectroInterfaceNode(electro, () => {
+                    removeNode(electro.id);
+                    setRecalculateFlip((state) => !state);
+                  });
+                }}
+                closeMenu={() => setShowMenu(false)}
+              />
+            }
           </div>
-        </ReactFlow.Panel>
-        <ReactFlow.Panel position="bottom-center">
-          <Footer />
-        </ReactFlow.Panel>
-      </ReactFlow.ReactFlow>
-
-
-      {showMenu ? (
-        <div className="w-screen h-screen flowmenu-small-width absolute md:relative ">
-          {
-            <FlowMenu
-              allPlacedNodeTemplateIds={
-                nodes
-                  .map(
-                    (n) =>
-                      (n.data as ElectroInterfaceNodeProps).electroInterface
-                        .templateId
-                  )
-                  .filter((id) => id != undefined) as string[]
-              }
-              addElectroInterfaceNodeCallback={(electro: ElectroInterface) => {
-                addElectroInterfaceNode(electro, () => {
-                  removeNode(electro.id);
-                  setRecalculateFlip((state) => !state);
-                });
-              }}
-              closeMenu={() => setShowMenu(false)}
-            />
-          }
-        </div>
-      ) : undefined}
+        ) : undefined}
+      </ReactFlow.ReactFlowProvider>
     </div>
   );
 }

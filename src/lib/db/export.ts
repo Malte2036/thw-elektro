@@ -1,18 +1,18 @@
 import { Predefined } from "../data/Predefined";
 
-export function exportPredefinedData(predefinedData: Predefined[]) {
-  const jsonData = JSON.stringify(predefinedData, null, 2); // Convert predefinedData to pretty-printed JSON
+export function exportDataAsJson(fileName: string, data: unknown) {
+  const jsonData = JSON.stringify(data, null, 2);
   const blob = new Blob([jsonData], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = "exported_templates.json"; // File name for the downloaded JSON file
+  link.download = fileName; // File name for the downloaded JSON file
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
 }
 
-export function importPredefinedData(file: any): Promise<Predefined[]> {
+export function importPredefinedData(file: unknown): Promise<Predefined[]> {
   console.log("Start importPredefinedData");
 
   return new Promise((resolve, reject) => {
