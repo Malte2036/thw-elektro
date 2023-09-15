@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import * as ReactFlow from "reactflow";
 
 import "reactflow/dist/style.css";
@@ -35,6 +35,8 @@ import ConfirmDialog from "./components/ConfirmDialog";
 const selector = (state: RFState) => ({
   nodes: state.nodes,
   edges: state.edges,
+  setNodes: state.setNodes,
+  setEdges: state.setEdges,
   onNodesChange: state.onNodesChange,
   onEdgesChange: state.onEdgesChange,
   removeNode: state.removeNode,
@@ -104,6 +106,8 @@ export default function FlowPage() {
   const {
     nodes,
     edges,
+    setNodes,
+    setEdges,
     onNodesChange,
     onEdgesChange,
     removeNode,
@@ -114,6 +118,39 @@ export default function FlowPage() {
     updateElectroInterfaceNode,
     deleteAll,
   } = useStore(selector, shallow);
+  //const { setViewport } = ReactFlow.useReactFlow();
+
+
+  const [rfInstance, setRfInstance] = useState(null);
+
+  const FLOW_KEY = "currentFlow"
+
+  const onSave = useCallback(() => {
+    if (rfInstance) {
+      const flow = rfInstance.toObject();
+      localStorage.setItem(FLOW_KEY, JSON.stringify(flow));
+
+    }
+  }, [rfInstance]);
+
+  function restoreFlow(): boolean {
+    const item = localStorage.getItem(FLOW_KEY)
+    if (!item) return false;
+
+    const flow = JSON.parse(item);
+    if (!flow) return false;
+
+
+    console.log("restore Flow");
+
+    setNodes(flow.nodes || []);
+    setEdges(flow.edges || []);
+
+    //const { x = 0, y = 0, zoom = 1 } = flow.viewport;
+    //setViewport({ x, y, zoom });
+
+    return true;
+  }
 
   function getAllElectro(): ElectroInterface[] {
     return (nodes as ReactFlow.Node[])
@@ -180,7 +217,11 @@ export default function FlowPage() {
   }
 
   useEffect(() => {
-    createInitialNodes();
+
+    const success = restoreFlow();
+    if (success === false) {
+      createInitialNodes();
+    }
 
     dialogContext?.setDialog(<InfoDialog />);
   }, []);
@@ -237,6 +278,7 @@ export default function FlowPage() {
     <div className="w-screen h-screen flex flex-row">
       <ReactFlow.ReactFlow
         nodeTypes={nodeTypes}
+        onInit={setRfInstance}
         nodes={nodes}
         edgeTypes={edgeTypes}
         edges={edges}
@@ -308,6 +350,7 @@ export default function FlowPage() {
                 Clear
               </Button>
             )}
+            <Button type="secondary" onClick={onSave}>Speichern</Button>
           </div>
         </ReactFlow.Panel>
         <ReactFlow.Panel position="bottom-center">
