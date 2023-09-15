@@ -7,9 +7,8 @@ import { Producer } from "./lib/data/Producer";
 import CableEdge from "./components/flow/CableEdge";
 import { Cable } from "./lib/data/Cable";
 import {
-  calculateTotalVoltageDropPercent,
+  getRecursiveApparentPower,
   getRecursiveEnergyConsumption,
-  getVoltageDropForCableData,
 } from "./lib/calculation/energy";
 import { Distributor } from "./lib/data/Distributor";
 
@@ -31,6 +30,7 @@ import { useDialogContext } from "./hooks/useDialog";
 import InfoDialog from "./components/InfoDIalog";
 import Footer from "./components/Footer";
 import ConfirmDialog from "./components/ConfirmDialog";
+import { calculateTotalVoltageDropPercent, getVoltageDropForCableData } from "./lib/calculation/voltageDrop";
 
 const selector = (state: RFState) => ({
   nodes: state.nodes,
@@ -62,39 +62,42 @@ export default function FlowPage() {
   const initialElectroInterfaceNodes = [
     new Consumer(
       "consumer-1",
+      "Chiemsee A",
+      { x: 700, y: 100 },
+      3200,
+      7.3,
       undefined,
-      { x: 550, y: 100 },
-      1500,
-      undefined,
-      undefined
+      { current: 16, voltage: 400 }
     ),
     new Consumer(
       "consumer-2",
+      "Mast TP15-1",
+      { x: 700, y: 300 },
+      5300,
+      9.3,
       undefined,
-      { x: 550, y: 300 },
-      800,
-      undefined,
-      undefined
+      { current: 16, voltage: 400 }
     ),
     new Consumer(
       "consumer-3",
+      "Chiemsee A",
+      { x: 700, y: 500 },
+      3200,
+      7.3,
       undefined,
-      { x: 550, y: 500 },
-      1800,
-      undefined,
-      undefined
+      { current: 16, voltage: 400 }
     ),
     new Distributor(
       "distributor-1",
       undefined,
-      { x: 300, y: 200 },
+      { x: 350, y: 200 },
       undefined,
       undefined
     ),
     new Distributor(
       "distributor-2",
       undefined,
-      { x: 300, y: 400 },
+      { x: 350, y: 400 },
       undefined,
       undefined
     ),
@@ -159,6 +162,20 @@ export default function FlowPage() {
     return allEnergyConsumptions;
   }
 
+  function getApparentPowers(): Map<string, number> {
+    const allElectro = getAllElectro();
+    const allCables = getAllCables();
+
+    const allApparentPowers = getRecursiveApparentPower(
+      allElectro,
+      allCables,
+      allElectro.filter((e) => e.type == "Producer").map((p) => p.id) ?? []
+    );
+
+    return allApparentPowers;
+  }
+
+
   function getVoltageDrops(
     currentAllEnergyConsumptions: Map<string, number>
   ): Map<string, number> {
@@ -187,6 +204,7 @@ export default function FlowPage() {
 
   function recalculate() {
     const allEnergyConsumptions = getEnergyConsumptions();
+    const allApparentPowers = getApparentPowers();
     const voltageDrops = getVoltageDrops(allEnergyConsumptions);
 
     const allElectro = getAllElectro();
@@ -207,10 +225,12 @@ export default function FlowPage() {
           const distributor = electro as Distributor;
           distributor.energyFlow = allEnergyConsumptions.get(electro.id) ?? 0;
           distributor.hasEnergy = allEnergyConsumptions.has(distributor.id);
+          distributor.apparentPower = allApparentPowers.get(distributor.id) ?? 0;
           break;
         case "Producer":
           const producer = electro as Producer;
           producer.energyFlow = allEnergyConsumptions.get(producer.id) ?? 0;
+          producer.apparentPower = allApparentPowers.get(producer.id) ?? 0;
           break;
       }
 

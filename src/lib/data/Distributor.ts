@@ -6,6 +6,7 @@ import { Plug } from "./Plug";
 export class Distributor extends ElectroInterfaceWithInputPlug {
   public energyFlow: number = 0;
   public hasEnergy: boolean = false;
+  public apparentPower: number | undefined = undefined;
 
   public get allowedEnergyFlow(): number {
     return calculatePowerInWatt(this.inputPlug);

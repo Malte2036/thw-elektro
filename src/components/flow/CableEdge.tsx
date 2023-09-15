@@ -5,7 +5,7 @@ import {
   getBezierPath,
 } from "reactflow";
 import { Cable } from "../../lib/data/Cable";
-import { isVoltageDropTooHigh } from "../../lib/calculation/energy";
+import { isVoltageDropTooHigh } from "../../lib/calculation/voltageDrop";
 import Button from "../../components/Button";
 import { formatNumberWithMaxTwoDecimals } from "../../lib/utils";
 
@@ -53,12 +53,12 @@ export default function CableEdge(edgeProps: EdgeProps<CableEdgeData>) {
               >
                 Länge
               </Button>
-              <Button
+              {/*<Button
                 type="secondary"
                 onClick={() => edgeProps.data?.nextType(edgeProps.data.cable)}
               >
                 Type
-              </Button>
+          </Button>*/}
               <Button
                 type="secondary"
                 onClick={() => edgeProps.data?.deleteEdge(edgeProps.data.cable)}
@@ -69,8 +69,8 @@ export default function CableEdge(edgeProps: EdgeProps<CableEdgeData>) {
           )}
           <div
             className={`bg-white ${isVoltageDropTooHigh(edgeProps.data?.cable.voltageDrop ?? 0)
-                ? "border-red-600 text-red-600 font-bold border-4"
-                : "border-black border-2"
+              ? "border-red-600 text-red-600 font-bold border-4"
+              : "border-black border-2"
               } rounded-md px-1 py-0.5 flex flex-col items-center justify-center`}
           >
             <div>{edgeProps.data?.cable.length}m</div>

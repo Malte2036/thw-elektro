@@ -13,6 +13,7 @@ export type Predefined = {
   defaultPlug: Plug | undefined;
   energyConsumption?: number;
   energyProduction?: number;
+  ratedPower?: number
 };
 
 export function electroInterfaceToPredefined(
@@ -78,6 +79,10 @@ export function getBodyFromPredefined(predefined: Predefined): ReactNode {
           <div>
             Energiebedarf:{" "}
             {formatNumberWithMaxTwoDecimals(energyConsumption / 1000)}kW
+          </div>
+          <div>
+            Nennstrom:{" "}
+            {formatNumberWithMaxTwoDecimals(predefined.ratedPower ?? 0)}A
           </div>
           {defaultPlugText}
         </>

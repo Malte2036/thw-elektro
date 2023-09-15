@@ -1,6 +1,8 @@
 import { Position } from "../Position";
 import { Plug } from "./Plug";
 
+export const COS_PHY = 0.8;
+
 export type ElectroType = "Consumer" | "Distributor" | "Producer";
 
 export abstract class ElectroInterface {
