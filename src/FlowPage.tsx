@@ -30,6 +30,8 @@ import Footer from "./components/Footer";
 import ConfirmDialog from "./components/ConfirmDialog";
 import Dialog from "./components/Dialog";
 import { calculateTotalVoltageDropPercent, getVoltageDropForCableData } from "./lib/calculation/voltageDrop";
+import { restoreFlow } from "./lib/flow/save";
+import { useRecalculateFlip } from "./components/flow/recalculateFlipContext";
 
 const selector = (state: RFState) => ({
   nodes: state.nodes,
@@ -120,7 +122,6 @@ export default function FlowPage() {
     updateElectroInterfaceNode,
     deleteAll,
   } = useStore(selector, shallow);
-  //const { setViewport } = ReactFlow.useReactFlow();
 
 
   const [rfInstance, setRfInstance] = useState<
@@ -137,7 +138,7 @@ export default function FlowPage() {
     }
   }, [rfInstance]);
 
-  function restoreFlow(): boolean {
+  function restoreFlowFromJson(): boolean {
     const item = localStorage.getItem(FLOW_KEY)
     if (!item) return false;
 
@@ -146,13 +147,9 @@ export default function FlowPage() {
 
 
     console.log("restore Flow");
+    restoreFlow(flow, setNodes, setEdges);
 
-    setNodes(flow.nodes || []);
-    setEdges(flow.edges || []);
-
-    //const { x = 0, y = 0, zoom = 1 } = flow.viewport;
-    //setViewport({ x, y, zoom });
-
+    triggerRecalculation();
     return true;
   }
 
@@ -163,8 +160,9 @@ export default function FlowPage() {
   }
 
   // bug fix (replace later with a better solution)
-  // need to force rerender to trigger recalculation. Just invert the value
-  const [recalculateFlip, setRecalculateFlip] = useState<boolean>(false);
+  // need to force rerender to trigger recalculation. Just change the value
+  const { flip: recalculateFlip, recalculateFlip: triggerRecalculation } = useRecalculateFlip();
+
 
   function getAllCables(): Cable[] {
     return (edges as ReactFlow.Edge[])
@@ -181,7 +179,7 @@ export default function FlowPage() {
     initialElectroInterfaceNodes.forEach((electro) => {
       addElectroInterfaceNode(electro, () => {
         removeNode(electro.id);
-        setRecalculateFlip((state) => !state);
+        triggerRecalculation();
       });
     });
     recalculate();
@@ -236,7 +234,7 @@ export default function FlowPage() {
 
   useEffect(() => {
 
-    const success = restoreFlow();
+    const success = restoreFlowFromJson();
     if (success === false) {
       createInitialNodes();
     }
@@ -313,7 +311,7 @@ export default function FlowPage() {
                 cable.nextLength();
 
                 updateCableEdge(cable);
-                setRecalculateFlip((state) => !state);
+                triggerRecalculation();
               },
               (cable: Cable) => {
                 cable.nextPlug();
@@ -333,15 +331,15 @@ export default function FlowPage() {
                   }
                 }
 
-                setRecalculateFlip((state) => !state);
+                triggerRecalculation();
               },
               (cable: Cable) => {
                 removeEdge(cable.id);
-                setRecalculateFlip((state) => !state);
+                triggerRecalculation();
               },
               0
             );
-            setRecalculateFlip((state) => !state);
+            triggerRecalculation();
           }}
           fitView
         >
@@ -409,7 +407,7 @@ export default function FlowPage() {
                 addElectroInterfaceNodeCallback={(electro: ElectroInterface) => {
                   addElectroInterfaceNode(electro, () => {
                     removeNode(electro.id);
-                    setRecalculateFlip((state) => !state);
+                    triggerRecalculation();
                   });
                 }}
                 closeMenu={() => setShowMenu(false)}

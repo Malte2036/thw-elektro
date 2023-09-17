@@ -21,4 +21,14 @@ export class Producer extends ElectroInterface {
 
     this.energyProduction = energyProduction;
   }
+
+  static fromJSON(json: Producer): Producer {
+    return new Producer(
+      json.id,
+      json.name,
+      json.position,
+      json.templateId,
+      json.energyProduction
+    );
+  }
 }

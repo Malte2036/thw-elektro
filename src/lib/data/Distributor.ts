@@ -21,4 +21,14 @@ export class Distributor extends ElectroInterfaceWithInputPlug {
   ) {
     super(id, name, position, "Distributor", templateId, inputPlug);
   }
+
+  static fromJSON(json: Distributor): Distributor {
+    return new Distributor(
+      json.id,
+      json.name,
+      json.position,
+      json.templateId,
+      json.inputPlug
+    );
+  }
 }

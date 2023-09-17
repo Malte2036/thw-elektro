@@ -14,6 +14,8 @@ import { Predefined } from "../../../lib/data/Predefined";
 import { useDialogContext } from "../../../hooks/useDialog";
 import ConfirmDialog from "../../ConfirmDialog";
 import * as ReactFlow from "reactflow";
+import { restoreFlow } from "../../../lib/flow/save";
+import { useRecalculateFlip } from "../recalculateFlipContext";
 
 type FlowMenuSettingsProps = {
   openPredefinedPage: () => void;
@@ -26,6 +28,7 @@ export default function FlowMenuSettings({
   const [templateFile, setTemplateFile] = useState<File>();
   const [flowFile, setFlowFile] = useState<File>();
 
+  const { recalculateFlip: triggerRecalculation } = useRecalculateFlip();
 
   const flow = ReactFlow.useReactFlow();
 
@@ -74,14 +77,10 @@ export default function FlowMenuSettings({
     }
 
     try {
-      type ImportedFlowData = {
-        nodes: ReactFlow.Node[],
-        edges: ReactFlow.Edge[]
-      }
-      const data = await importJsonData<ImportedFlowData>(flowFile);
+      const data = await importJsonData<ReactFlow.ReactFlowJsonObject>(flowFile);
       if (data) {
-        flow.setNodes(data.nodes);
-        flow.setEdges(data.edges);
+        restoreFlow(data, flow.setNodes, flow.setEdges);
+        triggerRecalculation();
       }
 
     } catch (error) {

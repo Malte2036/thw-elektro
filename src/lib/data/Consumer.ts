@@ -27,6 +27,18 @@ export class Consumer extends ElectroInterfaceWithInputPlug {
     this.ratedPower = ratedPower;
   }
 
+  static fromJSON(json: Consumer): Consumer {
+    return new Consumer(
+      json.id,
+      json.name,
+      json.position,
+      json.energyConsumption,
+      json.ratedPower,
+      json.templateId,
+      json.inputPlug
+    );
+  }
+
   /**
    * S = U * I * Wurzel(3)
    * @returns Scheinleistung in VA
