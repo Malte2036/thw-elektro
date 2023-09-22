@@ -1,5 +1,3 @@
-import Button from "../../../components/Button";
-
 export enum FlowMenuHeaderOptions {
   Predefined = "Templates",
   Create = "Erstellen",

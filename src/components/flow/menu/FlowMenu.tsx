@@ -10,7 +10,6 @@ import FlowMenuPredefined from "./FlowMenuPredefined";
 import { Predefined } from "../../../lib/data/Predefined";
 import { deletePredefined, savePredefined } from "../../../lib/db/save";
 import { generateId } from "../../../lib/utils";
-import Button from "../../Button";
 import FlowMenuSettings from "./FlowMenuSettings";
 import { Plug } from "../../../lib/data/Plug";
 

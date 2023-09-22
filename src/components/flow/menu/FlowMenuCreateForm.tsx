@@ -3,7 +3,6 @@ import FlowMenuItem from "./FlowMenuItem";
 import { ElectroType, translateElectroType } from "../../../lib/data/Electro";
 import { Plug, allPossiblePlugs } from "../../../lib/data/Plug";
 import { Predefined } from "../../../lib/data/Predefined";
-import Button from "../../Button";
 import { generateId } from "../../../lib/utils";
 
 type FlowMenuCreateFormProps = {

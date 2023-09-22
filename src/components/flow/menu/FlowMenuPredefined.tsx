@@ -1,4 +1,3 @@
-import Button from "../../../components/Button";
 import { ElectroType, translateElectroType } from "../../../lib/data/Electro";
 import { useEffect, useState } from "react";
 import {

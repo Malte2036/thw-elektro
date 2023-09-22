@@ -6,7 +6,6 @@ import {
 } from "reactflow";
 import { Cable } from "../../lib/data/Cable";
 import { isVoltageDropTooHigh } from "../../lib/calculation/voltageDrop";
-import Button from "../../components/Button";
 import { formatNumberWithMaxTwoDecimals } from "../../lib/utils";
 
 export type CableEdgeData = {

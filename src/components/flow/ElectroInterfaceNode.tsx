@@ -4,7 +4,6 @@ import { ReactNode } from "react";
 import { Consumer } from "../../lib/data/Consumer";
 import { isVoltageDropTooHigh } from "../../lib/calculation/voltageDrop";
 import { Distributor } from "../../lib/data/Distributor";
-import Button from "../../components/Button";
 import { Producer } from "../../lib/data/Producer";
 import { formatNumberWithMaxTwoDecimals } from "../../lib/utils";
 import { useDialogContext } from "../../hooks/useDialog";
