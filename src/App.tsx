@@ -3,7 +3,6 @@ import { ReactNode, useState } from "react";
 import { DialogContext } from "./hooks/useDialog";
 import { Helmet } from "react-helmet";
 import { RecalculateFlipProvider } from "./components/flow/recalculateFlipContext";
-import "thw-tools-components/src/thw-button";
 
 export default function App() {
   const [dialog, setDialog] = useState<ReactNode | undefined>();
