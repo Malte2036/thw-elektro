@@ -44,7 +44,7 @@ export default function FlowMenu({
         if (!consumerEnergyConsumption)
           throw new Error(
             "Consumer energy consumption is undefined" +
-            consumerEnergyConsumption
+              consumerEnergyConsumption
           );
 
         return new Consumer(
@@ -155,9 +155,9 @@ export default function FlowMenu({
         {getFlowMenuPart()}
       </div>
       <div className="mt-4 flex flex-row justify-center">
-        <Button onClick={closeMenu} type="primary">
+        <thw-button onClick={closeMenu} type="primary">
           Schliessen
-        </Button>
+        </thw-button>
       </div>
     </div>
   );

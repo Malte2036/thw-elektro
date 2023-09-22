@@ -22,7 +22,7 @@ export default function FlowMenuHeader({
       <div className="text-2xl font-bold">Elektro Spannungsfall</div>
       <div className="flex flex-row gap-2">
         {allOptions.map((option) => (
-          <Button
+          <thw-button
             onClick={() => {
               selectOptionCallback(option);
             }}
@@ -32,7 +32,7 @@ export default function FlowMenuHeader({
             <div className={option === selectedOption ? "font-bold" : ""}>
               {option}
             </div>
-          </Button>
+          </thw-button>
         ))}
       </div>
     </>

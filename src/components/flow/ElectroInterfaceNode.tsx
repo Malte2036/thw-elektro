@@ -18,9 +18,8 @@ export type ElectroInterfaceNodeProps = {
 
 export function ElectroInterfaceNode({
   data,
-  selected
+  selected,
 }: NodeProps<ElectroInterfaceNodeProps>) {
-
   function getMainLine(): ReactNode {
     switch (data.electroInterface.type) {
       case "Consumer": {
@@ -54,10 +53,11 @@ export function ElectroInterfaceNode({
               {formatNumberWithMaxTwoDecimals(distributor.energyFlow / 1000)}kW
             </div>
             <div
-              className={`text-xs ${distributor.energyFlow > distributor.allowedEnergyFlow
-                ? "text-red-600 font-bold"
-                : "opacity-75"
-                }`}
+              className={`text-xs ${
+                distributor.energyFlow > distributor.allowedEnergyFlow
+                  ? "text-red-600 font-bold"
+                  : "opacity-75"
+              }`}
             >
               max Leistung:{" "}
               {formatNumberWithMaxTwoDecimals(
@@ -76,10 +76,11 @@ export function ElectroInterfaceNode({
               {formatNumberWithMaxTwoDecimals(producer.energyFlow / 1000)}kW
             </div>
             <div
-              className={`text-xs ${producer.energyFlow > producer.allowedEnergyFlow
-                ? "text-red-600 font-bold"
-                : "opacity-75"
-                }`}
+              className={`text-xs ${
+                producer.energyFlow > producer.allowedEnergyFlow
+                  ? "text-red-600 font-bold"
+                  : "opacity-75"
+              }`}
             >
               max Leistung:{" "}
               {formatNumberWithMaxTwoDecimals(
@@ -141,17 +142,19 @@ export function ElectroInterfaceNode({
   const dialogContext = useDialogContext();
 
   function openNodeInfoDialog() {
-    dialogContext?.setDialog(<NodeInfoDialog electroInterface={data.electroInterface} />)
+    dialogContext?.setDialog(
+      <NodeInfoDialog electroInterface={data.electroInterface} />
+    );
   }
 
   function getNodeToolbar(): ReactNode {
     const buttons = [
-      <Button key={"info"} type="secondary" onClick={openNodeInfoDialog}>
+      <thw-button key={"info"} type="secondary" onClick={openNodeInfoDialog}>
         Info
-      </Button>,
-      <Button key={"delete"} type="secondary" onClick={data.deleteNode}>
+      </thw-button>,
+      <thw-button key={"delete"} type="secondary" onClick={data.deleteNode}>
         Delete
-      </Button>,
+      </thw-button>,
     ];
 
     return (
@@ -178,10 +181,13 @@ export function ElectroInterfaceNode({
     <div>
       {getNodeToolbar()}
       <div
-        className={`${hasEnergy() ? "bg-thw" : "bg-thw-400"
-          } transition-colors text-white px-6 py-2 rounded-sm`}
+        className={`${
+          hasEnergy() ? "bg-thw" : "bg-thw-400"
+        } transition-colors text-white px-6 py-2 rounded-sm`}
       >
-        <div className="text-xs">{getTitleForElectro(data.electroInterface)}</div>
+        <div className="text-xs">
+          {getTitleForElectro(data.electroInterface)}
+        </div>
         {getMainLine()}
       </div>
       {getHandles()}

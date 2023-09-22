@@ -37,7 +37,10 @@ export default function FlowMenuCreateForm({
   );
 
   const [defaultInputPlug, setDefaultInputPlug] = useState<number | undefined>(
-    electroType != "Producer" ? allPossiblePlugs.findIndex((plug) => plug.voltage === 400 && plug.current === 16)
+    electroType != "Producer"
+      ? allPossiblePlugs.findIndex(
+          (plug) => plug.voltage === 400 && plug.current === 16
+        )
       : undefined
   );
 
@@ -102,7 +105,6 @@ export default function FlowMenuCreateForm({
             />
           </div>
 
-
           <div className="flex flex-col gap-1">
             <label>Nennstrom in A:</label>
             <input
@@ -156,7 +158,7 @@ export default function FlowMenuCreateForm({
         </div>
       )}
       <div className="flex flex-row gap-2 mt-1">
-        <Button
+        <thw-button
           type="primary"
           onClick={() =>
             addNode(
@@ -168,13 +170,13 @@ export default function FlowMenuCreateForm({
               undefined,
               defaultInputPlug !== undefined
                 ? allPossiblePlugs[defaultInputPlug]
-                : undefined,
+                : undefined
             )
           }
         >
           Hinzufügen
-        </Button>
-        <Button
+        </thw-button>
+        <thw-button
           type="secondary"
           onClick={() =>
             saveNodeAsPredefined({
@@ -192,8 +194,8 @@ export default function FlowMenuCreateForm({
           }
         >
           Template speichern
-        </Button>
+        </thw-button>
       </div>
-    </FlowMenuItem >
+    </FlowMenuItem>
   );
 }

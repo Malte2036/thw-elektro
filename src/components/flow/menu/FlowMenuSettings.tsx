@@ -1,9 +1,6 @@
 import Button from "../../../components/Button";
 import FlowMenuItem from "./FlowMenuItem";
-import {
-  exportDataAsJson,
-  importJsonData,
-} from "../../../lib/db/export";
+import { exportDataAsJson, importJsonData } from "../../../lib/db/export";
 import {
   bulkSavePredefined,
   deleteAllPredefined,
@@ -77,80 +74,83 @@ export default function FlowMenuSettings({
     }
 
     try {
-      const data = await importJsonData<ReactFlow.ReactFlowJsonObject>(flowFile);
+      const data = await importJsonData<ReactFlow.ReactFlowJsonObject>(
+        flowFile
+      );
       if (data) {
         restoreFlow(data, flow.setNodes, flow.setEdges);
         triggerRecalculation();
       }
-
     } catch (error) {
       alert("Fehler beim Importieren der Templates.");
     }
   }
 
-
   const dialogContext = useDialogContext();
 
   async function startTemplateDelete() {
     dialogContext?.setDialog(
-      <ConfirmDialog title="Löschen" question="Bist du dir sicher, dass du alle Templates unwiderruflich löschen möchtest?" onConfirm={
-        async () => {
+      <ConfirmDialog
+        title="Löschen"
+        question="Bist du dir sicher, dass du alle Templates unwiderruflich löschen möchtest?"
+        onConfirm={async () => {
           await deleteAllPredefined();
           console.log("Deleted all predefined data");
 
           openPredefinedPage();
-        }
-      } />
-    )
+        }}
+      />
+    );
   }
 
   return (
     <>
       <FlowMenuItem>
         <div>Hiermit kann der derzeitige Flow exportiert werden.</div>
-        <Button onClick={startFlowExport} type="secondary">
+        <thw-button onClick={startFlowExport} type="secondary">
           Exportieren
-        </Button>
-      </FlowMenuItem> <FlowMenuItem>
+        </thw-button>
+      </FlowMenuItem>{" "}
+      <FlowMenuItem>
         <div>
           Hiermit kann ein Flow eines anderen Nutzers importiert werden.
         </div>
         <input type="file" accept=".json" onChange={handleFlowFileChange} />
-        <Button
+        <thw-button
           onClick={startFlowImport}
           type="secondary"
           disabled={flowFile == undefined}
         >
           Importieren
-        </Button>
+        </thw-button>
       </FlowMenuItem>
       <FlowMenuItem>
         <div>Hiermit können alle aktuellen Templates exportiert werden.</div>
-        <Button onClick={startTemplateExport} type="secondary">
+        <thw-button onClick={startTemplateExport} type="secondary">
           Exportieren
-        </Button>
+        </thw-button>
       </FlowMenuItem>
       <FlowMenuItem>
         <div>
           Hiermit können alle Templates eines anderen Nutzers importiert werden.
         </div>
         <input type="file" accept=".json" onChange={handleTemplateFileChange} />
-        <Button
+        <thw-button
           onClick={startTemplateImport}
           type="secondary"
           disabled={templateFile == undefined}
         >
           Importieren
-        </Button>
+        </thw-button>
       </FlowMenuItem>
       <FlowMenuItem>
         <div>
           Hiermit können alle aktuellen Templates unwiderruflich gelöscht
           werden.
         </div>
-        <Button onClick={startTemplateDelete} type="secondary">
+        <thw-button onClick={startTemplateDelete} type="secondary">
           Templates löschen
-        </Button>
+        </thw-button>
       </FlowMenuItem>
     </>
   );

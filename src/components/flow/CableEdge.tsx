@@ -47,31 +47,32 @@ export default function CableEdge(edgeProps: EdgeProps<CableEdgeData>) {
         >
           {edgeProps.selected && (
             <div className="flex flex-row gap-1 absolute -top-8">
-              <Button
+              <thw-button
                 type="secondary"
                 onClick={() => edgeProps.data?.nextLength(edgeProps.data.cable)}
               >
                 Länge
-              </Button>
-              {/*<Button
+              </thw-button>
+              {/*<thw-button
                 type="secondary"
                 onClick={() => edgeProps.data?.nextType(edgeProps.data.cable)}
               >
                 Type
-          </Button>*/}
-              <Button
+          </thw-button>*/}
+              <thw-button
                 type="secondary"
                 onClick={() => edgeProps.data?.deleteEdge(edgeProps.data.cable)}
               >
                 Delete
-              </Button>
+              </thw-button>
             </div>
           )}
           <div
-            className={`bg-white ${isVoltageDropTooHigh(edgeProps.data?.cable.voltageDrop ?? 0)
-              ? "border-red-600 text-red-600 font-bold border-4"
-              : "border-black border-2"
-              } rounded-md px-1 py-0.5 flex flex-col items-center justify-center`}
+            className={`bg-white ${
+              isVoltageDropTooHigh(edgeProps.data?.cable.voltageDrop ?? 0)
+                ? "border-red-600 text-red-600 font-bold border-4"
+                : "border-black border-2"
+            } rounded-md px-1 py-0.5 flex flex-col items-center justify-center`}
           >
             <div>{edgeProps.data?.cable.length}m</div>
             <div>

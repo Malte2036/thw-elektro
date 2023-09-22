@@ -1,7 +1,10 @@
 import Button from "../../../components/Button";
 import { ElectroType, translateElectroType } from "../../../lib/data/Electro";
 import { useEffect, useState } from "react";
-import { Predefined, getBodyFromPredefined } from "../../../lib/data/Predefined";
+import {
+  Predefined,
+  getBodyFromPredefined,
+} from "../../../lib/data/Predefined";
 import { getPredefined } from "../../../lib/db/save";
 import { FlowMenuHeaderOptions } from "./FlowMenuHeader";
 import FlowMenuItem from "./FlowMenuItem";
@@ -62,7 +65,6 @@ export default function FlowMenuPredefined({
       }
     });
 
-
   async function fetchPredefined() {
     const data = await getPredefined();
     setAllPredefinedNodes(data);
@@ -80,9 +82,9 @@ export default function FlowMenuPredefined({
         <span>
           Keine vordefinierten <b>Templates</b> vorhanden. Erstelle erst welche.
         </span>
-        <Button onClick={openAddPredefinedPage} type="primary">
+        <thw-button onClick={openAddPredefinedPage} type="primary">
           Gehe zu &quot;{FlowMenuHeaderOptions.Create}&quot;
-        </Button>
+        </thw-button>
       </FlowMenuItem>
     );
   }
@@ -112,17 +114,22 @@ export default function FlowMenuPredefined({
       key={node.id}
     >
       <div className="text-xl font-bold">
-        {`${translateElectroType(node.type)}${node.name != undefined && node.name.length > 0 ? ": " + node.name : ""
-          }`}
+        {`${translateElectroType(node.type)}${
+          node.name != undefined && node.name.length > 0 ? ": " + node.name : ""
+        }`}
       </div>
       {getBodyFromPredefined(node)}
       <div className="flex flex-row gap-2">
-        <Button
+        <thw-button
           type="primary"
           onClick={() => {
             if (allPlacedNodeTemplateIds.includes(node.id)) {
               dialogContext?.setDialog(
-                <ConfirmDialog title="Duplikat" question="Dieses Template wurde bereits platziert. Es wird eine Kopie des Templates platziert." onConfirm={() => addNodeFromPredefined(node)} />
+                <ConfirmDialog
+                  title="Duplikat"
+                  question="Dieses Template wurde bereits platziert. Es wird eine Kopie des Templates platziert."
+                  onConfirm={() => addNodeFromPredefined(node)}
+                />
               );
               return;
             }
@@ -130,20 +137,25 @@ export default function FlowMenuPredefined({
           }}
         >
           Hinzufügen
-        </Button>
-        <Button
+        </thw-button>
+        <thw-button
           onClick={() =>
             dialogContext?.setDialog(
-              <ConfirmDialog title="Template löschen" question="Willst du wirklich dieses Template unwiderruflich löschen?" onConfirm={() => {
-                deleteNode(node.id);
-                fetchPredefined();
-              }} />
-            )}
+              <ConfirmDialog
+                title="Template löschen"
+                question="Willst du wirklich dieses Template unwiderruflich löschen?"
+                onConfirm={() => {
+                  deleteNode(node.id);
+                  fetchPredefined();
+                }}
+              />
+            )
+          }
           type="secondary"
         >
           Löschen
-        </Button>
+        </thw-button>
       </div>
-    </FlowMenuItem >
+    </FlowMenuItem>
   ));
 }
