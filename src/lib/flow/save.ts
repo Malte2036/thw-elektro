@@ -13,16 +13,7 @@ export function restoreFlow(
   flowFunctions: FlowFunctions
 ) {
   const convertedNodes = data.nodes
-    .map((node) => ({
-      ...node,
-      data: {
-        ...node.data,
-        deleteNode: () => flowFunctions.addNodeFunctions.deleteNode(node.id),
-        electroInterface: jsonElectroInterfaceToElectroInterface(
-          node.data.electroInterface
-        ),
-      },
-    }))
+    .map((node) => nodeToParsedNode(node, flowFunctions))
     .filter((n) => n !== undefined) as ReactFlow.Node[];
 
   const convertedEdges = data.edges.map(
@@ -38,6 +29,33 @@ export function restoreFlow(
 
   setNodes(convertedNodes);
   setEdges(convertedEdges);
+}
+
+function nodeToParsedNode(node: ReactFlow.Node, flowFunctions: FlowFunctions) {
+  let data: ReactFlow.Node["data"];
+
+  switch (node.type) {
+    case "electroInterfaceNode":
+      data = {
+        ...node.data,
+        deleteNode: () =>
+          flowFunctions.addNodeFunctions.deleteNode(node.data.id),
+        electroInterface: jsonElectroInterfaceToElectroInterface(
+          node.data.electroInterface
+        ),
+      };
+      break;
+    case "labelNode":
+      data = node.data;
+      break;
+    default:
+      throw new Error(`Unknown node type: ${node.type}`);
+  }
+
+  return {
+    ...node,
+    data,
+  };
 }
 
 function jsonElectroInterfaceToElectroInterface(

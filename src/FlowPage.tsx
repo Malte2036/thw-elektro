@@ -35,6 +35,7 @@ import {
 } from "./lib/calculation/voltageDrop";
 import { restoreFlow } from "./lib/flow/save";
 import { useRecalculateFlip } from "./components/flow/recalculateFlipContext";
+import { LabelNode } from "./components/flow/LabelNode";
 
 export type FlowFunctions = {
   addNodeFunctions: AddNodeFunctions;
@@ -64,6 +65,7 @@ const selector = (state: RFState) => ({
   updateCableEdge: state.updateCableEdge,
   addElectroInterfaceNode: state.addElectroInterfaceNode,
   updateElectroInterfaceNode: state.updateElectroInterfaceNode,
+  addLabelNode: state.addLabelNode,
   deleteAll: state.deleteAll,
 });
 
@@ -73,6 +75,7 @@ export default function FlowPage() {
   const nodeTypes = useMemo(
     () => ({
       electroInterfaceNode: ElectroInterfaceNode,
+      labelNode: LabelNode,
     }),
     []
   );
@@ -136,6 +139,7 @@ export default function FlowPage() {
     updateCableEdge,
     addElectroInterfaceNode,
     updateElectroInterfaceNode,
+    addLabelNode,
     deleteAll,
   } = useStore(selector, shallow);
 
@@ -165,10 +169,14 @@ export default function FlowPage() {
     return true;
   }
 
+  function getAllElectroNodes(): ReactFlow.Node<{
+    electroInterface: ElectroInterface;
+  }>[] {
+    return nodes.filter((n) => n.type == "electroInterfaceNode");
+  }
+
   function getAllElectro(): ElectroInterface[] {
-    return (nodes as ReactFlow.Node[])
-      .filter((n) => n.type == "electroInterfaceNode")
-      .map((n) => n.data.electroInterface) as ElectroInterface[];
+    return getAllElectroNodes().map((n) => n.data.electroInterface);
   }
 
   // bug fix (replace later with a better solution)
@@ -261,7 +269,9 @@ export default function FlowPage() {
 
         updateCableEdge(cable);
 
-        const targetNode = nodes.find((n) => n.id == cable.target);
+        const targetNode = getAllElectroNodes().find(
+          (n) => n.id == cable.target
+        );
         if (targetNode) {
           const electroInterface = (
             targetNode.data as ElectroInterfaceNodeProps
@@ -435,6 +445,30 @@ export default function FlowPage() {
               >
                 Speichern
               </Button>
+              <Button
+                onClick={() => {
+                  let label = "";
+                  dialogContext?.setDialog(
+                    <ConfirmDialog
+                      title="Label hinzufügen"
+                      question=""
+                      onConfirm={() => {
+                        addLabelNode(label);
+                        dialogContext?.closeDialog();
+                      }}
+                    >
+                      <input
+                        className="bg-thw text-white px-2 rounded-md"
+                        min={0}
+                        onChange={(e) => (label = e.target.value)}
+                      />
+                    </ConfirmDialog>
+                  );
+                }}
+                type="secondary"
+              >
+                Label hinzufügen
+              </Button>
             </div>
           </ReactFlow.Panel>
           <ReactFlow.Panel position="bottom-center">
@@ -447,7 +481,7 @@ export default function FlowPage() {
             {
               <FlowMenu
                 allPlacedNodeTemplateIds={
-                  nodes
+                  getAllElectroNodes()
                     .map(
                       (n) =>
                         (n.data as ElectroInterfaceNodeProps).electroInterface

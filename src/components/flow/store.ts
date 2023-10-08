@@ -40,6 +40,7 @@ export type RFState = {
     deleteNode: () => void
   ) => void;
   updateElectroInterfaceNode: (electroInterface: ElectroInterface) => void;
+  addLabelNode: (label: string) => void;
   deleteAll: () => void;
 };
 
@@ -208,6 +209,20 @@ const useStore = create<RFState>((set, get) => ({
         }
         return node;
       }),
+    });
+  },
+  addLabelNode: (label: string) => {
+    const labelNode = {
+      id: "label-" + Date.now(),
+      type: "labelNode",
+      position: { x: 0, y: 0 },
+      data: {
+        label,
+      },
+      draggable: true,
+    };
+    set({
+      nodes: [...get().nodes, labelNode],
     });
   },
   deleteAll: () => {
