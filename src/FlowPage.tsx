@@ -36,6 +36,12 @@ import {
 import { restoreFlow } from "./lib/flow/save";
 import { useRecalculateFlip } from "./components/flow/recalculateFlipContext";
 
+export type AddCableEdgeFunctions = {
+  nextLength: (cable: Cable) => void;
+  nextType: (cable: Cable) => void;
+  deleteEdge: (cable: Cable) => void;
+};
+
 const selector = (state: RFState) => ({
   nodes: state.nodes,
   edges: state.edges,
@@ -144,7 +150,7 @@ export default function FlowPage() {
     if (!flow) return false;
 
     console.log("restore Flow");
-    restoreFlow(flow, setNodes, setEdges);
+    restoreFlow(flow, setNodes, setEdges, addCableEdgeFunctions);
 
     triggerRecalculation();
     return true;
@@ -228,6 +234,38 @@ export default function FlowPage() {
     return voltageDrops;
   }
 
+  const addCableEdgeFunctions: AddCableEdgeFunctions = {
+    nextLength: (cable: Cable) => {
+      cable.nextLength();
+
+      updateCableEdge(cable);
+      triggerRecalculation();
+    },
+    nextType: (cable: Cable) => {
+      cable.nextPlug();
+
+      updateCableEdge(cable);
+
+      const targetNode = nodes.find((n) => n.id == cable.target);
+      if (targetNode) {
+        const electroInterface = (targetNode.data as ElectroInterfaceNodeProps)
+          .electroInterface;
+        if (electroInterface.type != "Producer") {
+          const electroInterfaceWithPlug =
+            electroInterface as ElectroInterfaceWithInputPlug;
+          electroInterfaceWithPlug.inputPlug = cable.plug;
+          updateElectroInterfaceNode(electroInterfaceWithPlug);
+        }
+      }
+
+      triggerRecalculation();
+    },
+    deleteEdge: (cable: Cable) => {
+      removeEdge(cable.id);
+      triggerRecalculation();
+    },
+  };
+
   useEffect(() => {
     const success = restoreFlowFromJson();
     if (success === false) {
@@ -308,36 +346,9 @@ export default function FlowPage() {
           onConnect={(connection) => {
             addCableEdge(
               connection,
-              (cable: Cable) => {
-                cable.nextLength();
-
-                updateCableEdge(cable);
-                triggerRecalculation();
-              },
-              (cable: Cable) => {
-                cable.nextPlug();
-
-                updateCableEdge(cable);
-
-                const targetNode = nodes.find((n) => n.id == cable.target);
-                if (targetNode) {
-                  const electroInterface = (
-                    targetNode.data as ElectroInterfaceNodeProps
-                  ).electroInterface;
-                  if (electroInterface.type != "Producer") {
-                    const electroInterfaceWithPlug =
-                      electroInterface as ElectroInterfaceWithInputPlug;
-                    electroInterfaceWithPlug.inputPlug = cable.plug;
-                    updateElectroInterfaceNode(electroInterfaceWithPlug);
-                  }
-                }
-
-                triggerRecalculation();
-              },
-              (cable: Cable) => {
-                removeEdge(cable.id);
-                triggerRecalculation();
-              },
+              addCableEdgeFunctions.nextLength,
+              addCableEdgeFunctions.nextType,
+              addCableEdgeFunctions.deleteEdge,
               0
             );
             triggerRecalculation();
@@ -436,6 +447,7 @@ export default function FlowPage() {
                   });
                 }}
                 closeMenu={() => setShowMenu(false)}
+                addCableEdgeFunctions={addCableEdgeFunctions}
               />
             }
           </div>

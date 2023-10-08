@@ -4,11 +4,13 @@ import { ElectroInterface } from "../data/Electro";
 import { Distributor } from "../data/Distributor";
 import { Producer } from "../data/Producer";
 import { Cable } from "../data/Cable";
+import { AddCableEdgeFunctions } from "../../FlowPage";
 
 export function restoreFlow(
   data: ReactFlow.ReactFlowJsonObject,
   setNodes: (nodes: ReactFlow.Node[]) => void,
-  setEdges: (edges: ReactFlow.Edge[]) => void
+  setEdges: (edges: ReactFlow.Edge[]) => void,
+  addCableEdgeFunctions: AddCableEdgeFunctions
 ) {
   const convertedNodes = data.nodes
     .map((node) => ({
@@ -27,6 +29,7 @@ export function restoreFlow(
       ...edge,
       data: {
         ...edge.data,
+        ...addCableEdgeFunctions,
         cable: Cable.fromJSON(edge.data!.cable),
       },
     })

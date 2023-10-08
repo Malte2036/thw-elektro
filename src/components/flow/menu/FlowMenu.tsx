@@ -13,17 +13,20 @@ import { generateId } from "../../../lib/utils";
 import Button from "../../Button";
 import FlowMenuSettings from "./FlowMenuSettings";
 import { Plug } from "../../../lib/data/Plug";
+import { AddCableEdgeFunctions } from "../../../FlowPage";
 
 type FlowMenuProps = {
   allPlacedNodeTemplateIds: string[];
   addElectroInterfaceNodeCallback: (electroInterface: ElectroInterface) => void;
   closeMenu: () => void;
+  addCableEdgeFunctions: AddCableEdgeFunctions;
 };
 
 export default function FlowMenu({
   allPlacedNodeTemplateIds,
   addElectroInterfaceNodeCallback,
   closeMenu,
+  addCableEdgeFunctions,
 }: FlowMenuProps) {
   function generateElectroInterface(
     type: ElectroType,
@@ -44,7 +47,7 @@ export default function FlowMenu({
         if (!consumerEnergyConsumption)
           throw new Error(
             "Consumer energy consumption is undefined" +
-            consumerEnergyConsumption
+              consumerEnergyConsumption
           );
 
         return new Consumer(
@@ -138,6 +141,7 @@ export default function FlowMenu({
               setSelectedOption(FlowMenuHeaderOptions.Predefined)
             }
             closeMenu={closeMenu}
+            addCableEdgeFunctions={addCableEdgeFunctions}
           />
         );
       default:
