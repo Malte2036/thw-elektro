@@ -115,7 +115,9 @@ const useStore = create<RFState>((set, get) => ({
       return;
     }
 
-    var targetNode = get().nodes.find((node) => node.id === connection.target);
+    const targetNode = get().nodes.find(
+      (node) => node.id === connection.target
+    );
     if (!targetNode) return;
 
     const cable = new Cable(

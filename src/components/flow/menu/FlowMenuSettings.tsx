@@ -1,9 +1,6 @@
 import Button from "../../../components/Button";
 import FlowMenuItem from "./FlowMenuItem";
-import {
-  exportDataAsJson,
-  importJsonData,
-} from "../../../lib/db/export";
+import { exportDataAsJson, importJsonData } from "../../../lib/db/export";
 import {
   bulkSavePredefined,
   deleteAllPredefined,
@@ -16,14 +13,17 @@ import ConfirmDialog from "../../ConfirmDialog";
 import * as ReactFlow from "reactflow";
 import { restoreFlow } from "../../../lib/flow/save";
 import { useRecalculateFlip } from "../recalculateFlipContext";
+import { FlowFunctions } from "../../../FlowPage";
 
 type FlowMenuSettingsProps = {
   openPredefinedPage: () => void;
   closeMenu: () => void;
+  flowFunctions: FlowFunctions;
 };
 
 export default function FlowMenuSettings({
   openPredefinedPage,
+  flowFunctions,
 }: FlowMenuSettingsProps) {
   const [templateFile, setTemplateFile] = useState<File>();
   const [flowFile, setFlowFile] = useState<File>();
@@ -77,31 +77,33 @@ export default function FlowMenuSettings({
     }
 
     try {
-      const data = await importJsonData<ReactFlow.ReactFlowJsonObject>(flowFile);
+      const data = await importJsonData<ReactFlow.ReactFlowJsonObject>(
+        flowFile
+      );
       if (data) {
-        restoreFlow(data, flow.setNodes, flow.setEdges);
+        restoreFlow(data, flow.setNodes, flow.setEdges, flowFunctions);
         triggerRecalculation();
       }
-
     } catch (error) {
       alert("Fehler beim Importieren der Templates.");
     }
   }
 
-
   const dialogContext = useDialogContext();
 
   async function startTemplateDelete() {
     dialogContext?.setDialog(
-      <ConfirmDialog title="Löschen" question="Bist du dir sicher, dass du alle Templates unwiderruflich löschen möchtest?" onConfirm={
-        async () => {
+      <ConfirmDialog
+        title="Löschen"
+        question="Bist du dir sicher, dass du alle Templates unwiderruflich löschen möchtest?"
+        onConfirm={async () => {
           await deleteAllPredefined();
           console.log("Deleted all predefined data");
 
           openPredefinedPage();
-        }
-      } />
-    )
+        }}
+      />
+    );
   }
 
   return (
@@ -111,7 +113,8 @@ export default function FlowMenuSettings({
         <Button onClick={startFlowExport} type="secondary">
           Exportieren
         </Button>
-      </FlowMenuItem> <FlowMenuItem>
+      </FlowMenuItem>{" "}
+      <FlowMenuItem>
         <div>
           Hiermit kann ein Flow eines anderen Nutzers importiert werden.
         </div>
