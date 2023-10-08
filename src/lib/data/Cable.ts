@@ -29,7 +29,14 @@ export class Cable {
     this.voltageDrop = voltageDrop;
   }
 
-  static fromJSON(json: any): Cable {
+  static fromJSON(json: {
+    id: string;
+    length: CableLength;
+    plug: Plug;
+    source: string;
+    target: string;
+    voltageDrop: number;
+  }): Cable {
     return new Cable(
       json.id,
       json.length,

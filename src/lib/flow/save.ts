@@ -22,19 +22,32 @@ export function restoreFlow(
     }))
     .filter((n) => n !== undefined) as ReactFlow.Node[];
 
-  const convertedEdges = data.edges.map((edge) => ({
-    ...edge,
-    data: {
-      ...edge.data,
-      cable: Cable.fromJSON(edge.data.cable),
-    },
-  }));
+  const convertedEdges = data.edges.map(
+    (edge: ReactFlow.Edge<{ cable: Cable }>) => ({
+      ...edge,
+      data: {
+        ...edge.data,
+        cable: Cable.fromJSON(edge.data!.cable),
+      },
+    })
+  );
 
   setNodes(convertedNodes);
   setEdges(convertedEdges);
 }
 
-function jsonElectroInterfaceToElectroInterface(json: any): ElectroInterface {
+function jsonElectroInterfaceToElectroInterface(
+  json:
+    | ({
+        type: "Consumer";
+      } & Consumer)
+    | ({
+        type: "Distributor";
+      } & Distributor)
+    | ({
+        type: "Producer";
+      } & Producer)
+): ElectroInterface {
   switch (json.type) {
     case "Consumer":
       return Consumer.fromJSON(json);
@@ -43,6 +56,6 @@ function jsonElectroInterfaceToElectroInterface(json: any): ElectroInterface {
     case "Producer":
       return Producer.fromJSON(json);
     default:
-      throw new Error(`Unknown ElectroInterface type: ${json.type}`);
+      throw new Error(`Unknown ElectroInterface type: ${json}`);
   }
 }

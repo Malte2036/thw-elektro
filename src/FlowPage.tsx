@@ -29,7 +29,10 @@ import InfoDialog from "./components/InfoDIalog";
 import Footer from "./components/Footer";
 import ConfirmDialog from "./components/ConfirmDialog";
 import Dialog from "./components/Dialog";
-import { calculateTotalVoltageDropPercent, getVoltageDropForCableData } from "./lib/calculation/voltageDrop";
+import {
+  calculateTotalVoltageDropPercent,
+  getVoltageDropForCableData,
+} from "./lib/calculation/voltageDrop";
 import { restoreFlow } from "./lib/flow/save";
 import { useRecalculateFlip } from "./components/flow/recalculateFlipContext";
 
@@ -50,8 +53,6 @@ const selector = (state: RFState) => ({
 });
 
 export default function FlowPage() {
-
-
   const [showMenu, setShowMenu] = useState<boolean>(false);
 
   const nodeTypes = useMemo(
@@ -123,28 +124,24 @@ export default function FlowPage() {
     deleteAll,
   } = useStore(selector, shallow);
 
+  const [rfInstance, setRfInstance] =
+    useState<ReactFlow.ReactFlowInstance | null>(null);
 
-  const [rfInstance, setRfInstance] = useState<
-    ReactFlow.ReactFlowInstance | null
-  >(null);
-
-  const FLOW_KEY = "currentFlow"
+  const FLOW_KEY = "currentFlow";
 
   const onSave = useCallback(() => {
     if (rfInstance) {
       const flow = rfInstance.toObject();
       localStorage.setItem(FLOW_KEY, JSON.stringify(flow));
-
     }
   }, [rfInstance]);
 
   function restoreFlowFromJson(): boolean {
-    const item = localStorage.getItem(FLOW_KEY)
+    const item = localStorage.getItem(FLOW_KEY);
     if (!item) return false;
 
     const flow = JSON.parse(item);
     if (!flow) return false;
-
 
     console.log("restore Flow");
     restoreFlow(flow, setNodes, setEdges);
@@ -161,8 +158,8 @@ export default function FlowPage() {
 
   // bug fix (replace later with a better solution)
   // need to force rerender to trigger recalculation. Just change the value
-  const { flip: recalculateFlip, recalculateFlip: triggerRecalculation } = useRecalculateFlip();
-
+  const { flip: recalculateFlip, recalculateFlip: triggerRecalculation } =
+    useRecalculateFlip();
 
   function getAllCables(): Cable[] {
     return (edges as ReactFlow.Edge[])
@@ -211,7 +208,6 @@ export default function FlowPage() {
     return allApparentPowers;
   }
 
-
   function getVoltageDrops(
     currentAllEnergyConsumptions: Map<string, number>
   ): Map<string, number> {
@@ -233,7 +229,6 @@ export default function FlowPage() {
   }
 
   useEffect(() => {
-
     const success = restoreFlowFromJson();
     if (success === false) {
       createInitialNodes();
@@ -252,7 +247,7 @@ export default function FlowPage() {
 
     allElectro.forEach((electro) => {
       switch (electro.type) {
-        case "Consumer":
+        case "Consumer": {
           const consumer = electro as Consumer;
           consumer.hasEnergy = allEnergyConsumptions.has(consumer.id);
           consumer.totalVoltageDrop = calculateTotalVoltageDropPercent(
@@ -261,17 +256,23 @@ export default function FlowPage() {
             consumer.id
           );
           break;
-        case "Distributor":
+        }
+        default:
+          break;
+        case "Distributor": {
           const distributor = electro as Distributor;
           distributor.energyFlow = allEnergyConsumptions.get(electro.id) ?? 0;
           distributor.hasEnergy = allEnergyConsumptions.has(distributor.id);
-          distributor.apparentPower = allApparentPowers.get(distributor.id) ?? 0;
+          distributor.apparentPower =
+            allApparentPowers.get(distributor.id) ?? 0;
           break;
-        case "Producer":
+        }
+        case "Producer": {
           const producer = electro as Producer;
           producer.energyFlow = allEnergyConsumptions.get(producer.id) ?? 0;
           producer.apparentPower = allApparentPowers.get(producer.id) ?? 0;
           break;
+        }
       }
 
       updateElectroInterfaceNode(electro);
@@ -347,7 +348,12 @@ export default function FlowPage() {
           <ReactFlow.Controls />
           <ReactFlow.Panel position="top-right">
             <div className="flex flex-col gap-2">
-              <Button type="primary" onClick={() => window.open("https://thw-tools.de?ref=elektro", '_blank')}>
+              <Button
+                type="primary"
+                onClick={() =>
+                  window.open("https://thw-tools.de?ref=elektro", "_blank")
+                }
+              >
                 Mehr THW Tools
               </Button>
               <Button
@@ -357,39 +363,56 @@ export default function FlowPage() {
                 {showMenu ? "Close" : "Open"} Menu
               </Button>
 
-              <Button type="secondary" onClick={() => dialogContext?.setDialog(<InfoDialog />)}>
+              <Button
+                type="secondary"
+                onClick={() => dialogContext?.setDialog(<InfoDialog />)}
+              >
                 Info
               </Button>
               {nodes.length > 0 && (
                 <Button
                   type="secondary"
-                  onClick={
-                    () => dialogContext?.setDialog(<ConfirmDialog title="Löschen" question="Bist du dir sicher, dass du alle sichtbaren Nodes löschen möchtest?" onConfirm={deleteAll} />)
+                  onClick={() =>
+                    dialogContext?.setDialog(
+                      <ConfirmDialog
+                        title="Löschen"
+                        question="Bist du dir sicher, dass du alle sichtbaren Nodes löschen möchtest?"
+                        onConfirm={deleteAll}
+                      />
+                    )
                   }
                 >
                   Clear
                 </Button>
               )}
-              <Button type="secondary" onClick={() => {
-                onSave();
-                dialogContext?.setDialog(<Dialog header="Flow gespeichert">
-                  <div>
-                    Der Flow wurde erfolgreich gespeichert.
-                    Sobald die Seite neugeladen wird,
-                    wird der Flow wieder hergestellt.
-                  </div>
-                  <Button type="primary" onClick={() => dialogContext?.closeDialog()}>
-                    Okay
-                  </Button>
-                </Dialog>)
-              }}>Speichern</Button>
+              <Button
+                type="secondary"
+                onClick={() => {
+                  onSave();
+                  dialogContext?.setDialog(
+                    <Dialog header="Flow gespeichert">
+                      <div>
+                        Der Flow wurde erfolgreich gespeichert. Sobald die Seite
+                        neugeladen wird, wird der Flow wieder hergestellt.
+                      </div>
+                      <Button
+                        type="primary"
+                        onClick={() => dialogContext?.closeDialog()}
+                      >
+                        Okay
+                      </Button>
+                    </Dialog>
+                  );
+                }}
+              >
+                Speichern
+              </Button>
             </div>
           </ReactFlow.Panel>
           <ReactFlow.Panel position="bottom-center">
             <Footer />
           </ReactFlow.Panel>
         </ReactFlow.ReactFlow>
-
 
         {showMenu ? (
           <div className="w-screen h-screen flowmenu-small-width absolute md:relative ">
@@ -404,7 +427,9 @@ export default function FlowPage() {
                     )
                     .filter((id) => id != undefined) as string[]
                 }
-                addElectroInterfaceNodeCallback={(electro: ElectroInterface) => {
+                addElectroInterfaceNodeCallback={(
+                  electro: ElectroInterface
+                ) => {
                   addElectroInterfaceNode(electro, () => {
                     removeNode(electro.id);
                     triggerRecalculation();
