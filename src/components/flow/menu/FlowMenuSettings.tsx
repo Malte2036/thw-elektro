@@ -13,17 +13,17 @@ import ConfirmDialog from "../../ConfirmDialog";
 import * as ReactFlow from "reactflow";
 import { restoreFlow } from "../../../lib/flow/save";
 import { useRecalculateFlip } from "../recalculateFlipContext";
-import { AddCableEdgeFunctions } from "../../../FlowPage";
+import { FlowFunctions } from "../../../FlowPage";
 
 type FlowMenuSettingsProps = {
   openPredefinedPage: () => void;
   closeMenu: () => void;
-  addCableEdgeFunctions: AddCableEdgeFunctions;
+  flowFunctions: FlowFunctions;
 };
 
 export default function FlowMenuSettings({
   openPredefinedPage,
-  addCableEdgeFunctions,
+  flowFunctions,
 }: FlowMenuSettingsProps) {
   const [templateFile, setTemplateFile] = useState<File>();
   const [flowFile, setFlowFile] = useState<File>();
@@ -81,7 +81,7 @@ export default function FlowMenuSettings({
         flowFile
       );
       if (data) {
-        restoreFlow(data, flow.setNodes, flow.setEdges, addCableEdgeFunctions);
+        restoreFlow(data, flow.setNodes, flow.setEdges, flowFunctions);
         triggerRecalculation();
       }
     } catch (error) {

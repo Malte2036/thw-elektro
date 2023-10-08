@@ -36,6 +36,15 @@ import {
 import { restoreFlow } from "./lib/flow/save";
 import { useRecalculateFlip } from "./components/flow/recalculateFlipContext";
 
+export type FlowFunctions = {
+  addNodeFunctions: AddNodeFunctions;
+  addCableEdgeFunctions: AddCableEdgeFunctions;
+};
+
+export type AddNodeFunctions = {
+  deleteNode: (id: string) => void;
+};
+
 export type AddCableEdgeFunctions = {
   nextLength: (cable: Cable) => void;
   nextType: (cable: Cable) => void;
@@ -150,7 +159,7 @@ export default function FlowPage() {
     if (!flow) return false;
 
     console.log("restore Flow");
-    restoreFlow(flow, setNodes, setEdges, addCableEdgeFunctions);
+    restoreFlow(flow, setNodes, setEdges, flowFunctions);
 
     triggerRecalculation();
     return true;
@@ -180,10 +189,9 @@ export default function FlowPage() {
     }
 
     initialElectroInterfaceNodes.forEach((electro) => {
-      addElectroInterfaceNode(electro, () => {
-        removeNode(electro.id);
-        triggerRecalculation();
-      });
+      addElectroInterfaceNode(electro, () =>
+        flowFunctions.addNodeFunctions.deleteNode(electro.id)
+      );
     });
     recalculate();
   }
@@ -234,35 +242,44 @@ export default function FlowPage() {
     return voltageDrops;
   }
 
-  const addCableEdgeFunctions: AddCableEdgeFunctions = {
-    nextLength: (cable: Cable) => {
-      cable.nextLength();
-
-      updateCableEdge(cable);
-      triggerRecalculation();
+  const flowFunctions: FlowFunctions = {
+    addNodeFunctions: {
+      deleteNode: (id: string) => {
+        removeNode(id);
+        triggerRecalculation();
+      },
     },
-    nextType: (cable: Cable) => {
-      cable.nextPlug();
+    addCableEdgeFunctions: {
+      nextLength: (cable: Cable) => {
+        cable.nextLength();
 
-      updateCableEdge(cable);
+        updateCableEdge(cable);
+        triggerRecalculation();
+      },
+      nextType: (cable: Cable) => {
+        cable.nextPlug();
 
-      const targetNode = nodes.find((n) => n.id == cable.target);
-      if (targetNode) {
-        const electroInterface = (targetNode.data as ElectroInterfaceNodeProps)
-          .electroInterface;
-        if (electroInterface.type != "Producer") {
-          const electroInterfaceWithPlug =
-            electroInterface as ElectroInterfaceWithInputPlug;
-          electroInterfaceWithPlug.inputPlug = cable.plug;
-          updateElectroInterfaceNode(electroInterfaceWithPlug);
+        updateCableEdge(cable);
+
+        const targetNode = nodes.find((n) => n.id == cable.target);
+        if (targetNode) {
+          const electroInterface = (
+            targetNode.data as ElectroInterfaceNodeProps
+          ).electroInterface;
+          if (electroInterface.type != "Producer") {
+            const electroInterfaceWithPlug =
+              electroInterface as ElectroInterfaceWithInputPlug;
+            electroInterfaceWithPlug.inputPlug = cable.plug;
+            updateElectroInterfaceNode(electroInterfaceWithPlug);
+          }
         }
-      }
 
-      triggerRecalculation();
-    },
-    deleteEdge: (cable: Cable) => {
-      removeEdge(cable.id);
-      triggerRecalculation();
+        triggerRecalculation();
+      },
+      deleteEdge: (cable: Cable) => {
+        removeEdge(cable.id);
+        triggerRecalculation();
+      },
     },
   };
 
@@ -346,9 +363,9 @@ export default function FlowPage() {
           onConnect={(connection) => {
             addCableEdge(
               connection,
-              addCableEdgeFunctions.nextLength,
-              addCableEdgeFunctions.nextType,
-              addCableEdgeFunctions.deleteEdge,
+              flowFunctions.addCableEdgeFunctions.nextLength,
+              flowFunctions.addCableEdgeFunctions.nextType,
+              flowFunctions.addCableEdgeFunctions.deleteEdge,
               0
             );
             triggerRecalculation();
@@ -441,13 +458,12 @@ export default function FlowPage() {
                 addElectroInterfaceNodeCallback={(
                   electro: ElectroInterface
                 ) => {
-                  addElectroInterfaceNode(electro, () => {
-                    removeNode(electro.id);
-                    triggerRecalculation();
-                  });
+                  addElectroInterfaceNode(electro, () =>
+                    flowFunctions.addNodeFunctions.deleteNode(electro.id)
+                  );
                 }}
                 closeMenu={() => setShowMenu(false)}
-                addCableEdgeFunctions={addCableEdgeFunctions}
+                flowFunctions={flowFunctions}
               />
             }
           </div>
