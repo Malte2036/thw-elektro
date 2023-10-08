@@ -11,7 +11,7 @@
     "test": "jest --watch"
   },
   "dependencies": {
-    "@malte2036/thw-tools-components": "latest",
+    "@malte2036/thw-tools-components": "^0.1.0",
     "@webcomponents/webcomponentsjs": "^2.8.0",
     "dexie": "^3.2.4",
     "react": "^18.2.0",

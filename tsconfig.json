@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
-    "types": ["@webcomponents/webcomponentsjs"],
+    "types": [
+      "@webcomponents/webcomponentsjs",
+      "@malte2036/thw-tools-components"
+    ],
 
     "target": "ES2020",
     "useDefineForClassFields": true,
