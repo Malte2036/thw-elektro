@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as ReactFlow from "reactflow";
 
 import "reactflow/dist/style.css";
@@ -36,6 +36,8 @@ import {
 import { restoreFlow } from "./lib/flow/save";
 import { useRecalculateFlip } from "./components/flow/recalculateFlipContext";
 import { LabelNode } from "./components/flow/LabelNode";
+import GroupNode from "./components/flow/GroupNode";
+import { getNodePositionInsideParent } from "./components/flow/utils";
 
 export type FlowFunctions = {
   addNodeFunctions: AddNodeFunctions;
@@ -66,6 +68,7 @@ const selector = (state: RFState) => ({
   addElectroInterfaceNode: state.addElectroInterfaceNode,
   updateElectroInterfaceNode: state.updateElectroInterfaceNode,
   addLabelNode: state.addLabelNode,
+  addGroupNode: state.addGroupNode,
   deleteAll: state.deleteAll,
 });
 
@@ -76,6 +79,7 @@ export default function FlowPage() {
     () => ({
       electroInterfaceNode: ElectroInterfaceNode,
       labelNode: LabelNode,
+      groupNode: GroupNode,
     }),
     []
   );
@@ -140,6 +144,7 @@ export default function FlowPage() {
     addElectroInterfaceNode,
     updateElectroInterfaceNode,
     addLabelNode,
+    addGroupNode,
     deleteAll,
   } = useStore(selector, shallow);
 
@@ -201,8 +206,103 @@ export default function FlowPage() {
         flowFunctions.addNodeFunctions.deleteNode(electro.id)
       );
     });
+
+    addGroupNode();
+
     recalculate();
   }
+
+  const onNodeDragStop = (_: MouseEvent, node: ReactFlow.Node) => {
+    if (node.type !== "electroInterfaceNode" && !node.parentNode) {
+      return;
+    }
+    if (rfInstance == null) {
+      console.warn("rfInstance is null");
+      return;
+    }
+
+    const intersections = rfInstance!
+      .getIntersectingNodes(node)
+      .filter((n) => n.type === "groupNode");
+    const groupNode = intersections[0];
+
+    // when there is an intersection on drag stop, we want to attach the node to its new parent
+    if (intersections.length && node.parentNode !== groupNode?.id) {
+      const nextNodes: ReactFlow.Node[] = nodes.map((n) => {
+        if (n.id === groupNode.id) {
+          return {
+            ...n,
+            className: "",
+          };
+        } else if (n.id === node.id) {
+          const position = getNodePositionInsideParent(n, groupNode) ?? {
+            x: 0,
+            y: 0,
+          };
+
+          return {
+            ...n,
+            position,
+            parentNode: groupNode.id,
+            // we need to set dragging = false, because the internal change of the dragging state
+            // is not applied yet, so the node would be rendered as dragging
+            dragging: false,
+            extent: "parent" as "parent",
+          };
+        }
+
+        return n;
+      });
+      //.sort(sortNodes);
+
+      setNodes(nextNodes);
+    }
+  };
+
+  const onNodeDrag = (_: MouseEvent, node: ReactFlow.Node) => {
+    console.log("drag stop");
+
+    console.log(node.type, node.parentNode);
+
+    if (node.type !== "electroInterfaceNode" && !node.parentNode) {
+      return;
+    }
+
+    if (rfInstance == null) {
+      console.warn("rfInstance is null");
+      return;
+    }
+
+    const intersections = rfInstance!
+      .getIntersectingNodes(node)
+      .filter((n) => n.type === "groupNode");
+    const groupClassName =
+      intersections.length && node.parentNode !== intersections[0]?.id
+        ? "active"
+        : "";
+
+    console.log("groupClassName", groupClassName);
+    console.log("intersections", intersections);
+
+    const updatedNodes = nodes
+      .map((n) => {
+        if (n.type === "groupNode") {
+          return {
+            ...n,
+            className: groupClassName,
+          };
+        } else if (n.id === node.id) {
+          return {
+            ...n,
+            position: node.position,
+          };
+        }
+        return { ...n };
+      })
+      .filter((n) => n != undefined) as ReactFlow.Node[];
+
+    setNodes(updatedNodes);
+  };
 
   function getEnergyConsumptions(): Map<string, number> {
     const allElectro = getAllElectro();
@@ -380,6 +480,8 @@ export default function FlowPage() {
             );
             triggerRecalculation();
           }}
+          onNodeDrag={onNodeDrag}
+          onNodeDragStop={onNodeDragStop}
           fitView
         >
           <ReactFlow.Background />

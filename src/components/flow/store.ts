@@ -41,6 +41,7 @@ export type RFState = {
   ) => void;
   updateElectroInterfaceNode: (electroInterface: ElectroInterface) => void;
   addLabelNode: (label: string) => void;
+  addGroupNode: () => void;
   deleteAll: () => void;
 };
 
@@ -223,6 +224,19 @@ const useStore = create<RFState>((set, get) => ({
     };
     set({
       nodes: [...get().nodes, labelNode],
+    });
+  },
+
+  addGroupNode: () => {
+    const groupNode = {
+      id: "group-" + Date.now(),
+      type: "groupNode",
+      position: { x: 0, y: 0 },
+      data: {},
+      draggable: true,
+    };
+    set({
+      nodes: [...get().nodes, groupNode],
     });
   },
   deleteAll: () => {
