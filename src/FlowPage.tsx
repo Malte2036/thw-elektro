@@ -383,7 +383,7 @@ export default function FlowPage() {
           fitView
         >
           <ReactFlow.Background />
-          <ReactFlow.Controls />
+          <ReactFlow.Controls onFitView={rfInstance?.fitView} />
           <ReactFlow.Panel position="top-right">
             <div className="flex flex-col gap-2">
               <Button
