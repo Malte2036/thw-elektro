@@ -20,11 +20,10 @@ export default function ConfirmDialog({
   const dialogContent = useDialogContext();
 
   return (
-    <Dialog header={title}>
-      <div className="flex flex-col gap-2">
-        {question}
-        {children}
-        <div className="flex flex-row gap-2 w-full justify-between">
+    <Dialog
+      title={title}
+      footer={
+        <>
           <Button
             type="primary"
             onClick={() => {
@@ -43,7 +42,13 @@ export default function ConfirmDialog({
           >
             <span className="block min-width-3">Nein</span>
           </Button>
-        </div>
+        </>
+      }
+    >
+      <div className="flex flex-col gap-2">
+        {question}
+        {children}
+        <div className="flex flex-row gap-2 w-full justify-between"></div>
       </div>
     </Dialog>
   );

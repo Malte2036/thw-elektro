@@ -12,12 +12,12 @@
   },
   "dependencies": {
     "@lit/react": "^1.0.3",
+    "@malte2036/thw-tools-components": "^0.2.6",
     "dexie": "^3.2.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
-    "reactflow": "^11.8.3",
-    "@malte2036/thw-tools-components": "../thw-tools-components"
+    "reactflow": "^11.8.3"
   },
   "devDependencies": {
     "@types/jest": "^29.5.3",

@@ -8,7 +8,6 @@ import { Cable } from "../../lib/data/Cable";
 import { isVoltageDropTooHigh } from "../../lib/calculation/voltageDrop";
 import Button from "../../components/Button";
 import { formatNumberWithMaxTwoDecimals } from "../../lib/utils";
-import React from "react";
 
 export type CableEdgeData = {
   cable: Cable;

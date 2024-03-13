@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import * as ReactFlow from "reactflow";
 
 import "reactflow/dist/style.css";
@@ -25,7 +25,6 @@ import {
 } from "./components/flow/ElectroInterfaceNode";
 import Button from "./components/Button";
 import { useDialogContext } from "./hooks/useDialog";
-import InfoDialog from "./components/InfoDIalog";
 import Footer from "./components/Footer";
 import ConfirmDialog from "./components/ConfirmDialog";
 import Dialog from "./components/Dialog";
@@ -36,6 +35,7 @@ import {
 import { restoreFlow } from "./lib/flow/save";
 import { useRecalculateFlip } from "./components/flow/recalculateFlipContext";
 import { LabelNode } from "./components/flow/LabelNode";
+import InfoDialog from "./components/InfoDialog";
 
 export type FlowFunctions = {
   addNodeFunctions: AddNodeFunctions;
@@ -431,17 +431,21 @@ export default function FlowPage() {
                 onClick={() => {
                   onSave();
                   dialogContext?.setDialog(
-                    <Dialog header="Flow gespeichert">
+                    <Dialog
+                      title="Flow gespeichert"
+                      footer={
+                        <Button
+                          type="primary"
+                          onClick={() => dialogContext?.closeDialog()}
+                        >
+                          Okay
+                        </Button>
+                      }
+                    >
                       <div>
                         Der Flow wurde erfolgreich gespeichert. Sobald die Seite
                         neugeladen wird, wird der Flow wieder hergestellt.
                       </div>
-                      <Button
-                        type="primary"
-                        onClick={() => dialogContext?.closeDialog()}
-                      >
-                        Okay
-                      </Button>
                     </Dialog>
                   );
                 }}

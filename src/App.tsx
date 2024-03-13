@@ -1,5 +1,5 @@
 import FlowPage from "./FlowPage";
-import React, { ReactNode, useState } from "react";
+import { ReactNode, useState } from "react";
 import { DialogContext } from "./hooks/useDialog";
 import { Helmet } from "react-helmet";
 import { RecalculateFlipProvider } from "./components/flow/recalculateFlipContext";
