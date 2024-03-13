@@ -8,6 +8,7 @@ import { Cable } from "../../lib/data/Cable";
 import { isVoltageDropTooHigh } from "../../lib/calculation/voltageDrop";
 import Button from "../../components/Button";
 import { formatNumberWithMaxTwoDecimals } from "../../lib/utils";
+import React from "react";
 
 export type CableEdgeData = {
   cable: Cable;
@@ -49,6 +50,7 @@ export default function CableEdge(edgeProps: EdgeProps<CableEdgeData>) {
             <div className="flex flex-row gap-1 absolute -top-8">
               <Button
                 type="secondary"
+                size="small"
                 onClick={() => {
                   return edgeProps.data?.nextLength(edgeProps.data.cable);
                 }}
@@ -57,12 +59,14 @@ export default function CableEdge(edgeProps: EdgeProps<CableEdgeData>) {
               </Button>
               {/*<Button
                 type="secondary"
+                size="small"
                 onClick={() => edgeProps.data?.nextType(edgeProps.data.cable)}
               >
                 Type
           </Button>*/}
               <Button
                 type="secondary"
+                size="small"
                 onClick={() => edgeProps.data?.deleteEdge(edgeProps.data.cable)}
               >
                 Delete

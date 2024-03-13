@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import * as ReactFlow from "reactflow";
 
 import "reactflow/dist/style.css";
@@ -383,9 +383,12 @@ export default function FlowPage() {
           fitView
         >
           <ReactFlow.Background />
-          <ReactFlow.Controls onFitView={rfInstance?.fitView} showInteractive={false} />
+          <ReactFlow.Controls
+            onFitView={rfInstance?.fitView}
+            showInteractive={false}
+          />
           <ReactFlow.Panel position="top-right">
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 grow">
               <Button
                 type="primary"
                 onClick={() =>

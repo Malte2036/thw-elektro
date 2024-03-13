@@ -1,23 +1,37 @@
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
+import { createComponent } from "@lit/react";
+import { THWButton } from "@malte2036/thw-tools-components";
+
+const THWButtonComponent = createComponent({
+  elementClass: THWButton,
+  react: React,
+  tagName: "thw-button",
+  displayName: "THWButton",
+});
 
 type ButtonProps = {
   children: ReactNode;
   type: "primary" | "secondary";
+  size?: "small" | "medium" | "large";
   onClick: () => void;
   disabled?: boolean;
 };
 
-export default function Button({ children, type, onClick, disabled }: ButtonProps) {
+export default function Button({
+  children,
+  type,
+  size,
+  onClick,
+  disabled,
+}: ButtonProps) {
   return (
-    <button
-      className={`${type == "primary"
-        ? "bg-thw text-white hover:bg-thw-800"
-        : "border-2 border-thw bg-white hover:bg-thw-100 text-thw disabled:text-gray-400 disabled:border-gray-400"
-        } rounded-md px-2 py-1`}
+    <THWButtonComponent
+      type={type}
+      disabled={disabled ?? false}
+      size={size ?? "medium"}
       onClick={onClick}
-      disabled={disabled}
     >
       {children}
-    </button>
+    </THWButtonComponent>
   );
 }
