@@ -3,7 +3,8 @@ import { createComponent } from "@lit/react";
 import { THWButton } from "@malte2036/thw-tools-components";
 
 const THWButtonComponent = createComponent({
-  elementClass: THWButton,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  elementClass: THWButton as any,
   react: React,
   tagName: "thw-button",
   displayName: "THWButton",
@@ -17,21 +18,15 @@ type ButtonProps = {
   disabled?: boolean;
 };
 
-export default function Button({
-  children,
-  type,
-  size,
-  onClick,
-  disabled,
-}: ButtonProps) {
+export default function Button(props: ButtonProps) {
+  const buttonProps = {
+    type: props.type ?? "primary",
+    disabled: props.disabled ?? false,
+    size: props.size ?? "medium",
+    onClick: props.onClick,
+  };
+
   return (
-    <THWButtonComponent
-      type={type}
-      disabled={disabled ?? false}
-      size={size ?? "medium"}
-      onClick={onClick}
-    >
-      {children}
-    </THWButtonComponent>
+    <THWButtonComponent {...buttonProps}>{props.children}</THWButtonComponent>
   );
 }

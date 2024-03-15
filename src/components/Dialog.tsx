@@ -3,7 +3,8 @@ import { THWDialog } from "@malte2036/thw-tools-components";
 import React, { ReactNode } from "react";
 
 const THWDialogComponent = createComponent({
-  elementClass: THWDialog,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  elementClass: THWDialog as any,
   react: React,
   tagName: "thw-dialog",
   displayName: "THWDialog",

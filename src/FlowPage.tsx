@@ -27,7 +27,7 @@ import Button from "./components/Button";
 import { useDialogContext } from "./hooks/useDialog";
 import Footer from "./components/Footer";
 import ConfirmDialog from "./components/ConfirmDialog";
-import Dialog from "./components/Dialog";
+import InfoDialog from "./components/InfoDialog";
 import {
   calculateTotalVoltageDropPercent,
   getVoltageDropForCableData,
@@ -35,7 +35,7 @@ import {
 import { restoreFlow } from "./lib/flow/save";
 import { useRecalculateFlip } from "./components/flow/recalculateFlipContext";
 import { LabelNode } from "./components/flow/LabelNode";
-import InfoDialog from "./components/InfoDialog";
+import Dialog from "./components/Dialog";
 
 export type FlowFunctions = {
   addNodeFunctions: AddNodeFunctions;
