@@ -1,6 +1,7 @@
 import { createComponent } from "@lit/react";
 import { THWDialog } from "@malte2036/thw-tools-components";
 import React, { ReactNode } from "react";
+import { useDialogContext } from "../hooks/useDialog";
 
 const THWDialogComponent = createComponent({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -17,8 +18,15 @@ type DialogProps = {
 };
 
 export default function Dialog({ title, children, footer }: DialogProps) {
+  const dialogContext = useDialogContext();
+
+  const dialogProps = {
+    title,
+    onOutsideClick: dialogContext?.closeDialog,
+  };
+
   return (
-    <THWDialogComponent title={title}>
+    <THWDialogComponent {...dialogProps}>
       <slot slot="content">{children}</slot>
       {footer && <slot slot="footer">{footer}</slot>}
     </THWDialogComponent>
