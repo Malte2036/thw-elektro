@@ -8,9 +8,6 @@ RUN npm prune --production
 
 FROM nginx:stable-alpine
 WORKDIR /app
-COPY --from=builder /app/dist dist/
-COPY --from=builder /app/node_modules node_modules/
-COPY package.json .
-EXPOSE 3000
-ENV NODE_ENV=production
+COPY --from=builder /app/dist /usr/share/nginx/html
+EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
