@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: thw-elektro
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: thw-elektro
+  template:
+    metadata:
+      labels:
+        app: thw-elektro
+    spec:
+      containers:
+        - name: thw-elektro
+          image: ghcr.io/malte2036/thw-elektro:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+      imagePullSecrets:
+        - name: github-container-registry
