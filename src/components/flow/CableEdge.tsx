@@ -9,6 +9,8 @@ import { getPlugLabel } from "../../lib/data/Plug";
 import { isVoltageDropTooHigh } from "../../lib/calculation/voltageDrop";
 import Button from "../../components/Button";
 import { formatNumberWithMaxTwoDecimals } from "../../lib/utils";
+import { useDialogContext } from "../../hooks/useDialog";
+import CableSettingsDialog from "../CableSettingsDialog";
 
 export type CableEdgeData = {
   cable: Cable;
@@ -18,6 +20,7 @@ export type CableEdgeData = {
 };
 
 export default function CableEdge(edgeProps: EdgeProps<CableEdgeData>) {
+  const dialogContext = useDialogContext();
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX: edgeProps.sourceX,
     sourceY: edgeProps.sourceY,
@@ -47,23 +50,18 @@ export default function CableEdge(edgeProps: EdgeProps<CableEdgeData>) {
           className="nodrag nopan flex flex-col gap-1 items-center"
         >
           {edgeProps.selected && (
-            <div className="flex flex-row gap-1 absolute -top-8">
+            <div className="flex flex-row gap-1 absolute -top-8 w-max">
               <Button
                 type="secondary"
                 size="small"
                 onClick={() => {
-                  return edgeProps.data?.nextLength(edgeProps.data.cable);
+                  dialogContext?.setDialog(
+                    <CableSettingsDialog cable={edgeProps.data!.cable} />
+                  );
                 }}
               >
                 Länge
               </Button>
-              {/*<Button
-                type="secondary"
-                size="small"
-                onClick={() => edgeProps.data?.nextType(edgeProps.data.cable)}
-              >
-                Type
-              </Button>*/}
               <Button
                 type="secondary"
                 size="small"

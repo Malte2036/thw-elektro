@@ -65,6 +65,23 @@ describe("calculateVoltageDrop", () => {
       3
     );
   });
+
+  it("should calculate voltage drop correctly for a custom decimal cable length (e.g. 12.5m)", () => {
+    const cable = new Cable(
+      "cable-test",
+      12.5,
+      { current: 16, voltage: 400 },
+      "",
+      ""
+    );
+    const energyConsumption = 5000;
+    // length = 12.5m, resistance = 56, diameter = 2.5, voltage = 400
+    // drop = (12.5 * 5000) / (56 * 2.5 * 400^2) * 100 = 62,500 / 22,400,000 * 100 = 0.279%
+    expect(calculateVoltageDropPercent(cable, energyConsumption)).toBeCloseTo(
+      0.279,
+      3
+    );
+  });
 });
 
 
