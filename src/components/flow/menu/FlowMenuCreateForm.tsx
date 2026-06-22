@@ -1,10 +1,11 @@
 import { useState } from "react";
 import FlowMenuItem from "./FlowMenuItem";
 import { ElectroType, translateElectroType } from "../../../lib/data/Electro";
-import { Plug, allPossiblePlugs } from "../../../lib/data/Plug";
+import { Plug, allPossiblePlugs, getPlugLabel } from "../../../lib/data/Plug";
 import { Predefined } from "../../../lib/data/Predefined";
 import Button from "../../Button";
 import { generateId } from "../../../lib/utils";
+
 
 type FlowMenuCreateFormProps = {
   electroType: ElectroType;
@@ -132,7 +133,7 @@ export default function FlowMenuCreateForm({
           >
             {allPossiblePlugs.map((plug, index) => (
               <option key={index} value={index}>
-                {`${plug.voltage}V/${plug.current}A`}
+                {getPlugLabel(plug)}
               </option>
             ))}
           </select>

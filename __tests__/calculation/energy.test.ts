@@ -12,20 +12,30 @@ import { Cable } from "../../src/lib/data/Cable";
 import { Consumer } from "../../src/lib/data/Consumer";
 import { Distributor } from "../../src/lib/data/Distributor";
 import { ElectroInterface } from "../../src/lib/data/Electro";
-import { Plug } from "../../src/lib/data/Plug";
+import { Plug, getPlugLabel } from "../../src/lib/data/Plug";
 import { Producer } from "../../src/lib/data/Producer";
 import { toTargetSourceString } from "../../src/lib/utils";
 
-describe("calculatePowerInWatt", () => {
-  it("", () => {
-    const plug: Plug = { current: 16, voltage: 230 };
 
+describe("calculatePowerInWatt", () => {
+  it("should calculate power correctly for 230V 16A", () => {
+    const plug: Plug = { current: 16, voltage: 230 };
     expect(calculatePowerInWatt(plug)).toEqual(3680);
+  });
+
+  it("should calculate power correctly for 400V 288A (4x 95mm²)", () => {
+    const plug: Plug = { current: 288, voltage: 400 };
+    expect(calculatePowerInWatt(plug)).toBeCloseTo(199532, 0); // 400 * 288 * sqrt(3)
+  });
+
+  it("should calculate power correctly for 400V 400A (4x 120mm²)", () => {
+    const plug: Plug = { current: 400, voltage: 400 };
+    expect(calculatePowerInWatt(plug)).toBeCloseTo(277128, 0); // 400 * 400 * sqrt(3)
   });
 });
 
 describe("calculateVoltageDrop", () => {
-  it("", () => {
+  it("should calculate voltage drop correctly for standard CEE 16A cable", () => {
     const cable = new Cable(
       "cable-test",
       75,
@@ -38,7 +48,25 @@ describe("calculateVoltageDrop", () => {
       1.67
     );
   });
+
+  it("should calculate voltage drop correctly for 4x 95mm² (288A) cable", () => {
+    const cable = new Cable(
+      "cable-test",
+      75,
+      { current: 288, voltage: 400 },
+      "",
+      ""
+    );
+    const energyConsumption = 100000; // 100 kW load
+    // length = 75m, resistance = 56, diameter = 95.0, voltage = 400
+    // drop = (75 * 100000) / (56 * 95 * 400^2) * 100 = 7,500,000 / 851,200,000 * 100 = 0.881%
+    expect(calculateVoltageDropPercent(cable, energyConsumption)).toBeCloseTo(
+      0.881,
+      3
+    );
+  });
 });
+
 
 describe("calculateTotalVoltageDropPercent", () => {
   it("", () => {
@@ -250,36 +278,23 @@ describe("energy consumption", () => {
     expect(consumer.getApparentPower() / 1000).toBeCloseTo(5.06, 2);
     expect(consumer.getReactivePower() / 1000).toBeCloseTo(3.916, 2);
   });
-
-  /*describe("getReactivePower distributor", () => {
-    const consumer = new Consumer(
-      "consumer-1",
-      undefined,
-      { x: 0, y: 0 },
-      3200,
-      7.3,
-      undefined,
-      { current: 16, voltage: 400 }
-    );
-    const consumer2 = new Consumer(
-      "consumer-2",
-      undefined,
-      { x: 0, y: 0 },
-      5300,
-      9.3,
-      undefined,
-      { current: 16, voltage: 400 }
-    );
-    const distributor = new Distributor(
-      "distributor-1",
-      undefined,
-      { x: 0, y: 0 },
-      undefined,
-      { current: 32, voltage: 400 }
-    );
-
-    expect(
-      distributor.getApparentPower([consumer, consumer2]) / 1000
-    ).toBeCloseTo(11.39, 2);
-  });*/
 });
+
+describe("getPlugLabel", () => {
+  it("should return format 230V/16A for normal single-phase plugs", () => {
+    expect(getPlugLabel({ voltage: 230, current: 16 })).toEqual("230V/16A");
+  });
+
+  it("should return format 400V/63A for standard CEE plugs", () => {
+    expect(getPlugLabel({ voltage: 400, current: 63 })).toEqual("400V/63A");
+  });
+
+  it("should return 400V 95mm² for current 288A at 400V", () => {
+    expect(getPlugLabel({ voltage: 400, current: 288 })).toEqual("400V 95mm²");
+  });
+
+  it("should return 400V 120mm² for current 400A at 400V", () => {
+    expect(getPlugLabel({ voltage: 400, current: 400 })).toEqual("400V 120mm²");
+  });
+});
+

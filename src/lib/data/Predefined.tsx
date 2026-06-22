@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { ElectroInterface, ElectroType } from "./Electro";
-import { Plug } from "./Plug";
+import { Plug, getPlugLabel } from "./Plug";
 import { formatNumberWithMaxTwoDecimals } from "../utils";
 import { Consumer } from "./Consumer";
 import { Distributor } from "./Distributor";
@@ -63,9 +63,10 @@ export function getBodyFromPredefined(predefined: Predefined): ReactNode {
       ""
     ) : (
       <div>
-        Input Stecker: {plug.voltage}V/{plug.current}A
+        Input Stecker: {getPlugLabel(plug)}
       </div>
     );
+
 
   switch (predefined.type) {
     case "Consumer":

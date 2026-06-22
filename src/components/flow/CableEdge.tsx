@@ -5,6 +5,7 @@ import {
   getBezierPath,
 } from "reactflow";
 import { Cable } from "../../lib/data/Cable";
+import { getPlugLabel } from "../../lib/data/Plug";
 import { isVoltageDropTooHigh } from "../../lib/calculation/voltageDrop";
 import Button from "../../components/Button";
 import { formatNumberWithMaxTwoDecimals } from "../../lib/utils";
@@ -62,7 +63,7 @@ export default function CableEdge(edgeProps: EdgeProps<CableEdgeData>) {
                 onClick={() => edgeProps.data?.nextType(edgeProps.data.cable)}
               >
                 Type
-          </Button>*/}
+              </Button>*/}
               <Button
                 type="secondary"
                 size="small"
@@ -81,8 +82,7 @@ export default function CableEdge(edgeProps: EdgeProps<CableEdgeData>) {
           >
             <div>{edgeProps.data?.cable.length}m</div>
             <div>
-              {edgeProps.data?.cable.plug.voltage}V/
-              {edgeProps.data?.cable.plug.current}A
+              {edgeProps.data?.cable.plug && getPlugLabel(edgeProps.data.cable.plug)}
             </div>
             <div>
               {formatNumberWithMaxTwoDecimals(
@@ -96,3 +96,4 @@ export default function CableEdge(edgeProps: EdgeProps<CableEdgeData>) {
     </>
   );
 }
+
