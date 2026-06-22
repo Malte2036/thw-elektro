@@ -8,13 +8,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - name: Use Node.js 18
-        uses: actions/setup-node@v1
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
         with:
-          node-version: 18
+          version: 11
 
-      - run: npm ci
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
 
-      - run: npm test
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm test
