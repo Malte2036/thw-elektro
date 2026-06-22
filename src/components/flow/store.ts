@@ -155,10 +155,24 @@ const useStore = create<RFState>((set, get) => ({
     set({
       edges: get().edges.map((edge) => {
         if (edge.id === cable.id) {
+          const current = cable.getCurrent();
+          const maxCurrent = cable.plug.current;
+
+          let style: React.CSSProperties = {};
+          if (current > 0) {
+            const loadRatio = current / maxCurrent;
+            const duration = Math.max(0.3, Math.min(3.0, 1.5 / loadRatio));
+            style = {
+              animationDuration: `${duration.toFixed(2)}s`,
+            };
+          }
+
           edge.data = {
             ...edge.data,
             cable,
           };
+          edge.animated = cable.apparentPower > 0;
+          edge.style = style;
         }
         return edge;
       }),

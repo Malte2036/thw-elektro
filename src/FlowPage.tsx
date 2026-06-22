@@ -345,9 +345,20 @@ export default function FlowPage() {
 
     allCables.forEach((c) => {
       const voltageDrop = voltageDrops.get(c.toTargetSourceString()) ?? 0;
-      if (voltageDrop == c.voltageDrop) return;
+      const activePower = allEnergyConsumptions.get(c.target) ?? 0;
+      const apparentPower = allApparentPowers.get(c.target) ?? 0;
+
+      if (
+        voltageDrop === c.voltageDrop &&
+        activePower === c.activePower &&
+        apparentPower === c.apparentPower
+      ) {
+        return;
+      }
 
       c.voltageDrop = voltageDrop;
+      c.activePower = activePower;
+      c.apparentPower = apparentPower;
 
       updateCableEdge(c);
     });

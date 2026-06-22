@@ -12,6 +12,8 @@ export class Cable {
   public readonly target: string;
 
   public voltageDrop: number;
+  public activePower: number;
+  public apparentPower: number;
 
   constructor(
     id: string,
@@ -19,7 +21,9 @@ export class Cable {
     plug: Plug,
     source: string,
     target: string,
-    voltageDrop: number = 0
+    voltageDrop: number = 0,
+    activePower: number = 0,
+    apparentPower: number = 0
   ) {
     this.id = id;
     this.length = length;
@@ -27,6 +31,8 @@ export class Cable {
     this.source = source;
     this.target = target;
     this.voltageDrop = voltageDrop;
+    this.activePower = activePower;
+    this.apparentPower = apparentPower;
   }
 
   static fromJSON(json: {
@@ -36,6 +42,8 @@ export class Cable {
     source: string;
     target: string;
     voltageDrop: number;
+    activePower?: number;
+    apparentPower?: number;
   }): Cable {
     return new Cable(
       json.id,
@@ -43,7 +51,9 @@ export class Cable {
       json.plug,
       json.source,
       json.target,
-      json.voltageDrop
+      json.voltageDrop,
+      json.activePower ?? 0,
+      json.apparentPower ?? 0
     );
   }
 
@@ -58,7 +68,9 @@ export class Cable {
       this.plug === other.plug &&
       this.source === other.source &&
       this.target === other.target &&
-      this.voltageDrop === other.voltageDrop
+      this.voltageDrop === other.voltageDrop &&
+      this.activePower === other.activePower &&
+      this.apparentPower === other.apparentPower
     );
   }
 
@@ -68,6 +80,15 @@ export class Cable {
 
   nextPlug(): void {
     this.plug = getNextCablePlug(this.plug);
+  }
+
+  getCurrent(): number {
+    if (this.apparentPower === 0) return 0;
+    if (this.plug.voltage === 230) {
+      return this.apparentPower / 230;
+    }
+    // For 400V 3-phase: I = S / (U * sqrt(3))
+    return this.apparentPower / (400 * Math.sqrt(3));
   }
 }
 
